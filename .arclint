@@ -9,7 +9,7 @@
     },
     "PHP Codesniffer": {
       "type": "phpcs",
-      "bin": "vendor/bin/phpcs",
+      "bin": ["vendor/bin/phpcs", "phpcs"],
       "flags": ["--standard=TYPO3CMS"],
       "include": "(\\.php$)",
       "severity": {
