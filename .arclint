@@ -13,7 +13,8 @@
       "flags": ["--standard=TYPO3CMS"],
       "include": "(\\.php$)",
       "severity": {
-        "PHPCS.E.TYPO3SniffPool.Files.FileExtension.WrongFileExtension": "disabled"
+        "PHPCS.E.TYPO3SniffPool.Files.FileExtension.WrongFileExtension": "disabled",
+        "PHPCS.E.TYPO3.Files.LowercasedFilename": "disabled"
       }
     },
     "English spelling": {
