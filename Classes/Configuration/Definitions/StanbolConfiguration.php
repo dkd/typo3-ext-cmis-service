@@ -1,6 +1,11 @@
 <?php
 namespace Dkd\CmisService\Configuration\Definitions;
 
-class StanbolConfiguration implements ConfigurationDefinitionInterface {
+/**
+ * Stanbol Configuration Definition
+ *
+ * @package Dkd\CmisService\Configuration\Definitions
+ */
+class StanbolConfiguration extends AbstractConfigurationDefinition implements ConfigurationDefinitionInterface {
 
 }
