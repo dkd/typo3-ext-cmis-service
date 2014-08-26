@@ -3,26 +3,26 @@ namespace Dkd\CmisService\Queue;
 
 use Dkd\CmisService\Task\TaskInterface;
 
-class AbstractWorker {
+/**
+ * Worker base class
+ *
+ * Contains the most basic possible implementation of
+ * a Task + Execution based task handling.
+ *
+ * @package Dkd\CmisService\Queue
+ */
+abstract class AbstractWorker implements WorkerInterface {
 
 	/**
-	 * @var TaskInterface
-	 */
-	protected $task;
-
-	/**
+	 * Execute Task given in argument by internally resolving
+	 * an Execution befitting the Task and then executing
+	 * the Task via this Execution.
+	 *
 	 * @param TaskInterface $task
-	 * @return void
+	 * @return Result
 	 */
-	public function setTask(TaskInterface $task) {
-		$this->task = $task;
-	}
-
-	/**
-	 * @return TaskInterface
-	 */
-	public function getTask() {
-		return $this->task;
+	public function execute(TaskInterface $task) {
+		return $task->resolveExecutionObject()->execute($task);
 	}
 
 }
