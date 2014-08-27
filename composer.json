@@ -5,6 +5,21 @@
     "keywords": ["cmis", "typo3"],
     "homepage": "https://phabricator.dkd.de/diffusion/EXTCMISS/",
     "license": "GPL-2.0",
+    "autoload": {
+        "classmap": [
+            "Classes/",
+            "vendor/typo3/cms"
+        ]
+    },
+    "replace": {
+        "typo3/cms-composer-installers": "*"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://composer.typo3.org/"
+        }
+    ],
     "authors": [
         {
             "name": "Sascha Egerer",
@@ -16,6 +31,7 @@
         "squizlabs/php_codesniffer": "1.*",
         "phpunit/phpunit": "4.1.*",
         "typo3-ci/typo3sniffpool": "dev-master",
-        "typo3-ci/typo3cms": "dev-master"
+        "typo3-ci/typo3cms": "dev-master",
+        "typo3/cms": "~6.2.4"
     }
 }
