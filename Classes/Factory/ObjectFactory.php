@@ -21,6 +21,21 @@ class ObjectFactory {
 	 * Make an instance of $className, if any additional parameters
 	 * are present they will be used as constructor arguments.
 	 *
+	 * Note about potential porting to other frameworks:
+	 *
+	 * Some classes implement the SingletonInterface from this
+	 * package which, in this TYPO3 CMS implementation context
+	 * simply extends the framework's own SingletonInterface
+	 * which, because this method also uses the TYPO3 CMS native
+	 * way of creating new object instances, means that Singletons
+	 * are supported without further code. Should any other
+	 * implementation wish to support Singletons it can either
+	 * use the same approach as this, to leverage the framework's
+	 * Singletons if they exist - or, as a manual implementation
+	 * of Singletons, store these instances in some registry if
+	 * it implements this interface and then check this registry
+	 * to be able to return the same instance in subsequent calls.
+	 *
 	 * @param string $className
 	 * @return mixed
 	 */
