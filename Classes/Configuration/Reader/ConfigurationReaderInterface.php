@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Configuration\Reader;
 
+use Dkd\CmisService\Configuration\ConfigurationResourceConsumerInterface;
 use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
 
 /**
@@ -13,7 +14,7 @@ use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
  *
  * @package Dkd\CmisService\Configuration\Reader
  */
-interface ConfigurationReaderInterface {
+interface ConfigurationReaderInterface extends ConfigurationResourceConsumerInterface {
 
 	/**
 	 * Load the specified resource into the reader.

@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Configuration\Writer;
 
+use Dkd\CmisService\Configuration\ConfigurationResourceConsumerInterface;
 use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
 
 /**
@@ -10,12 +11,15 @@ use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
  *
  * @package Dkd\CmisService\Configuration\Definitions
  */
-interface ConfigurationWriterInterface {
+interface ConfigurationWriterInterface extends ConfigurationResourceConsumerInterface {
 
 	/**
+	 * Writes the definition to the resource.
+	 *
 	 * @param ConfigurationDefinitionInterface $configuration
+	 * @param string $resourceIdentifier
 	 * @return boolean
 	 */
-	public function write(ConfigurationDefinitionInterface $configuration);
+	public function write(ConfigurationDefinitionInterface $configuration, $resourceIdentifier);
 
 }

@@ -1,68 +1,65 @@
 <?php
-namespace Dkd\CmisService\Configuration\Writer;
+namespace Dkd\CmisService\Tests\Fixtures\Configuration;
 
 use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
+use Dkd\CmisService\Configuration\Writer\ConfigurationWriterInterface;
 
 /**
- * YAML-based Configuration Writer
- *
- * Writes a ConfigurationDefinition to a YAML file target.
- *
- * @package Dkd\CmisService\Configuration\Writer
+ * Class DummyWriter
  */
-class YamlConfigurationWriter implements ConfigurationWriterInterface {
+class DummyWriter implements ConfigurationWriterInterface {
 
 	/**
+	 * DummyWriter never writes anything and always
+	 * responds TRUE for success unless mocked.
+	 *
 	 * @param ConfigurationDefinitionInterface $configuration
 	 * @param string $resourceIdentifier
 	 * @return boolean
 	 */
 	public function write(ConfigurationDefinitionInterface $configuration, $resourceIdentifier) {
-
+		return TRUE;
 	}
 
 	/**
-	 * Load the specified YAML file and parse it into
-	 * memory.
+	 * Always returns NULL unless mocked.
 	 *
 	 * @param string $resourceIdentifier
 	 * @return mixed
 	 */
 	public function read($resourceIdentifier) {
-
+		return NULL;
 	}
 
 	/**
-	 * Returns TRUE if the resource YAML file exists
+	 * Always returns FALSE unless mocked.
 	 *
 	 * @param string $resourceIdentifier
 	 * @return boolean
 	 */
 	public function exists($resourceIdentifier) {
-
+		return FALSE;
 	}
 
 	/**
-	 * Performs a checksum calculation of the resource
-	 * identifier (file checksum of YAML file)
+	 * Always returns same value as $resourceIdentifier
+	 * unless mocked.
 	 *
 	 * @param string $resourceIdentifier
 	 * @return string
 	 */
 	public function checksum($resourceIdentifier) {
-
+		return $resourceIdentifier;
 	}
 
 	/**
-	 * Returns a DateTime instance reflecting the last
-	 * modification date of the resource identified in
-	 * the argument.
+	 * Always returns a UNIXTIME zero DateTime.
 	 *
 	 * @param string $resourceIdentifier
 	 * @return \DateTime
 	 */
 	public function lastModified($resourceIdentifier) {
-
+		return \DateTime::createFromFormat('U', '0');
 	}
 
 }

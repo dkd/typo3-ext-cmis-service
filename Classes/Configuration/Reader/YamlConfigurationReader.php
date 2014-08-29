@@ -1,7 +1,6 @@
 <?php
 namespace Dkd\CmisService\Configuration\Reader;
 
-use Dkd\CmisService\Configuration\ConfigurationResourceConsumerInterface;
 use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
 
 /**
@@ -12,7 +11,7 @@ use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
  *
  * @package Dkd\CmisService\Configuration\Definitions
  */
-class YamlConfigurationReader implements ConfigurationReaderInterface, ConfigurationResourceConsumerInterface {
+class YamlConfigurationReader implements ConfigurationReaderInterface {
 
 	/**
 	 * Load the specified resource into the reader.
@@ -66,7 +65,7 @@ class YamlConfigurationReader implements ConfigurationReaderInterface, Configura
 	 * @param string $resourceIdentifier
 	 * @return \DateTime
 	 */
-	public function modified($resourceIdentifier) {
+	public function lastModified($resourceIdentifier) {
 
 	}
 

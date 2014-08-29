@@ -1,7 +1,6 @@
 <?php
 namespace Dkd\CmisService\Configuration\Reader;
 
-use Dkd\CmisService\Configuration\ConfigurationResourceConsumerInterface;
 use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
 
 /**
@@ -12,7 +11,7 @@ use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
  *
  * @package Dkd\CmisService\Configuration\Reader
  */
-class TypoScriptConfigurationReader implements ConfigurationReaderInterface, ConfigurationResourceConsumerInterface {
+class TypoScriptConfigurationReader implements ConfigurationReaderInterface {
 
 	/**
 	 * Load the specified TypoScript object path into
@@ -60,7 +59,7 @@ class TypoScriptConfigurationReader implements ConfigurationReaderInterface, Con
 	 * @param string $resourceIdentifier
 	 * @return \DateTime
 	 */
-	public function modified($resourceIdentifier) {
+	public function lastModified($resourceIdentifier) {
 
 	}
 

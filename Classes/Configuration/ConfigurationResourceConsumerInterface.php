@@ -54,6 +54,6 @@ interface ConfigurationResourceConsumerInterface {
 	 * @param string $resourceIdentifier
 	 * @return \DateTime
 	 */
-	public function modified($resourceIdentifier);
+	public function lastModified($resourceIdentifier);
 
 }
