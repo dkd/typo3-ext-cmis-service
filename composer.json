@@ -6,10 +6,11 @@
     "homepage": "https://phabricator.dkd.de/diffusion/EXTCMISS/",
     "license": "GPL-2.0",
     "autoload": {
-        "classmap": [
-            "Classes/",
-            "vendor/typo3/cms"
-        ]
+        "psr-4": {
+            "TYPO3\\CMS\\": "vendor/typo3/cms/typo3/sysext/",
+            "Dkd\\CmisService\\": "Classes/",
+            "Dkd\\CmisService\\Tests\\": "Tests/"
+        }
     },
     "replace": {
         "typo3/cms-composer-installers": "*"

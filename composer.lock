@@ -4,176 +4,36 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f8d10c2c4466c4e15ab589c556888712",
+    "hash": "c85bdbd97caf5d05eeb0e85c495f65a5",
     "packages": [
 
     ],
     "packages-dev": [
         {
-            "name": "composer/installers",
-            "version": "v1.0.18",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/composer/installers.git",
-                "reference": "74fb0a7a1a23696d9c8cc2fba5903f6711cdd067"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/74fb0a7a1a23696d9c8cc2fba5903f6711cdd067",
-                "reference": "74fb0a7a1a23696d9c8cc2fba5903f6711cdd067",
-                "shasum": ""
-            },
-            "replace": {
-                "roundcube/plugin-installer": "*",
-                "shama/baton": "*"
-            },
-            "require-dev": {
-                "composer/composer": "1.0.*@dev",
-                "phpunit/phpunit": "4.1.*"
-            },
-            "type": "composer-installer",
-            "extra": {
-                "class": "Composer\\Installers\\Installer",
-                "branch-alias": {
-                    "dev-master": "1.0-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Composer\\Installers\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Kyle Robinson Young",
-                    "email": "kyle@dontkry.com",
-                    "homepage": "https://github.com/shama"
-                }
-            ],
-            "description": "A multi-framework Composer library installer",
-            "homepage": "http://composer.github.com/installers/",
-            "keywords": [
-                "Craft",
-                "Dolibarr",
-                "Hurad",
-                "MODX Evo",
-                "OXID",
-                "WolfCMS",
-                "agl",
-                "annotatecms",
-                "bitrix",
-                "cakephp",
-                "chef",
-                "codeigniter",
-                "concrete5",
-                "croogo",
-                "drupal",
-                "elgg",
-                "fuelphp",
-                "installer",
-                "joomla",
-                "kohana",
-                "laravel",
-                "lithium",
-                "magento",
-                "mako",
-                "mediawiki",
-                "modulework",
-                "moodle",
-                "phpbb",
-                "piwik",
-                "ppi",
-                "puppet",
-                "roundcube",
-                "shopware",
-                "silverstripe",
-                "symfony",
-                "typo3",
-                "wordpress",
-                "zend",
-                "zikula"
-            ],
-            "time": "2014-08-18 20:00:12"
-        },
-        {
-            "name": "lw/typo3cms-installers",
-            "version": "1.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/lightwerk/typo3cms-installers.git",
-                "reference": "53bd70e206349e744e1a3fae407464bd00358e48"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/lightwerk/typo3cms-installers/zipball/53bd70e206349e744e1a3fae407464bd00358e48",
-                "reference": "53bd70e206349e744e1a3fae407464bd00358e48",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "1.0.0",
-                "composer/installers": "*"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "Lw\\TYPO3CMSInstallers\\TYPO3CMSInstallerPlugin"
-            },
-            "autoload": {
-                "psr-0": {
-                    "": "src/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Felix Oertel",
-                    "email": "fo@lightwerk.com",
-                    "homepage": "https://github.com/lightwerk"
-                }
-            ],
-            "description": "A TYPO3 CMS Composer installer",
-            "homepage": "https://github.com/lightwerk/typo3cms-installers",
-            "keywords": [
-                "cms",
-                "installer",
-                "typo3"
-            ],
-            "support": {
-                "source": "https://github.com/lightwerk/typo3cms-installers/tree/1.0.4",
-                "issues": "https://github.com/lightwerk/typo3cms-installers/issues"
-            },
-            "time": "2014-02-21 14:20:55"
-        },
-        {
             "name": "phpunit/php-code-coverage",
-            "version": "2.0.10",
+            "version": "2.0.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "6d196af48e8c100a3ae881940123e693da5a9217"
+                "reference": "53603b3c995f5aab6b59c8e08c3a663d2cc810b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/6d196af48e8c100a3ae881940123e693da5a9217",
-                "reference": "6d196af48e8c100a3ae881940123e693da5a9217",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/53603b3c995f5aab6b59c8e08c3a663d2cc810b7",
+                "reference": "53603b3c995f5aab6b59c8e08c3a663d2cc810b7",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3",
-                "phpunit/php-file-iterator": "~1.3.1",
-                "phpunit/php-text-template": "~1.2.0",
-                "phpunit/php-token-stream": "~1.2.2",
-                "sebastian/environment": "~1.0.0",
-                "sebastian/version": "~1.0.3"
+                "phpunit/php-file-iterator": "~1.3",
+                "phpunit/php-text-template": "~1.2",
+                "phpunit/php-token-stream": "~1.3",
+                "sebastian/environment": "~1.0",
+                "sebastian/version": "~1.0"
             },
             "require-dev": {
                 "ext-xdebug": ">=2.1.4",
-                "phpunit/phpunit": "~4.0.14"
+                "phpunit/phpunit": "~4.1"
             },
             "suggest": {
                 "ext-dom": "*",
@@ -212,7 +72,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2014-08-06 06:39:42"
+            "time": "2014-08-31 06:33:04"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -349,45 +209,44 @@
         },
         {
             "name": "phpunit/php-token-stream",
-            "version": "1.2.2",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-token-stream.git",
-                "reference": "ad4e1e23ae01b483c16f600ff1bebec184588e32"
+                "reference": "f8d5d08c56de5cfd592b3340424a81733259a876"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/ad4e1e23ae01b483c16f600ff1bebec184588e32",
-                "reference": "ad4e1e23ae01b483c16f600ff1bebec184588e32",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/f8d5d08c56de5cfd592b3340424a81733259a876",
+                "reference": "f8d5d08c56de5cfd592b3340424a81733259a876",
                 "shasum": ""
             },
             "require": {
                 "ext-tokenizer": "*",
                 "php": ">=5.3.3"
             },
+            "require-dev": {
+                "phpunit/phpunit": "~4.2"
+            },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.2-dev"
+                    "dev-master": "1.3-dev"
                 }
             },
             "autoload": {
                 "classmap": [
-                    "PHP/"
+                    "src/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
-            "include-path": [
-                ""
-            ],
             "license": [
                 "BSD-3-Clause"
             ],
             "authors": [
                 {
                     "name": "Sebastian Bergmann",
-                    "email": "sb@sebastian-bergmann.de",
-                    "role": "lead"
+                    "email": "sebastian@phpunit.de"
                 }
             ],
             "description": "Wrapper around PHP's tokenizer extension.",
@@ -395,7 +254,7 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2014-03-03 05:10:30"
+            "time": "2014-08-31 06:12:13"
         },
         {
             "name": "phpunit/phpunit",
@@ -1089,81 +948,120 @@
         {
             "name": "typo3/cms",
             "version": "6.2.4",
-            "dist": {
-                "type": "zip",
-                "url": "http://get.typo3.org/6.2.4/zip",
-                "reference": null,
-                "shasum": null
+            "source": {
+                "type": "git",
+                "url": "git://git.typo3.org/Packages/TYPO3.CMS.git",
+                "reference": "ebcf783994e4e6e17bc3058f87be5bd6c9b99d7c"
             },
             "require": {
-                "lw/typo3cms-installers": "*"
+                "ext-fileinfo": "*",
+                "ext-pcre": "*",
+                "ext-session": "*",
+                "ext-xml": "*",
+                "php": ">=5.3.7",
+                "typo3/cms-composer-installers": "1.1.*@dev"
             },
-            "provide": {
-                "typo3-ter/about": "6.2.0",
-                "typo3-ter/aboutmodules": "6.2.0",
-                "typo3-ter/adodb": "6.2.0",
-                "typo3-ter/backend": "6.2.0",
-                "typo3-ter/belog": "6.2.0",
-                "typo3-ter/beuser": "6.2.0",
-                "typo3-ter/cms": "6.2.0",
-                "typo3-ter/context_help": "6.2.0",
-                "typo3-ter/core": "6.2.0",
-                "typo3-ter/cshmanual": "6.2.0",
-                "typo3-ter/css_styled_content": "6.2.0",
-                "typo3-ter/dbal": "6.2.0",
-                "typo3-ter/documentation": "6.2.0",
-                "typo3-ter/extbase": "6.2.0",
-                "typo3-ter/extensionmanager": "6.2.0",
-                "typo3-ter/extra_page_cm_options": "6.2.0",
-                "typo3-ter/feedit": "6.2.0",
-                "typo3-ter/felogin": "6.2.0",
-                "typo3-ter/filelist": "6.2.0",
-                "typo3-ter/fluid": "6.2.0",
-                "typo3-ter/form": "6.2.0",
-                "typo3-ter/frontend": "6.2.0",
-                "typo3-ter/func": "6.2.0",
-                "typo3-ter/func_wizards": "6.2.0",
-                "typo3-ter/impexp": "6.2.0",
-                "typo3-ter/indexed_search": "6.2.0",
-                "typo3-ter/indexed_search_mysql": "6.2.0",
-                "typo3-ter/info": "6.2.0",
-                "typo3-ter/info_pagetsconfig": "6.2.0",
-                "typo3-ter/install": "6.2.0",
-                "typo3-ter/lang": "6.2.0",
-                "typo3-ter/linkvalidator": "6.2.0",
-                "typo3-ter/lowlevel": "6.2.0",
-                "typo3-ter/opendocs": "6.2.0",
-                "typo3-ter/openid": "6.2.0",
-                "typo3-ter/perm": "6.2.0",
-                "typo3-ter/recordlist": "6.2.0",
-                "typo3-ter/recycler": "6.2.0",
-                "typo3-ter/reports": "6.2.0",
-                "typo3-ter/rsaauth": "6.2.0",
-                "typo3-ter/rtehtmlarea": "6.2.0",
-                "typo3-ter/saltedpasswords": "6.2.0",
-                "typo3-ter/scheduler": "6.2.0",
-                "typo3-ter/setup": "6.2.0",
-                "typo3-ter/sv": "6.2.0",
-                "typo3-ter/sys_action": "6.2.0",
-                "typo3-ter/sys_note": "6.2.0",
-                "typo3-ter/t3editor": "6.2.0",
-                "typo3-ter/t3skin": "6.2.0",
-                "typo3-ter/taskcenter": "6.2.0",
-                "typo3-ter/tstemplate": "6.2.0",
-                "typo3-ter/version": "6.2.0",
-                "typo3-ter/viewpage": "6.2.0",
-                "typo3-ter/wizard_crpages": "6.2.0",
-                "typo3-ter/wizard_sortpages": "6.2.0",
-                "typo3-ter/workspaces": "6.2.0"
+            "replace": {
+                "typo3/cms-about": "self.version",
+                "typo3/cms-aboutmodules": "self.version",
+                "typo3/cms-adodb": "self.version",
+                "typo3/cms-backend": "self.version",
+                "typo3/cms-belog": "self.version",
+                "typo3/cms-beuser": "self.version",
+                "typo3/cms-cms": "self.version",
+                "typo3/cms-context-help": "self.version",
+                "typo3/cms-core": "self.version",
+                "typo3/cms-cshmanual": "self.version",
+                "typo3/cms-css-styled-content": "self.version",
+                "typo3/cms-dbal": "self.version",
+                "typo3/cms-documentation": "self.version",
+                "typo3/cms-extbase": "self.version",
+                "typo3/cms-extensionmanager": "self.version",
+                "typo3/cms-extra-page-cm-options": "self.version",
+                "typo3/cms-feedit": "self.version",
+                "typo3/cms-felogin": "self.version",
+                "typo3/cms-filelist": "self.version",
+                "typo3/cms-filemetadata": "self.version",
+                "typo3/cms-fluid": "self.version",
+                "typo3/cms-form": "self.version",
+                "typo3/cms-frontend": "self.version",
+                "typo3/cms-func": "self.version",
+                "typo3/cms-func-wizards": "self.version",
+                "typo3/cms-impexp": "self.version",
+                "typo3/cms-indexed-search": "self.version",
+                "typo3/cms-indexed-search-mysql": "self.version",
+                "typo3/cms-info": "self.version",
+                "typo3/cms-info-pagetsconfig": "self.version",
+                "typo3/cms-install": "self.version",
+                "typo3/cms-lang": "self.version",
+                "typo3/cms-linkvalidator": "self.version",
+                "typo3/cms-lowlevel": "self.version",
+                "typo3/cms-opendocs": "self.version",
+                "typo3/cms-openid": "self.version",
+                "typo3/cms-perm": "self.version",
+                "typo3/cms-recordlist": "self.version",
+                "typo3/cms-recycler": "self.version",
+                "typo3/cms-reports": "self.version",
+                "typo3/cms-rsaauth": "self.version",
+                "typo3/cms-rtehtmlarea": "self.version",
+                "typo3/cms-saltedpasswords": "self.version",
+                "typo3/cms-scheduler": "self.version",
+                "typo3/cms-setup": "self.version",
+                "typo3/cms-sv": "self.version",
+                "typo3/cms-sys-action": "self.version",
+                "typo3/cms-sys-note": "self.version",
+                "typo3/cms-t3editor": "self.version",
+                "typo3/cms-t3skin": "self.version",
+                "typo3/cms-taskcenter": "self.version",
+                "typo3/cms-tstemplate": "self.version",
+                "typo3/cms-version": "self.version",
+                "typo3/cms-viewpage": "self.version",
+                "typo3/cms-wizard-crpages": "self.version",
+                "typo3/cms-wizard-sortpages": "self.version",
+                "typo3/cms-workspaces": "self.version"
             },
-            "type": "typo3cms-core",
+            "require-dev": {
+                "mikey179/vfsstream": "1.3.*@dev",
+                "phpunit/phpunit": "~4.1"
+            },
+            "suggest": {
+                "ext-gd": "GDlib/Freetype is required for building images with text (GIFBUILDER) and can also be used to scale images",
+                "ext-openssl": "",
+                "ext-soap": "",
+                "ext-zip": "",
+                "ext-zlib": "TYPO3 uses zlib for amongst others output compression and un/packing t3x extension files"
+            },
+            "type": "typo3-cms-core",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "6.2.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
             "authors": [
                 {
-                    "name": "TYPO3 Core Team",
-                    "Role": "Developer"
+                    "name": "TYPO3 CMS Core Team",
+                    "homepage": "http://forge.typo3.org/projects/typo3cms-core",
+                    "role": "Developer"
+                },
+                {
+                    "name": "The TYPO3 Community",
+                    "homepage": "https://typo3.org/community/",
+                    "role": "Contributor"
                 }
             ],
-            "description": "TYPO3 is an enterprise class Web CMS written in PHP/MySQL."
+            "description": "TYPO3 CMS is a free open source Content Management Framework initially created by Kasper Skaarhoj and licensed under GNU/GPL.",
+            "homepage": "http://typo3.org/",
+            "keywords": [
+                "Content management system",
+                "cms",
+                "extbase",
+                "typo3"
+            ],
+            "time": "2014-07-08 13:04:53"
         }
     ],
     "aliases": [
