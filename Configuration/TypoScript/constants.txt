@@ -1,0 +1,14 @@
+[global]
+plugin.tx_cmisservice.settings {
+    tables {
+        tt_content {
+            # Enable content indexing to CMIS?
+            enabled = 1
+        }
+        pages {
+            # Enable page indexing to CMIS?
+            enabled = 1
+        }
+
+    }
+}

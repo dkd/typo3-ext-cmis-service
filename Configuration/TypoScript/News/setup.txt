@@ -1,0 +1,8 @@
+[global]
+plugin.tx_cmisservice.settings {
+    tables {
+        tx_news_domain_model_news {
+            enabled = {$plugin.tx_cmisservice.settings.table.tx_news_domain_model_news.enabled}
+        }
+    }
+}

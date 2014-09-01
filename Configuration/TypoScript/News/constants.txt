@@ -1,0 +1,9 @@
+[global]
+plugin.tx_cmisservice.settings {
+    tables {
+        tx_news_domain_model_news {
+            # Enable indexing of EXT:news news-items?
+            enabled = 1
+        }
+    }
+}

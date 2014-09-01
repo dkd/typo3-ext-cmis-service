@@ -1,0 +1,21 @@
+[global]
+
+# TypoScript settings for extension cmis_service
+plugin.tx_cmisservice.settings {
+
+    # Configurations for tables which should be indexed to CMIS.
+    # Table name is the key and each table has an array of settings.
+    # Table configurations having only the "enabled" flag set, will
+    # use automatic resolving of indexable fields. See documentation
+    # for possible attributes to use when manually defining rules
+    # for a table.
+    tables {
+        tt_content {
+            enabled = {$plugin.tx_cmisservice.settings.tables.tt_content.enabled}
+        }
+        pages {
+            enabled = {$plugin.tx_cmisservice.settings.tables.pages.enabled}
+        }
+    }
+
+}
