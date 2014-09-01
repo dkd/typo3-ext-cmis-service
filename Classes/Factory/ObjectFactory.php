@@ -1,8 +1,12 @@
 <?php
 namespace Dkd\CmisService\Factory;
 
+use Dkd\CmisService\Configuration\ConfigurationManager;
 use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
+use Psr\Log\LoggerInterface;
+use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\ObjectManagerInterface;
 
 /**
@@ -16,6 +20,13 @@ use TYPO3\CMS\Extbase\ObjectManagerInterface;
  * @package Dkd\CmisService\Factory
  */
 class ObjectFactory {
+
+	const LOGGER_NAME = 'dkd.cmisservice';
+
+	/**
+	 * @var LoggerInterface
+	 */
+	protected static $logger;
 
 	/**
 	 * Make an instance of $className, if any additional parameters
@@ -41,10 +52,48 @@ class ObjectFactory {
 	 */
 	public function makeInstance($className) {
 		/** @var ObjectManagerInterface $manager */
-		$manager = GeneralUtility::makeInstance('TYPO3\CMS\Extbase\Object\ObjectManager');
+		$manager = GeneralUtility::makeInstance('TYPO3\\CMS\\Extbase\\Object\\ObjectManager');
 		$arguments = func_get_args();
 		$instance = call_user_func_array(array($manager, 'get'), $arguments);
 		return $instance;
+	}
+
+	/**
+	 * Returns the initialized ConfigurationManager which gives
+	 * access to all configuration parameters as well as exporting
+	 * of current configuration.
+	 *
+	 * @return ConfigurationManager
+	 */
+	public function getConfigurationManager() {
+		$managerClassName = $this->getConfigurationManagerClassName();
+		$readerClassName = $this->getConfigurationReaderClassName();
+		$writerClassName = $this->getConfigurationWriterClassName();
+		$cacheClassName = $this->getConfigurationReaderCacheClassName();
+		$writer = $cache = NULL;
+		$reader = $this->makeInstance($readerClassName);
+		if (NULL !== $writerClassName) {
+			$writer = $this->makeInstance($writerClassName);
+		}
+		if (NULL !== $cacheClassName) {
+			$cache = $this->makeInstance($cacheClassName);
+		}
+		$manager = $this->makeInstance('Dkd\\CmisService\\Configuration\\ConfigurationManager', $reader, $writer, $cache);
+		return $manager;
+	}
+
+	/**
+	 * Gets the configured PSR Logger implementation.
+	 *
+	 * @return LoggerInterface
+	 */
+	public function getLogger() {
+		if (TRUE === self::$logger instanceof LoggerInterface) {
+			return self::$logger;
+		}
+		/** @var LogManager $logManager */
+		$logManager = $this->makeInstance('TYPO3\\CMS\\Core\\Log\\LogManager');
+		return self::$logger = $logManager->getLogger(self::LOGGER_NAME);
 	}
 
 	/**
@@ -71,8 +120,62 @@ class ObjectFactory {
 	 * @return MasterConfiguration
 	 */
 	public function getConfiguration() {
-		$configuration = new MasterConfiguration();
+		$configuration = $this->getConfigurationManager()->getMasterConfiguration();
 		return $configuration;
+	}
+
+	/**
+	 * Gets all TypoScript inside plugin.tx_cmisservice.settings.
+	 *
+	 * @return array
+	 */
+	public function getExtensionTypoScriptSettings() {
+		/** @var ConfigurationManagerInterface $extbaseConfigurationManager */
+		$extbaseConfigurationManager = $this->makeInstance('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager');
+		return $extbaseConfigurationManager->getConfiguration(
+			ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT,
+			'Dkd.CmisService'
+		);
+	}
+
+	/**
+	 * Gets the configured class name to use as Configuration
+	 * Manager implementation.
+	 *
+	 * @return string|NULL
+	 */
+	protected function getConfigurationManagerClassName() {
+		return 'Dkd\\CmisService\\Configuration\\ConfigurationManager';
+	}
+
+	/**
+	 * Gets the configured class name to use as Configuration
+	 * Reader implementation.
+	 *
+	 * @return string|NULL
+	 */
+	protected function getConfigurationReaderClassName() {
+		return 'Dkd\\CmisService\\Configuration\\Reader\\TypoScriptConfigurationReader';
+	}
+
+	/**
+	 * Gets the configured class name to use as Configuration
+	 * Writer implementation.
+	 *
+	 * @return string|NULL
+	 */
+	protected function getConfigurationWriterClassName() {
+		return 'Dkd\\CmisService\\Configuration\\Writer\\YamlConfigurationWriter';
+	}
+
+	/**
+	 * Gets the configured class name to use as Configuration
+	 * Cache Reader implementation.
+	 *
+	 * @return string|NULL
+	 */
+	protected function getConfigurationReaderCacheClassName() {
+		return 'Dkd\\CmisService\\Configuration\\Reader\\YamlConfigurationReader';
 	}
 
 }
