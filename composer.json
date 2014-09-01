@@ -7,10 +7,12 @@
     "license": "GPL-2.0",
     "autoload": {
         "psr-4": {
-            "TYPO3\\CMS\\": "vendor/typo3/cms/typo3/sysext/",
             "Dkd\\CmisService\\": "Classes/",
             "Dkd\\CmisService\\Tests\\": "Tests/"
-        }
+        },
+        "classmap": [
+            "vendor/typo3/cms/typo3/sysext"
+        ]
     },
     "replace": {
         "typo3/cms-composer-installers": "*"
