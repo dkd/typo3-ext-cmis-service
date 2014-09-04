@@ -123,10 +123,11 @@ class ConfigurationManager {
 		if (TRUE === $this->masterConfiguration instanceof MasterConfiguration) {
 			return $this->masterConfiguration;
 		}
+		$definitionClassName = 'Dkd\\CmisService\\Configuration\\Definitions\\MasterConfiguration';
 		if (TRUE === $this->cache instanceof ConfigurationReaderInterface) {
-			return $this->masterConfiguration = $this->cache->read(self::CACHE_RESOURCE);
+			return $this->masterConfiguration = $this->cache->read(self::CACHE_RESOURCE, $definitionClassName);
 		}
-		return $this->masterConfiguration = $this->reader->read(self::MASTER_RESOURCE);
+		return $this->masterConfiguration = $this->reader->read(self::MASTER_RESOURCE, $definitionClassName);
 	}
 
 	/**

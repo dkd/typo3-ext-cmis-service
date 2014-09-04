@@ -265,9 +265,7 @@ class ConfigurationManagerTest extends UnitTestCase {
 			->will($this->returnValue('foobarchecksum'));
 		$mockCache->expects($this->once())->method('checksum')
 			->will($this->returnValue('differentchecksum'));
-		$mockCache->expects($this->never())->method('read')
-			->with(ConfigurationManager::CACHE_RESOURCE)
-			->will($this->returnValue($mockConfiguration));
+		$mockCache->expects($this->never())->method('read');
 		$mockWriter->expects($this->once())->method('write')
 			->with($dummyConfiguration, ConfigurationManager::CACHE_RESOURCE)
 			->will($this->returnValue(TRUE));
