@@ -1,6 +1,8 @@
 <?php
 namespace Dkd\CmisService\Analysis;
 
+use Dkd\CmisService\Analysis\Detection\IndexableColumnDetector;
+
 /**
  * Table Configuration Analyzer
  *
@@ -33,12 +35,13 @@ class TableConfigurationAnalyzer {
 	 * @return array
 	 */
 	public function getIndexableTableNames() {
+		$columnDetector = new IndexableColumnDetector();
 		$tables = $this->getAllTableNames();
 		$indexable = array();
 		foreach ($tables as $table) {
 			$fields = $this->getAllFieldNamesOfTable($table);
 			foreach ($fields as $field) {
-				if (TRUE === $this->isFieldPotentiallyIndexable($table, $field)) {
+				if (TRUE === $columnDetector->isFieldPotentiallyIndexable($table, $field)) {
 					$indexable[] = $table;
 					break;
 				}
@@ -68,7 +71,7 @@ class TableConfigurationAnalyzer {
 	 *
 	 * @return array
 	 */
-	protected function getAllTableNames() {
+	public function getAllTableNames() {
 		return array_keys($GLOBALS['TCA']);
 	}
 
@@ -80,7 +83,7 @@ class TableConfigurationAnalyzer {
 	 * @return array
 	 * @throws \RuntimeException
 	 */
-	protected function getAllFieldNamesOfTable($table) {
+	public function getAllFieldNamesOfTable($table) {
 		if (FALSE === isset($GLOBALS['TCA'][$table]['columns'])) {
 			throw new \RuntimeException('Table "' . $table . '" is either not defined in TCA or has no columns array', 1409091364);
 		}
@@ -97,7 +100,7 @@ class TableConfigurationAnalyzer {
 	 * @return string
 	 * @throws RuntimeException
 	 */
-	protected function getFieldTypeName($table, $field) {
+	public function getFieldTypeName($table, $field) {
 		if (FALSE === isset($GLOBALS['TCA'][$table])) {
 			throw new \RuntimeException('Table "' . $table . '" is not defined in TCA', 1409091365);
 		}
@@ -110,39 +113,5 @@ class TableConfigurationAnalyzer {
 		return $GLOBALS['TCA'][$table]['columns'][$field]['config']['type'];
 	}
 
-	/**
-	 * Returns TRUE if a field is *potentially* indexable
-	 * as determined by configuration-agnostic rules, for
-	 * example returns TRUE for "pages" field "title" when
-	 * "type" is zero (standard page) because a standard
-	 * input field is indexable unless manually disabled
-	 * or not specified in manual configuration.
-	 *
-	 * Any failed test for indexability returns FALSE,
-	 * whether it's because the table is not indexable or
-	 * the field does not exist or the field type is
-	 * unknown or the record type configured in $type
-	 * does not include the field.
-	 *
-	 * @param string $table
-	 * @param string $field
-	 * @return boolean
-	 */
-	protected function isFieldPotentiallyIndexable($table, $field) {
-		$tables = $this->getAllTableNames();
-		if (FALSE === in_array($table, $tables)) {
-			return FALSE;
-		}
-		$fields = $this->getAllFieldNamesOfTable($table);
-		if (FALSE === in_array($field, $fields)) {
-			return FALSE;
-		}
-		$configuredType = $this->getFieldTypeName($table, $field);
-		$indexableTypes = $this->getIndexableFieldTypeNames();
-		if (FALSE === in_array($configuredType, $indexableTypes)) {
-			return FALSE;
-		}
-		return TRUE;
-	}
-
 }
+

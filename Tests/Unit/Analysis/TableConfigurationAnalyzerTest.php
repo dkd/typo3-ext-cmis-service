@@ -46,16 +46,14 @@ class TableConfigurationAnalyzerTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function getIndexableTableNamesCallsExpectedMethodsAndReturnsExpectedResult() {
-		$field = 'dummyfield';
+		$field = 'dummy';
 		$instance = $this->getMock(
 			'Dkd\\CmisService\\Analysis\\TableConfigurationAnalyzer',
-			array('getAllTableNames', 'getAllFieldNamesOfTable', 'isFieldPotentiallyIndexable')
+			array('getAllTableNames', 'getAllFieldNamesOfTable')
 		);
 		$instance->expects($this->at(0))->method('getAllTableNames')->will($this->returnValue(array(self::TABLE)));
 		$instance->expects($this->at(1))->method('getAllFieldNamesOfTable')
 			->with(self::TABLE)->will($this->returnValue(array($field)));
-		$instance->expects($this->at(2))->method('isFieldPotentiallyIndexable')
-			->with(self::TABLE, $field)->will($this->returnValue(TRUE));
 		$return = $instance->getIndexableTableNames();
 		$this->assertEquals(array(self::TABLE), $return);
 	}
@@ -66,95 +64,9 @@ class TableConfigurationAnalyzerTest extends UnitTestCase {
 	 * @test
 	 * @return void
 	 */
-	public function isFieldPotentiallyIndexableCallsExpectedMethodsAndReturnsEarlyFalseForUnknownTable() {
-		$instance = $this->getMock(
-			'Dkd\\CmisService\Analysis\\TableConfigurationAnalyzer',
-			array('getAllTableNames', 'getAllFieldNamesOfTable', 'getFieldTypeName', 'getIndexableFieldTypeNames')
-		);
-		$instance->expects($this->at(0))->method('getAllTableNames')->will($this->returnValue(array('unsupportedtable')));
-		$instance->expects($this->never())->method('getAllFieldNamesOfTable');
-		$instance->expects($this->never())->method('getFieldTypeName');
-		$instance->expects($this->never())->method('getIndexableFieldTypeNames');
-		$return = $this->callInaccessibleMethod($instance, 'isFieldPotentiallyIndexable', 'invalidtablename', 'invalidfieldname');
-		$this->assertFalse($return);
-	}
-
-	/**
-	 * Unit test
-	 *
-	 * @test
-	 * @return void
-	 */
-	public function isFieldPotentiallyIndexableCallsExpectedMethodsAndReturnsEarlyFalseForUnknownFieldInKnownTable() {
-		$validFieldName = key($GLOBALS['TCA'][self::TABLE]['columns']);
-		$instance = $this->getMock(
-			'Dkd\\CmisService\Analysis\\TableConfigurationAnalyzer',
-			array('getAllTableNames', 'getAllFieldNamesOfTable', 'getFieldTypeName', 'getIndexableFieldTypeNames')
-		);
-		$instance->expects($this->at(0))->method('getAllTableNames')->will($this->returnValue(array(self::TABLE)));
-		$instance->expects($this->at(1))->method('getAllFieldNamesOfTable')
-			->with(self::TABLE)->will($this->returnValue(array($validFieldName)));
-		$instance->expects($this->never())->method('getFieldTypeName');
-		$instance->expects($this->never())->method('getIndexableFieldTypeNames');
-		$return = $this->callInaccessibleMethod($instance, 'isFieldPotentiallyIndexable', self::TABLE, 'invalidfieldname');
-		$this->assertFalse($return);
-	}
-
-	/**
-	 * Unit test
-	 *
-	 * @test
-	 * @return void
-	 */
-	public function isFieldPotentiallyIndexableCallsExpectedMethodsAndReturnsEarlyFalseForUnindexedFieldTypeInKnownTableAndKnownField() {
-		$validFieldName = key($GLOBALS['TCA'][self::TABLE]['columns']);
-		$validTypeName = $GLOBALS['TCA'][self::TABLE]['columns'][$validFieldName]['config']['type'];
-		$instance = $this->getMock(
-			'Dkd\\CmisService\Analysis\\TableConfigurationAnalyzer',
-			array('getAllTableNames', 'getAllFieldNamesOfTable', 'getFieldTypeName', 'getIndexableFieldTypeNames')
-		);
-		$instance->expects($this->at(0))->method('getAllTableNames')->will($this->returnValue(array(self::TABLE)));
-		$instance->expects($this->at(1))->method('getAllFieldNamesOfTable')
-			->with(self::TABLE)->will($this->returnValue(array($validFieldName)));
-		$instance->expects($this->at(2))->method('getFieldTypeName')
-			->with(self::TABLE, $validFieldName)->will($this->returnValue('unsupportedtype'));
-		$instance->expects($this->at(3))->method('getIndexableFieldTypeNames')->will($this->returnValue(array($validTypeName)));
-		$return = $this->callInaccessibleMethod($instance, 'isFieldPotentiallyIndexable', self::TABLE, $validFieldName);
-		$this->assertFalse($return);
-	}
-
-	/**
-	 * Unit test
-	 *
-	 * @test
-	 * @return void
-	 */
-	public function isFieldPotentiallyIndexableCallsExpectedMethodsAndReturnsFinalTrueForKnownTableAndKnownFieldAndIndexableFieldType() {
-		$validFieldName = key($GLOBALS['TCA'][self::TABLE]['columns']);
-		$validTypeName = $GLOBALS['TCA'][self::TABLE]['columns'][$validFieldName]['config']['type'];
-		$instance = $this->getMock(
-			'Dkd\\CmisService\\Analysis\\TableConfigurationAnalyzer',
-			array('getAllTableNames', 'getAllFieldNamesOfTable', 'getFieldTypeName', 'getIndexableFieldTypeNames')
-		);
-		$instance->expects($this->at(0))->method('getAllTableNames')->will($this->returnValue(array(self::TABLE)));
-		$instance->expects($this->at(1))->method('getAllFieldNamesOfTable')
-			->with(self::TABLE)->will($this->returnValue(array($validFieldName)));
-		$instance->expects($this->at(2))->method('getFieldTypeName')
-			->with(self::TABLE, $validFieldName)->will($this->returnValue($validTypeName));
-		$instance->expects($this->at(3))->method('getIndexableFieldTypeNames')->will($this->returnValue(array($validTypeName)));
-		$return = $this->callInaccessibleMethod($instance, 'isFieldPotentiallyIndexable', self::TABLE, $validFieldName);
-		$this->assertTrue($return);
-	}
-
-	/**
-	 * Unit test
-	 *
-	 * @test
-	 * @return void
-	 */
 	public function getAllTablesContainsExpectedTable() {
 		$instance = new TableConfigurationAnalyzer();
-		$allTables = $this->callInaccessibleMethod($instance, 'getAllTableNames');
+		$allTables = $instance->getAllTableNames();
 		$this->assertContains(self::TABLE, $allTables);
 	}
 
@@ -167,7 +79,7 @@ class TableConfigurationAnalyzerTest extends UnitTestCase {
 	public function getAllFieldNamesOfTablesContainsExpectedFields() {
 		$instance = new TableConfigurationAnalyzer();
 		$expectedFieldNames = array_keys($GLOBALS['TCA'][self::TABLE]['columns']);
-		$fieldNames = $this->callInaccessibleMethod($instance, 'getAllFieldNamesOfTable', self::TABLE);
+		$fieldNames = $instance->getAllFieldNamesOfTable(self::TABLE);
 		$this->assertSame($expectedFieldNames, $fieldNames);
 	}
 
@@ -208,8 +120,8 @@ class TableConfigurationAnalyzerTest extends UnitTestCase {
 	 */
 	public function getAllFieldNamesOfTableThrowsRuntimeExceptionOnUnrecognizedTableName() {
 		$this->setExpectedException('RuntimeException', NULL, 1409091364);
-		$analyzer = $this->getMock('Dkd\\CmisService\\Analysis\\TableConfigurationAnalyzer');
-		$this->callInaccessibleMethod($analyzer, 'getAllFieldNamesOfTable', 'thistabledoesnotexist');
+		$analyzer = new TableConfigurationAnalyzer();
+		$analyzer->getAllFieldNamesOfTable('thistabledoesnotexist');
 	}
 
 	/**
@@ -220,8 +132,8 @@ class TableConfigurationAnalyzerTest extends UnitTestCase {
 	 */
 	public function getFieldTypeNameThrowsRuntimeExceptionOnUnrecognizedTableNameAndFieldName() {
 		$this->setExpectedException('RuntimeException', NULL, 1409091365);
-		$analyzer = $this->getMock('Dkd\\CmisService\\Analysis\\TableConfigurationAnalyzer');
-		$this->callInaccessibleMethod($analyzer, 'getFieldTypeName', 'thistabledoesnotexist', 'thisfielddoesnotexist');
+		$analyzer = new TableConfigurationAnalyzer();
+		$analyzer->getFieldTypeName('thistabledoesnotexist', 'thisfielddoesnotexist');
 	}
 
 	/**
@@ -232,8 +144,9 @@ class TableConfigurationAnalyzerTest extends UnitTestCase {
 	 */
 	public function getFieldTypeNameThrowsRuntimeExceptionOnRecognizedTableNameAndUnrecognizedFieldName() {
 		$this->setExpectedException('RuntimeException', NULL, 1409091366);
-		$analyzer = $this->getMock('Dkd\\CmisService\\Analysis\\TableConfigurationAnalyzer');
-		$this->callInaccessibleMethod($analyzer, 'getFieldTypeName', self::TABLE, 'thisfielddoesnotexist');
+		$analyzer = new TableConfigurationAnalyzer();
+		$analyzer->getFieldTypeName(self::TABLE, 'thisfielddoesnotexist');
+
 	}
 
 }
