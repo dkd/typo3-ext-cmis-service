@@ -1,12 +1,11 @@
 <?php
-namespace Dkd\CmisService\Analysis;
+namespace Dkd\CmisService\Tests\Unit\Analysis;
 
+use Dkd\CmisService\Analysis\TableConfigurationAnalyzer;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class TableConfigurationAnalyzerTest
- *
- * @package Dkd\CmisService\Analysis
  */
 class TableConfigurationAnalyzerTest extends UnitTestCase {
 

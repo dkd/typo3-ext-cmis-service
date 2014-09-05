@@ -7,8 +7,6 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  *
  * Contains methods used by any implementation of a
  * ConfigurationDefinition.
- *
- * @package Dkd\CmisService\Configuration\Definitions
  */
 abstract class AbstractConfigurationDefinition implements ConfigurationDefinitionInterface {
 

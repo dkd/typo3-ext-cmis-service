@@ -1,12 +1,10 @@
 <?php
-namespace Dkd\CmisService\Service;
+namespace Dkd\CmisService\Tests\Unit\Service;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class StanbolServiceTest
- *
- * @package Dkd\CmisService\Service
  */
 class StanbolServiceTest extends UnitTestCase {
 

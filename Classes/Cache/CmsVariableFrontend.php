@@ -13,8 +13,6 @@ use TYPO3\CMS\Core\Cache\Frontend\VariableFrontend;
  *
  * No methods required since the TYPO3 CMS VariableFrontend
  * is already fully compatible with the interface.
- *
- * @package Dkd\CmisService\Cache
  */
 class CmsVariableFrontend extends VariableFrontend implements VariableFrontendInterface {
 

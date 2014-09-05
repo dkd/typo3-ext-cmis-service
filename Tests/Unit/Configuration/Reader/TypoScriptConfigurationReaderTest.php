@@ -1,12 +1,10 @@
 <?php
-namespace Dkd\CmisService\Configuration\Reader;
+namespace Dkd\CmisService\Tests\Unit\Configuration\Reader;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class TypoScriptConfigurationReaderTest
- *
- * @package Dkd\CmisService\Configuration\Reader
  */
 class TypoScriptConfigurationReaderTest extends UnitTestCase {
 

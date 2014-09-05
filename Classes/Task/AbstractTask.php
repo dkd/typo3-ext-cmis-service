@@ -1,9 +1,7 @@
 <?php
 namespace Dkd\CmisService\Task;
 
-use Dkd\CmisService\Execution\NoopExecution;
 use Dkd\CmisService\Queue\WorkerInterface;
-use Dkd\CmisService\Execution\ExecutionInterface;
 
 /**
  * Abstract: Task
@@ -12,8 +10,6 @@ use Dkd\CmisService\Execution\ExecutionInterface;
  * and properties shared by Tasks which get processed
  * via the queue and workers. Task classes extending
  * this base class also implement TaskInterface.
- *
- * @package Dkd\CmisService\Task
  */
 abstract class AbstractTask implements TaskInterface {
 

@@ -1,12 +1,8 @@
 <?php
 namespace Dkd\CmisService\Execution;
 
-use Dkd\CmisService\Execution\Result;
-
 /**
  * Base class for Executions
- *
- * @package Dkd\CmisService\Execution
  */
 abstract class AbstractExecution {
 

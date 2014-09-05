@@ -1,12 +1,13 @@
 <?php
-namespace Dkd\CmisService\Factory;
+namespace Dkd\CmisService\Tests\Unit\Factory;
+
+use Dkd\CmisService\Factory\WorkerFactory;
+use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class WorkerFactoryTest
- *
- * @package Dkd\CmisService\Factory
  */
-class WorkerFactoryTest {
+class WorkerFactoryTest extends UnitTestCase {
 
 	/**
 	 * Tests that this factory creates Worker instances
@@ -15,9 +16,9 @@ class WorkerFactoryTest {
 	 * @return void
 	 */
 	public function createsWorkers() {
-		$factory = $this->getMock('Dkd\CmisService\Factory\WorkerFactory');
+		$factory = new WorkerFactory();
 		$worker = $factory->createWorker();
-		$this->assertInstanceof('Dkd\CmisService\Queue\WorkerInterface', $worker);
+		$this->assertInstanceof('Dkd\\CmisService\\Queue\\WorkerInterface', $worker);
 	}
 
 }

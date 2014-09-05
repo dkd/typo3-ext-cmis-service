@@ -18,8 +18,6 @@ namespace Dkd\CmisService\Analysis;
  * configuration has disabled the table or disabled enough
  * field and/or field types that the table or field no
  * longer is a candidate for indexing.
- *
- * @package Dkd\CmisService\Analysis
  */
 class TableConfigurationAnalyzer {
 

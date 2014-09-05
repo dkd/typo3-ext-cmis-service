@@ -2,7 +2,6 @@
 namespace Dkd\CmisService\Configuration\Reader;
 
 use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
-use Dkd\CmisService\Factory\ObjectFactory;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -10,8 +9,6 @@ use Symfony\Component\Yaml\Yaml;
  *
  * Reads Configuration Definitions from data stored
  * in a YAML file.
- *
- * @package Dkd\CmisService\Configuration\Definitions
  */
 class YamlConfigurationReader implements ConfigurationReaderInterface {
 

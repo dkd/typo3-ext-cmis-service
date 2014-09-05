@@ -15,8 +15,6 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  * array returns just that setting. This allows the
  * Reader to construct different ConfigurationDefinition
  * instances from each sub-array of the configuration.
- *
- * @package Dkd\CmisService\Configuration\Reader
  */
 class TypoScriptConfigurationReader implements ConfigurationReaderInterface {
 

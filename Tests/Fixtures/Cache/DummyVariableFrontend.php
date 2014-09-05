@@ -5,8 +5,6 @@ use Dkd\CmisService\Cache\VariableFrontendInterface;
 
 /**
  * Class DummyVariableFrontend
- *
- * @package Dkd\CmisService\Tests\Fixtures\Cache
  */
 class DummyVariableFrontend implements VariableFrontendInterface {
 

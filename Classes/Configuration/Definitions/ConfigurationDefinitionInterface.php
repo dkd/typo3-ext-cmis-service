@@ -6,8 +6,6 @@ namespace Dkd\CmisService\Configuration\Definitions;
  *
  * Methods to be implemented in classes supporting
  * ConfigurationDefinition behavior.
- *
- * @package Dkd\CmisService\Configuration\Definitions
  */
 interface ConfigurationDefinitionInterface {
 

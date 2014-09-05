@@ -1,12 +1,10 @@
 <?php
-namespace Dkd\CmisService\Analysis;
+namespace Dkd\CmisService\Tests\Unit\Analysis;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class RecordAnalyzerTest
- *
- * @package Dkd\CmisService\Analysis
  */
 class RecordAnalyzerTest extends UnitTestCase {
 

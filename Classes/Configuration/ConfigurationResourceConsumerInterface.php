@@ -11,8 +11,6 @@ namespace Dkd\CmisService\Configuration;
  * Implemented when the class contains methods to stat
  * resource identifiers, for example determining when they
  * were last updated or whether or not they exist.
- *
- * @package Dkd\CmisService\Configuration
  */
 interface ConfigurationResourceConsumerInterface {
 

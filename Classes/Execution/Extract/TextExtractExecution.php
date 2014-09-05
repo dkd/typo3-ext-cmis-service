@@ -6,8 +6,6 @@ use Dkd\CmisService\Execution\ExecutionInterface;
 
 /**
  * Class TextExtractExecution
- *
- * @package Dkd\CmisService\Execution\Extract
  */
 class TextExtractExecution extends AbstractExecution implements ExecutionInterface {
 

@@ -1,24 +1,21 @@
 <?php
-namespace Dkd\CmisService\Configuration\Definitions;
+namespace Dkd\CmisService\Tests\Unit\Configuration\Definitions;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class TableConfigurationTest
- *
- * @package Dkd\CmisService\Configuration\Definitions
  */
 class TableConfigurationTest extends UnitTestCase {
 
 	/**
-	 * Unit test
+	 * Placeholder
 	 *
 	 * @test
 	 * @return void
 	 */
-	public function supportsInstanciationUsingNewKeyword() {
-		$instance = new TableConfiguration();
-		$this->assertInstanceOf('Dkd\CmisService\Configuration\Definitions\TableConfiguration', $instance);
+	public function placeholder() {
+		$this->markTestIncomplete('Tests not yet implemented');
 	}
 
 }

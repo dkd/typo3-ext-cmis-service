@@ -2,12 +2,9 @@
 namespace Dkd\CmisService\Task;
 
 use Dkd\CmisService\Queue\WorkerInterface;
-use Dkd\CmisService\Execution\ExecutionInterface;
 
 /**
  * Interface TaskInterface
- *
- * @package Dkd\CmisService\Task
  */
 interface TaskInterface {
 

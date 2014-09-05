@@ -16,8 +16,6 @@ use TYPO3\CMS\Extbase\ObjectManagerInterface;
  * arguments in a fashion that supports the host system's
  * object loader - in this default implementation using
  * Extbase's ObjectManager to create object instances.
- *
- * @package Dkd\CmisService\Factory
  */
 class ObjectFactory {
 

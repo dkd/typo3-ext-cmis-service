@@ -8,8 +8,6 @@ use Dkd\CmisService\Tests\Fixtures\Execution\DummyExecution;
 
 /**
  * Class DummyTask
- *
- * @package Dkd\CmisService\Tests\Fixtures\Task
  */
 class DummyTask extends AbstractTask implements TaskInterface {
 

@@ -7,8 +7,6 @@ namespace Dkd\CmisService\Execution;
  * Defines methods that must be implemented
  * by Execution implementations in order to
  * be usable in the system.
- *
- * @package Dkd\CmisService\Execution
  */
 interface ExecutionInterface {
 

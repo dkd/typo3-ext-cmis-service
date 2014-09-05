@@ -7,8 +7,6 @@ use Dkd\CmisService\Task\TaskInterface;
  * Queue Interface
  *
  * Must be implemented by system-configured Queue class(es).
- *
- * @package Dkd\CmisService\Queue
  */
 interface QueueInterface {
 

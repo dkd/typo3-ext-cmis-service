@@ -11,8 +11,6 @@ namespace Dkd\CmisService;
  * this package scope in order to make it more portable by
  * making a single point of coupling to TYPO3 CMS for all
  * Singleton classes.
- *
- * @package Dkd\CmisService
  */
 interface SingletonInterface extends \TYPO3\CMS\Core\SingletonInterface {
 

@@ -3,8 +3,6 @@ namespace Dkd\CmisService\Configuration\Definitions;
 
 /**
  * Implementation Configuration Definition
- *
- * @package Dkd\CmisService\Configuration\Definitions
  */
 class ImplementationConfiguration extends AbstractConfigurationDefinition implements ConfigurationDefinitionInterface {
 
@@ -16,9 +14,9 @@ class ImplementationConfiguration extends AbstractConfigurationDefinition implem
 	 * @var array
 	 */
 	protected $defaults = array(
-		self::OBJECT_CLASS_QUEUE => 'Dkd\CmisService\Queue\SimpleQueue',
-		self::OBJECT_CLASS_WORKER => 'Dkd\CmisService\Queue\SimpleWorker',
-		self::OBJECT_CLASS_LOGGER => 'Dkd\CmisService\Logging\SimpleLogger'
+		self::OBJECT_CLASS_QUEUE => 'Dkd\\CmisService\\Queue\\SimpleQueue',
+		self::OBJECT_CLASS_WORKER => 'Dkd\\CmisService\\Queue\\SimpleWorker',
+		self::OBJECT_CLASS_LOGGER => 'Dkd\\CmisService\\Logging\\SimpleLogger'
 	);
 
 }

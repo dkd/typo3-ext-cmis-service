@@ -3,6 +3,7 @@ namespace Dkd\CmisService\Factory;
 
 use Dkd\CmisService\Cache\VariableFrontendInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Cache Factory
@@ -19,14 +20,12 @@ use TYPO3\CMS\Core\Cache\CacheManager;
  * to be replaced with other implementations,
  * something that is not necessary to do with the
  * backend since a host system may not need one).
- *
- * @package Dkd\CmisService\Factory
  */
 class CacheFactory {
 
 	const CACHE_PREFIX = 'CmisService';
-	const DEFAULT_FRONTEND = 'Dkd\CmisService\Cache\CmsVariableFrontend';
-	const DEFAULT_BACKEND = 'TYPO3\CMS\Core\Cache\Backend\Typo3DatabaseBackend';
+	const DEFAULT_FRONTEND = 'Dkd\\CmisService\\Cache\\CmsVariableFrontend';
+	const DEFAULT_BACKEND = 'TYPO3\\CMS\\Core\\Cache\\Backend\\Typo3DatabaseBackend';
 
 	/**
 	 * Fetch (and create if not found) a Cache
@@ -37,7 +36,16 @@ class CacheFactory {
 	 */
 	public function fetchCache($name) {
 		$cacheManager = $this->getCacheManager();
-		$instance = $cacheManager->getCache(self::CACHE_PREFIX . $name);
+		if (TRUE === $cacheManager->hasCache(self::CACHE_PREFIX . $name)) {
+			$instance = $cacheManager->getCache(self::CACHE_PREFIX . $name);
+		} else {
+			$frontendClassName = self::DEFAULT_FRONTEND;
+			$backendClassName = self::DEFAULT_BACKEND;
+			$context = (string) GeneralUtility::getApplicationContext();
+			$backend = new $backendClassName($context);
+			$instance = new $frontendClassName(self::CACHE_PREFIX . $name, $backend);
+			$cacheManager->registerCache($instance);
+		}
 		return $instance;
 	}
 
@@ -53,7 +61,7 @@ class CacheFactory {
 	protected function getCacheManager() {
 		$objectFactory = new ObjectFactory();
 		/** @var CacheManager $cacheManager */
-		$cacheManager = $objectFactory->makeInstance('TYPO3\CMS\Core\Cache\CacheManager');
+		$cacheManager = $objectFactory->makeInstance('TYPO3\\CMS\\Core\\Cache\\CacheManager');
 		return $cacheManager;
 	}
 

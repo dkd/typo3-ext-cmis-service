@@ -1,14 +1,12 @@
 <?php
-namespace Dkd\CmisService\Queue;
+namespace Dkd\CmisService\Tests\Unit\Queue;
 
 use Dkd\CmisService\Execution\Result;
-use Dkd\CmisService\Tests\Fixtures\Task\DummyTask;
+use Dkd\CmisService\Queue\SimpleWorker;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class SimpleWorkerTest
- *
- * @package Dkd\CmisService\Queue
  */
 class SimpleWorkerTest extends UnitTestCase {
 

@@ -4,8 +4,6 @@ namespace Dkd\CmisService\Configuration;
 use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
 use Dkd\CmisService\Configuration\Reader\ConfigurationReaderInterface;
 use Dkd\CmisService\Configuration\Writer\ConfigurationWriterInterface;
-use Dkd\CmisService\SingletonInterface;
-use TYPO3\CMS\Core\Log\Writer\WriterInterface;
 
 /**
  * Configuration Manager
@@ -56,8 +54,6 @@ use TYPO3\CMS\Core\Log\Writer\WriterInterface;
  * Note: since this class is a Singleton, constructor
  * parameters are only respected when the first instance is
  * created and ignored for all others.
- *
- * @package Dkd\CmisService\Configuration
  */
 class ConfigurationManager {
 

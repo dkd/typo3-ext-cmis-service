@@ -6,8 +6,6 @@ namespace Dkd\CmisService\Cache;
  * cache operations (save, get, has) to a
  * supported implementation provided by the
  * host system.
- *
- * @package Dkd\CmisService\Cache
  */
 interface VariableFrontendInterface {
 

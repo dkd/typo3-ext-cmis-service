@@ -1,12 +1,10 @@
 <?php
-namespace Dkd\CmisService\Command;
+namespace Dkd\CmisService\Tests\Unit\Command;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class CronjobCommandControllerTest
- *
- * @package Dkd\CmisService\Command
  */
 class CronjobCommandControllerTest extends UnitTestCase {
 

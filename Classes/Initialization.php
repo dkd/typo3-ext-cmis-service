@@ -6,15 +6,13 @@ namespace Dkd\CmisService;
  *
  * Class with minimum dependencies to construct an initial
  * `cmis_service` environment.
- *
- * @package Dkd\CmisService
  */
 class Initialization {
 
 	/**
 	 * @var boolean
 	 */
-	static $initialized = FALSE;
+	protected static $initialized = FALSE;
 
 	/**
 	 * Starts the CmisService initialization process.

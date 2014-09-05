@@ -1,8 +1,8 @@
 <?php
 namespace Dkd\CmisService\Factory;
 
+use Dkd\CmisService\Queue\QueueCachableInterface;
 use Dkd\CmisService\Queue\QueueInterface;
-use Dkd\CmisService\Queue\SimpleQueue;
 
 /**
  * Queue Factory
@@ -10,8 +10,6 @@ use Dkd\CmisService\Queue\SimpleQueue;
  * Fetches an instance of the Queue implementation the
  * host system has configured as active, preparing it
  * for use.
- *
- * @package Dkd\CmisService\Factory
  */
 class QueueFactory {
 
@@ -47,9 +45,11 @@ class QueueFactory {
 		$objectFactory = new ObjectFactory();
 		$cacheFactory = new CacheFactory();
 		$queueFactory = new QueueFactory();
-		$queueCache = $cacheFactory->fetchCache(SimpleQueue::CACHE_IDENTITY);
 		self::$instance = new $className();
-		self::$instance->setCache($queueCache);
+		if (TRUE === self::$instance instanceof QueueCachableInterface) {
+			$queueCache = $cacheFactory->fetchCache($className::CACHE_IDENTITY);
+			self::$instance->setCache($queueCache);
+		}
 		return self::$instance;
 	}
 

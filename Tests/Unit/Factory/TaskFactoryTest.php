@@ -1,12 +1,10 @@
 <?php
-namespace Dkd\CmisService\Factory;
+namespace Dkd\CmisService\Tests\Unit\Factory;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class TaskFactoryTest
- *
- * @package Dkd\CmisService\Factory
  */
 class TaskFactoryTest extends UnitTestCase {
 

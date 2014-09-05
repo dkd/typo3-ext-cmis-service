@@ -6,8 +6,6 @@ namespace Dkd\CmisService\Execution;
  *
  * Default implementation of Execution which
  * has no actions and no impact whatsoever.
- *
- * @package Dkd\CmisService\Execution
  */
 class NoopExecution extends AbstractExecution implements ExecutionInterface {
 

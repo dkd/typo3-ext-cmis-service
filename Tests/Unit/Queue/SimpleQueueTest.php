@@ -1,16 +1,13 @@
 <?php
-namespace Dkd\CmisService\Queue;
+namespace Dkd\CmisService\Tests\Unit\Queue;
 
-use Dkd\CmisService\Factory\WorkerFactory;
-use Dkd\CmisService\Tests\Fixtures\Queue\DummyWorker;
+use Dkd\CmisService\Queue\SimpleQueue;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Locking\Locker;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class SimpleQueueTest
- *
- * @package Dkd\CmisService\Queue
  */
 class SimpleQueueTest extends UnitTestCase {
 

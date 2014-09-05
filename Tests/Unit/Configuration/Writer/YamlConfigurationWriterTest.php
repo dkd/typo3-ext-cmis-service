@@ -1,6 +1,7 @@
 <?php
-namespace Dkd\CmisService\Configuration\Writer;
+namespace Dkd\CmisService\Tests\Unit\Configuration\Writer;
 
+use Dkd\CmisService\Configuration\Writer\YamlConfigurationWriter;
 use Dkd\CmisService\Tests\Fixtures\Configuration\DummyMasterConfiguration;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamDirectory;
@@ -10,8 +11,6 @@ use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * Class YamlConfigurationReaderTest
- *
- * @package Dkd\CmisService\Configuration\Writer
  */
 class YamlConfigurationWriterTest extends UnitTestCase {
 

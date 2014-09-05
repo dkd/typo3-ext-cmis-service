@@ -1,24 +1,28 @@
 <?php
-namespace Dkd\CmisService\Factory;
+namespace Dkd\CmisService\Tests\Unit\Factory;
 
+use Dkd\CmisService\Factory\QueueFactory;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class QueueFactoryTest
- *
- * @package Dkd\CmisService\Factory
  */
 class QueueFactoryTest extends UnitTestCase {
 
 	/**
-	 * Setup
+	 * Setup - initialize a very basic set of TYPO3 constants
+	 * and include the ext_localconf.php file to generate the
+	 * necessary cache definitions.
 	 *
 	 * @return void
 	 */
 	protected function setUp() {
 		if (FALSE === defined('TYPO3_version')) {
-			Bootstrap::getInstance()->baseSetup('vendor/typo3/cms/typo3');
+			define('PATH_thisScript', realpath('vendor/typo3/cms/typo3/index.php'));
+			Bootstrap::getInstance()->baseSetup('typo3/')->initializeClassLoader()
+				->unregisterClassLoader();
+			$GLOBALS['EXEC_TIME'] = time();
 		}
 		parent::setUp();
 	}
@@ -44,7 +48,7 @@ class QueueFactoryTest extends UnitTestCase {
 	public function initializeQueueReturnsValidClassInstance() {
 		$factory = new QueueFactory();
 		$instance = $this->callInaccessibleMethod($factory, 'initializeQueue');
-		$this->assertInstanceOf('Dkd\CmisService\Queue\QueueInterface', $instance);
+		$this->assertInstanceOf('Dkd\\CmisService\\Queue\\QueueInterface', $instance);
 	}
 
 	/**
@@ -56,7 +60,7 @@ class QueueFactoryTest extends UnitTestCase {
 	public function fetchQueueCallsExpectedMethodsAndReturnsValidClassInstance() {
 		$expectedQueueClassName = QueueFactory::DEFAULT_QUEUE_CLASS;
 		$expectedQueueClassInstance = new $expectedQueueClassName();
-		$factory = $this->getAccessibleMock('Dkd\CmisService\Factory\QueueFactory', array('initializeQueue'));
+		$factory = $this->getAccessibleMock('Dkd\\CmisService\\Factory\\QueueFactory', array('initializeQueue'));
 		$factory->_setStatic('instance', NULL);
 		$factory->expects($this->once())->method('initializeQueue')->will($this->returnValue($expectedQueueClassInstance));
 		$queue = $factory->fetchQueue();
@@ -72,7 +76,7 @@ class QueueFactoryTest extends UnitTestCase {
 	public function fetchQueueReturnsPreparedInstanceOnSubsequentUseIfInternalInstanceIsSet() {
 		$expectedQueueClassName = QueueFactory::DEFAULT_QUEUE_CLASS;
 		$expectedQueueClassInstance = new $expectedQueueClassName();
-		$factory = $this->getAccessibleMock('Dkd\CmisService\Factory\QueueFactory', array('initializeQueue'));
+		$factory = $this->getAccessibleMock('Dkd\\CmisService\\Factory\\QueueFactory', array('initializeQueue'));
 		$factory->_setStatic('instance', $expectedQueueClassInstance);
 		$factory->expects($this->never())->method('initializeQueue');
 		$queue = $factory->fetchQueue();

@@ -11,8 +11,6 @@ use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
  * configuration parameters or collections of parameters
  * identified by a string for example a stream protocul
  * URL or other location identifier.
- *
- * @package Dkd\CmisService\Configuration\Reader
  */
 interface ConfigurationReaderInterface extends ConfigurationResourceConsumerInterface {
 

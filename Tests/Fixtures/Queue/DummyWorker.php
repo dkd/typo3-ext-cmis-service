@@ -8,8 +8,6 @@ use Dkd\CmisService\Execution\Result;
 
 /**
  * Class DummyWorker
- *
- * @package Dkd\CmisService\Tests\Fixtures\Queue
  */
 class DummyWorker extends AbstractWorker implements WorkerInterface {
 

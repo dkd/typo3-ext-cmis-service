@@ -12,8 +12,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * Writes a ConfigurationDefinition to a YAML file target.
  * Is a subclass of the YamlConfigurationReader but with
  * a write() method and implementing the Writer interface.
- *
- * @package Dkd\CmisService\Configuration\Writer
  */
 class YamlConfigurationWriter extends YamlConfigurationReader implements ConfigurationWriterInterface {
 

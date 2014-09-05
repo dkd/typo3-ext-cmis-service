@@ -6,8 +6,6 @@ use Dkd\CmisService\Queue\WorkerInterface;
 
 /**
  * Factory to create new Worker instances.
- *
- * @package Dkd\CmisService\Factory
  */
 class WorkerFactory {
 

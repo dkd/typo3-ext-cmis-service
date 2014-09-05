@@ -8,8 +8,6 @@ use Dkd\CmisService\Task\TaskInterface;
  *
  * Contains the most basic possible implementation of
  * a Task + Execution based task handling.
- *
- * @package Dkd\CmisService\Queue
  */
 abstract class AbstractWorker implements WorkerInterface {
 

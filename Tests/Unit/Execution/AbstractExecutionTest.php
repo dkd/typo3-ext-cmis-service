@@ -1,12 +1,10 @@
 <?php
-namespace Dkd\CmisService\Execution;
+namespace Dkd\CmisService\Tests\Unit\Execution;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class AbstractExecutionTest
- *
- * @package Dkd\CmisService\Execution
  */
 class AbstractExecutionTest extends UnitTestCase {
 
@@ -17,9 +15,9 @@ class AbstractExecutionTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function createsResultObjects() {
-		$execution = $this->getAccessibleMockForAbstractClass('Dkd\CmisService\Execution\AbstractExecution');
+		$execution = $this->getAccessibleMockForAbstractClass('Dkd\\CmisService\\Execution\\AbstractExecution');
 		$result = $this->callInaccessibleMethod($execution, 'createResultObject');
-		$this->assertInstanceOf('Dkd\CmisService\Execution\Result', $result);
+		$this->assertInstanceOf('Dkd\\CmisService\\Execution\\Result', $result);
 	}
 
 	/**
@@ -29,10 +27,10 @@ class AbstractExecutionTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function storesResultAfterExecution() {
-		$task = $this->getAccessibleMock('Dkd\CmisService\Tests\Fixtures\Task\DummyTask');
-		$execution = $this->getAccessibleMockForAbstractClass('Dkd\CmisService\Execution\AbstractExecution');
+		$task = $this->getAccessibleMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask');
+		$execution = $this->getAccessibleMockForAbstractClass('Dkd\\CmisService\\Execution\\AbstractExecution');
 		$executionResult = $execution->execute($task);
-		$this->assertInstanceOf('Dkd\CmisService\Execution\Result', $execution->getResult());
+		$this->assertInstanceOf('Dkd\\CmisService\\Execution\\Result', $execution->getResult());
 	}
 
 }

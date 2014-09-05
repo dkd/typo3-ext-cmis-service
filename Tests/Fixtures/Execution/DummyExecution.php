@@ -6,8 +6,6 @@ use Dkd\CmisService\Execution\ExecutionInterface;
 
 /**
  * Class DummyExecution
- *
- * @package Dkd\CmisService\Tests\Fixtures\Execution
  */
 class DummyExecution extends AbstractExecution implements ExecutionInterface {
 

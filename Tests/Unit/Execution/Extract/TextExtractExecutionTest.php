@@ -1,12 +1,10 @@
 <?php
-namespace Dkd\CmisService\Execution\Extract;
+namespace Dkd\CmisService\Tests\Unit\Execution\Extract;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class TextExtractionTest
- *
- * @package Dkd\CmisService\Execution\Extract
  */
 class TextExtractionTest extends UnitTestCase {
 

@@ -8,8 +8,6 @@ namespace Dkd\CmisService\Configuration\Definitions;
  * as names of classes to use for handling the bootstrap
  * process of configuration parameters. Also contains
  * API methods to access every other type of configuration.
- *
- * @package Dkd\CmisService\Configuration\Definitions
  */
 class MasterConfiguration extends AbstractConfigurationDefinition implements ConfigurationDefinitionInterface {
 
@@ -17,8 +15,8 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 	const OBJECT_CLASS_CONFIGURATION_WRITER = 'objects.configuration.writer.className';
 
 	protected $defaults = array(
-		self::OBJECT_CLASS_CONFIGURATION_READER => 'Dkd\CmisService\Configuration\Reader\YamlConfigurationReader',
-		self::OBJECT_CLASS_CONFIGURATION_WRITER => 'Dkd\CmisService\Configuration\Writer\YamlConfigurationWriter'
+		self::OBJECT_CLASS_CONFIGURATION_READER => 'Dkd\\CmisService\\Configuration\\Reader\\YamlConfigurationReader',
+		self::OBJECT_CLASS_CONFIGURATION_WRITER => 'Dkd\\CmisService\\Configuration\\Writer\\YamlConfigurationWriter'
 	);
 
 	/**

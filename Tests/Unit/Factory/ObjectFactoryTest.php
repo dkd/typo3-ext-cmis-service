@@ -1,14 +1,13 @@
 <?php
-namespace Dkd\CmisService\Factory;
+namespace Dkd\CmisService\Tests\Unit\Factory;
 
+use Dkd\CmisService\Factory\ObjectFactory;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 
 /**
  * Class ObjectFactoryTest
- *
- * @package Dkd\CmisService\Factory
  */
 class ObjectFactoryTest extends UnitTestCase {
 

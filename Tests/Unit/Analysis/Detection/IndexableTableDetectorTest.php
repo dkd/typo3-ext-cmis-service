@@ -1,12 +1,10 @@
 <?php
-namespace Dkd\CmisService\Analysis\Detection;
+namespace Dkd\CmisService\Tests\Unit\Analysis\Detection;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class IndexableTableDetectorTest
- *
- * @package Dkd\CmisService\Analysis\Detection
  */
 class IndexableTableDetectorTest extends UnitTestCase {
 

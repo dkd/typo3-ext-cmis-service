@@ -9,8 +9,6 @@ use Dkd\CmisService\Cache\VariableFrontendInterface;
  * Must be implemented if the Queue implementation also
  * should receive an instance of a VariableFrontend to
  * implement caching-based features.
- *
- * @package Dkd\CmisService\Queue
  */
 interface QueueCachableInterface {
 

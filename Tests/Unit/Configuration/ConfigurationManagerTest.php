@@ -1,6 +1,7 @@
 <?php
-namespace Dkd\CmisService\Configuration;
+namespace Dkd\CmisService\Tests\Unit\Configuration;
 
+use Dkd\CmisService\Configuration\ConfigurationManager;
 use Dkd\CmisService\Tests\Fixtures\Configuration\DummyMasterConfiguration;
 use Dkd\CmisService\Tests\Fixtures\Configuration\DummyReader;
 use Dkd\CmisService\Tests\Fixtures\Configuration\DummyWriter;
@@ -10,8 +11,6 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Class ConfigurationManagerTest
- *
- * @package Dkd\CmisService\Configuration
  */
 class ConfigurationManagerTest extends UnitTestCase {
 

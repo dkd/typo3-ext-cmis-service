@@ -1,12 +1,10 @@
 <?php
-namespace Dkd\CmisService\Queue;
+namespace Dkd\CmisService\Tests\Unit\Queue;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class QueueManagerTest
- *
- * @package Dkd\CmisService\Queue
  */
 class QueueManagerTest extends UnitTestCase {
 

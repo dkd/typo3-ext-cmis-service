@@ -42,8 +42,6 @@ use TYPO3\CMS\Core\Locking\Locker;
  * // dummy example execution without ANY handling.
  * // $result is a Dkd\CmisService\Execution\Result
  * $result = $task->getWorker()->execute($task);
- *
- * @package Dkd\CmisService\Queue
  */
 class SimpleQueue implements QueueInterface, QueueCachableInterface {
 

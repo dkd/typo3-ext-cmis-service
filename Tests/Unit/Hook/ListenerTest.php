@@ -1,12 +1,10 @@
 <?php
-namespace Dkd\CmisService\Hook;
+namespace Dkd\CmisService\Tests\Unit\Hook;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class ListenerTest
- *
- * @package Dkd\CmisService\Hook
  */
 class ListenerTest extends UnitTestCase {
 

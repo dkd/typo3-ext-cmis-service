@@ -1,12 +1,10 @@
 <?php
-namespace Dkd\CmisService\Execution;
+namespace Dkd\CmisService\Tests\Unit\Execution;
 
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
  * Class ResultTest
- *
- * @package Dkd\CmisService\Execution
  */
 class ResultTest extends UnitTestCase {
 

@@ -1,13 +1,12 @@
 <?php
-namespace Dkd\CmisService\Configuration\Reader;
+namespace Dkd\CmisService\Tests\Unit\Configuration\Reader;
 
+use Dkd\CmisService\Configuration\Reader\YamlConfigurationReader;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * Class YamlConfigurationReaderTest
- *
- * @package Dkd\CmisService\Configuration\Reader
  */
 class YamlConfigurationReaderTest extends UnitTestCase {
 
