@@ -93,6 +93,20 @@ class TypoScriptConfigurationReaderTest extends UnitTestCase {
 	 * @test
 	 * @return void
 	 */
+	public function readThrowsExpectedExceptionOnInvalidDefinitionClassName() {
+		$fixture = $this->getGoodFixturePath();
+		$invalidAsConfigurationDefinitionButExistingClassName = 'Dkd\\CmisService\\Tests\\Fixtures\\Configuration\\DummyReader';
+		$reader = new TypoScriptConfigurationReader();
+		$this->setExpectedException('RuntimeException', NULL, 1409923995);
+		$reader->read($fixture, $invalidAsConfigurationDefinitionButExistingClassName);
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
 	public function existsReturnsTrueIfResourceExists() {
 		$fixture = $this->getGoodFixturePath();
 		$reader = $this->getMock(
