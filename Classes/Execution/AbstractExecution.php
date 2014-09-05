@@ -4,7 +4,7 @@ namespace Dkd\CmisService\Execution;
 /**
  * Base class for Executions
  */
-abstract class AbstractExecution {
+abstract class AbstractExecution implements ExecutionInterface {
 
 	/**
 	 * @var Result

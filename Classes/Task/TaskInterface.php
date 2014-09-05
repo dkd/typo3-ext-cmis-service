@@ -83,6 +83,13 @@ interface TaskInterface {
 	public function assign(WorkerInterface $worker);
 
 	/**
+	 * Gets the assigned Worker or NULL if one is not set.
+	 *
+	 * @return WorkerInterface
+	 */
+	public function getWorker();
+
+	/**
 	 * Determine, instanciate and return an Execution
 	 * befitting this Task, possibly conditioned by
 	 * parameters defined in the Task.

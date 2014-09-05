@@ -107,7 +107,15 @@ abstract class AbstractTask implements TaskInterface {
 	public function assign(WorkerInterface $worker) {
 		$this->worker = $worker;
 		$this->status = TaskInterface::STATUS_ASSIGNED;
-		$worker->setTask($this);
+	}
+
+	/**
+	 * Gets the assigned Worker or NULL if one is not set.
+	 *
+	 * @return WorkerInterface
+	 */
+	public function getWorker() {
+		return $this->worker;
 	}
 
 	/**

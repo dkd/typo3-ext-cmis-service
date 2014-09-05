@@ -18,7 +18,6 @@ class DummyWorker extends AbstractWorker implements WorkerInterface {
 	 * @return Result
 	 */
 	public function execute(TaskInterface $task) {
-		$this->setTask($task);
 		$result = $task->resolveExecutionObject()->execute($task);
 		return $result;
 	}

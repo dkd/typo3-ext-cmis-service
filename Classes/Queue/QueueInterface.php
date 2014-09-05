@@ -37,4 +37,9 @@ interface QueueInterface {
 	 */
 	public function load();
 
+	/**
+	 * @return void
+	 */
+	public function flush();
+
 }

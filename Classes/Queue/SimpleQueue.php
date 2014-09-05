@@ -57,7 +57,7 @@ class SimpleQueue implements QueueInterface, QueueCachableInterface {
 	protected $queue = array();
 
 	/**
-	 * @var VariableFrontend
+	 * @var VariableFrontendInterface
 	 */
 	protected $cache;
 
@@ -168,6 +168,17 @@ class SimpleQueue implements QueueInterface, QueueCachableInterface {
 		if (TRUE === $this->cache->has(self::CACHE_IDENTITY)) {
 			$this->queue = $this->cache->get(self::CACHE_IDENTITY);
 		}
+	}
+
+	/**
+	 * Flushes every Task from the Queue.
+	 *
+	 * @api
+	 * @return void
+	 */
+	public function flush() {
+		$this->queue = array();
+		$this->save();
 	}
 
 	/**

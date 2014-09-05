@@ -14,3 +14,7 @@ if (!is_array($caches[\Dkd\CmisService\Factory\CacheFactory::CACHE_PREFIX . \Dkd
 
 // remove reference
 unset($caches);
+
+// add our CommandController which handles cronjobs
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][]
+	= 'Dkd\\CmisService\\Command\\CronjobCommandController';

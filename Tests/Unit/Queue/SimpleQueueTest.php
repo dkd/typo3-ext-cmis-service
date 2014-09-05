@@ -209,4 +209,16 @@ class SimpleQueueTest extends UnitTestCase {
 		$this->assertInstanceOf('TYPO3\\CMS\\Core\\Locking\\Locker', $locker);
 	}
 
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function flushSetsEmptyArrayAndCallsSave() {
+		$queue = $this->getMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('save'), array(), '', FALSE);
+		$queue->expects($this->once())->method('save');
+		$queue->flush();
+	}
+
 }
