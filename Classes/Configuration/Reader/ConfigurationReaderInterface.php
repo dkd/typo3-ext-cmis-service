@@ -31,8 +31,9 @@ interface ConfigurationReaderInterface extends ConfigurationResourceConsumerInte
 	 * identifier name.
 	 *
 	 * @param string $resourceIdentifier
+	 * @param string $definitionClassName
 	 * @return ConfigurationDefinitionInterface
 	 */
-	public function read($resourceIdentifier);
+	public function read($resourceIdentifier, $definitionClassName);
 
 }

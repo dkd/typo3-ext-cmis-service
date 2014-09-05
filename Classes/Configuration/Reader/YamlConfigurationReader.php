@@ -2,6 +2,8 @@
 namespace Dkd\CmisService\Configuration\Reader;
 
 use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
+use Dkd\CmisService\Factory\ObjectFactory;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * YAML Configuration Reader
@@ -30,8 +32,15 @@ class YamlConfigurationReader implements ConfigurationReaderInterface {
 	 * @param string $resourceIdentifier
 	 * @return ConfigurationDefinitionInterface
 	 */
-	public function read($resourceIdentifier) {
-
+	public function read($resourceIdentifier, $definitionClassName) {
+		if (FALSE === is_a($definitionClassName, 'Dkd\\CmisService\\Configuration\\Definitions\\ConfigurationDefinitionInterface', TRUE)) {
+			throw new \RuntimeException('Configuration definition class "' . $definitionClassName . '" must implement interface ' .
+				'"Dkd\\CmisService\\Configuration\\Definitions\\ConfigurationDefinitionInterface"', 1409923995);
+		}
+		$yamlArray = Yaml::parse($resourceIdentifier);
+		$definition = new $definitionClassName();
+		$definition->setDefinitions($yamlArray);
+		return $definition;
 	}
 
 	/**
@@ -42,7 +51,7 @@ class YamlConfigurationReader implements ConfigurationReaderInterface {
 	 * @return boolean
 	 */
 	public function exists($resourceIdentifier) {
-
+		return TRUE === file_exists($resourceIdentifier);
 	}
 
 	/**
@@ -54,7 +63,7 @@ class YamlConfigurationReader implements ConfigurationReaderInterface {
 	 * @return string
 	 */
 	public function checksum($resourceIdentifier) {
-
+		return sha1($resourceIdentifier);
 	}
 
 	/**
@@ -66,7 +75,7 @@ class YamlConfigurationReader implements ConfigurationReaderInterface {
 	 * @return \DateTime
 	 */
 	public function lastModified($resourceIdentifier) {
-
+		return \DateTime::createFromFormat('U', filemtime($resourceIdentifier));
 	}
 
 }

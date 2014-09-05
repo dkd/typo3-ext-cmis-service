@@ -2,28 +2,47 @@
 namespace Dkd\CmisService\Configuration\Reader;
 
 use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
+use Dkd\CmisService\Factory\ObjectFactory;
+use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
  * TypoScript Configuration Reader
  *
  * Reads ConfigurationDefinition instances from data
- * stored in TypoScript setup.
+ * stored in TypoScript setup. By providing the read()
+ * method with an argument that is a (dotted-path)
+ * name of a setting inside the main TypoScript settings
+ * array returns just that setting. This allows the
+ * Reader to construct different ConfigurationDefinition
+ * instances from each sub-array of the configuration.
  *
  * @package Dkd\CmisService\Configuration\Reader
  */
 class TypoScriptConfigurationReader implements ConfigurationReaderInterface {
 
 	/**
-	 * Load the specified TypoScript object path into
+	 * Load the specified TypoScript object sub-path into
 	 * the reader. Format is a string with a dotted path
-	 * to the desired object, for example
-	 * 'plugin.tx_cmisservice.settings.indexing'
+	 * to the desired object, for example 'tables' to
+	 * access the value of or array at location
+	 * 'plugin.tx_cmisservice.settings.tables'. Use an
+	 * empty value to read all settings.
 	 *
 	 * @param string $resourceIdentifier
+	 * @param string $definitionClassName
 	 * @return ConfigurationDefinitionInterface
 	 */
-	public function read($resourceIdentifier) {
-
+	public function read($resourceIdentifier, $definitionClassName) {
+		if (FALSE === is_a($definitionClassName, 'Dkd\\CmisService\\Configuration\\Definitions\\ConfigurationDefinitionInterface', TRUE)) {
+			throw new \RuntimeException('Configuration definition class "' . $definitionClassName . '" must implement interface ' .
+				'"Dkd\\CmisService\\Configuration\\Definitions\\ConfigurationDefinitionInterface"', 1409923995);
+		}
+		$typoScript = $this->getTypoScriptSettings();
+		$typoScript = ObjectAccess::getPropertyPath($typoScript, $resourceIdentifier);
+		/** @var ConfigurationDefinitionInterface $definition */
+		$definition = new $definitionClassName();
+		$definition->setDefinitions($typoScript);
+		return $definition;
 	}
 
 	/**
@@ -35,7 +54,9 @@ class TypoScriptConfigurationReader implements ConfigurationReaderInterface {
 	 * @return boolean
 	 */
 	public function exists($resourceIdentifier) {
-
+		$typoScript = $this->getTypoScriptSettings();
+		$typoScript = ObjectAccess::getPropertyPath($typoScript, $resourceIdentifier);
+		return (boolean) 0 < count($typoScript);
 	}
 
 	/**
@@ -47,7 +68,9 @@ class TypoScriptConfigurationReader implements ConfigurationReaderInterface {
 	 * @return string
 	 */
 	public function checksum($resourceIdentifier) {
-
+		$typoScript = $this->getTypoScriptSettings();
+		$typoScript = ObjectAccess::getPropertyPath($typoScript, $resourceIdentifier);
+		return sha1(serialize($typoScript));
 	}
 
 	/**
@@ -60,7 +83,33 @@ class TypoScriptConfigurationReader implements ConfigurationReaderInterface {
 	 * @return \DateTime
 	 */
 	public function lastModified($resourceIdentifier) {
+		$lastUpdatedRecord = $this->getLastUpdatedRecord();
+		return \DateTime::createFromFormat('U', $lastUpdatedRecord['tstamp']);
+	}
 
+	/**
+	 * @return array
+	 */
+	protected function getLastUpdatedRecord() {
+		$lastUpdatedRecord = $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow(
+			'tstamp',
+			'sys_template',
+			'deleted = 0',
+			'uid',
+			'tstamp DESC'
+		);
+		return $lastUpdatedRecord;
+	}
+
+	/**
+	 * Returns the TypoScript beneath plugin.tx_cmisservice.settings
+	 *
+	 * @return array
+	 */
+	protected function getTypoScriptSettings() {
+		$objectFactory = new ObjectFactory();
+		$typoScript = $objectFactory->getExtensionTypoScriptSettings();
+		return $typoScript;
 	}
 
 }

@@ -23,9 +23,10 @@ interface ConfigurationResourceConsumerInterface {
 	 * is an Array or object implementing ArrayAccess.
 	 *
 	 * @param string $resourceIdentifier
+	 * @param string $definitionClassName
 	 * @return mixed
 	 */
-	public function read($resourceIdentifier);
+	public function read($resourceIdentifier, $definitionClassName);
 
 	/**
 	 * Returns TRUE if the resource identified by the

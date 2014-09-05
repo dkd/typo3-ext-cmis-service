@@ -13,9 +13,10 @@ class DummyReader implements ConfigurationReaderInterface {
 	 * DummyReader always returns a DummyConfigurationDefinition
 	 *
 	 * @param string $resourceIdentifier
+	 * @param string $definitionClassName
 	 * @return ConfigurationDefinitionInterface
 	 */
-	public function read($resourceIdentifier) {
+	public function read($resourceIdentifier, $definitionClassName) {
 		return new DummyConfigurationDefinition();
 	}
 

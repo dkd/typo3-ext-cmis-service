@@ -9,6 +9,11 @@ use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
 class DummyConfigurationDefinition implements ConfigurationDefinitionInterface {
 
 	/**
+	 * @var array
+	 */
+	protected $definitions = array();
+
+	/**
 	 * DummyConfigurationDefinition always returns name of
 	 * variable passed as argument-
 	 *
@@ -21,21 +26,22 @@ class DummyConfigurationDefinition implements ConfigurationDefinitionInterface {
 	}
 
 	/**
-	 * Does nothing with $definitions
+	 * Sets $this->definitions
 	 *
 	 * @param array $definitions
 	 * @return void
 	 */
 	public function setDefinitions(array $definitions) {
+		$this->definitions = $definitions;
 	}
 
 	/**
-	 * Always returns array('foo' => 'bar')
+	 * Always returns $this->definitions
 	 *
 	 * @return array
 	 */
 	public function getDefinitions() {
-		return array('foo' => 'bar');
+		return $this->definitions;
 	}
 
 }

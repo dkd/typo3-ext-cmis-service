@@ -2,67 +2,33 @@
 namespace Dkd\CmisService\Configuration\Writer;
 
 use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
+use Dkd\CmisService\Configuration\Reader\YamlConfigurationReader;
+use Symfony\Component\Yaml\Yaml;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * YAML-based Configuration Writer
  *
  * Writes a ConfigurationDefinition to a YAML file target.
+ * Is a subclass of the YamlConfigurationReader but with
+ * a write() method and implementing the Writer interface.
  *
  * @package Dkd\CmisService\Configuration\Writer
  */
-class YamlConfigurationWriter implements ConfigurationWriterInterface {
+class YamlConfigurationWriter extends YamlConfigurationReader implements ConfigurationWriterInterface {
 
 	/**
+	 * Writes the definitions array from $configuration into
+	 * the YAML file at $resourceIdentifier.
+	 *
 	 * @param ConfigurationDefinitionInterface $configuration
 	 * @param string $resourceIdentifier
 	 * @return boolean
 	 */
 	public function write(ConfigurationDefinitionInterface $configuration, $resourceIdentifier) {
-
-	}
-
-	/**
-	 * Load the specified YAML file and parse it into
-	 * memory.
-	 *
-	 * @param string $resourceIdentifier
-	 * @return mixed
-	 */
-	public function read($resourceIdentifier) {
-
-	}
-
-	/**
-	 * Returns TRUE if the resource YAML file exists
-	 *
-	 * @param string $resourceIdentifier
-	 * @return boolean
-	 */
-	public function exists($resourceIdentifier) {
-
-	}
-
-	/**
-	 * Performs a checksum calculation of the resource
-	 * identifier (file checksum of YAML file)
-	 *
-	 * @param string $resourceIdentifier
-	 * @return string
-	 */
-	public function checksum($resourceIdentifier) {
-
-	}
-
-	/**
-	 * Returns a DateTime instance reflecting the last
-	 * modification date of the resource identified in
-	 * the argument.
-	 *
-	 * @param string $resourceIdentifier
-	 * @return \DateTime
-	 */
-	public function lastModified($resourceIdentifier) {
-
+		$array = $configuration->getDefinitions();
+		$yamlFileContents = Yaml::dump($array);
+		return GeneralUtility::writeFile($resourceIdentifier, $yamlFileContents);
 	}
 
 }
