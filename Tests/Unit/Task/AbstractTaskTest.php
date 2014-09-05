@@ -2,6 +2,7 @@
 namespace Dkd\CmisService\Tests\Unit\Task;
 
 use Dkd\CmisService\Task\TaskInterface;
+use Dkd\CmisService\Tests\Fixtures\Queue\DummyWorker;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -124,8 +125,7 @@ class AbstractTaskTest extends UnitTestCase {
 	 */
 	public function finishCallsExpectedMethodsAndSetsExpectedStatus() {
 		$task = $this->getAccessibleMockForAbstractClass('Dkd\\CmisService\\Task\\AbstractTask');
-		$worker = $this->getAccessibleMock('Dkd\\CmisService\\Queue\\SimpleWorker', array('setTask'));
-		$worker->expects($this->once())->method('setTask')->with($task);
+		$worker = new DummyWorker();
 		$task->assign($worker);
 		$this->assertSame($worker, $task->_get('worker'));
 		$task->finish();

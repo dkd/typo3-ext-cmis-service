@@ -47,4 +47,21 @@ class CacheFactoryTest extends UnitTestCase {
 		$return = $instance->fetchCache(SimpleQueue::CACHE_IDENTITY);
 	}
 
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function fetchCacheCallsExpectedMethodsWhenCacheDoesNotExist() {
+		$instance = $this->getMock('Dkd\\CmisService\\Factory\\CacheFactory', array('getCacheManager'), array(), '', FALSE);
+		$cacheManager = $this->getMock('TYPO3\\CMS\\Core\\Cache\\CacheManager', array('hasCache', 'registerCache'));
+		$cacheManager->expects($this->at(0))->method('hasCache')
+			->with(CacheFactory::CACHE_PREFIX . SimpleQueue::CACHE_IDENTITY)
+			->will($this->returnValue(FALSE));
+		$cacheManager->expects($this->at(1))->method('registerCache');
+		$instance->expects($this->at(0))->method('getCacheManager')->will($this->returnValue($cacheManager));
+		$return = $instance->fetchCache(SimpleQueue::CACHE_IDENTITY);
+	}
+
 }

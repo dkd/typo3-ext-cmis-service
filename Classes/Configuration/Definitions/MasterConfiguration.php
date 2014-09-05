@@ -61,6 +61,7 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 		NetworkConfiguration $networkConfiguration,
 		CmisConfiguration $cmisConfiguration,
 		StanbolConfiguration $stanbolConfiguration) {
+		$this->implementationConfiguration = $implementationConfiguration;
 		$this->tableConfiguration = $tableConfiguration;
 		$this->networkConfiguration = $networkConfiguration;
 		$this->cmisConfiguration = $cmisConfiguration;

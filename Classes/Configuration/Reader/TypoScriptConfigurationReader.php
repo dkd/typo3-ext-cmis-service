@@ -105,9 +105,19 @@ class TypoScriptConfigurationReader implements ConfigurationReaderInterface {
 	 * @return array
 	 */
 	protected function getTypoScriptSettings() {
-		$objectFactory = new ObjectFactory();
+		$objectFactory = $this->getObjectFactory();
 		$typoScript = $objectFactory->getExtensionTypoScriptSettings();
 		return $typoScript;
+	}
+
+	/**
+	 * Retrieves the ObjectFactory
+	 *
+	 * @return ObjectFactory
+	 */
+	protected function getObjectFactory() {
+		$objectFactory = new ObjectFactory();
+		return $objectFactory;
 	}
 
 }

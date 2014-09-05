@@ -1,5 +1,6 @@
 <?php
 namespace Dkd\CmisService\Configuration\Definitions;
+
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
