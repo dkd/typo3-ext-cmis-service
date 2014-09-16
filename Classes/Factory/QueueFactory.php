@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Factory;
 
+use Dkd\CmisService\Configuration\Definitions\ImplementationConfiguration;
 use Dkd\CmisService\Queue\QueueCachableInterface;
 use Dkd\CmisService\Queue\QueueInterface;
 
@@ -50,6 +51,7 @@ class QueueFactory {
 			$queueCache = $cacheFactory->fetchCache($className::CACHE_IDENTITY);
 			self::$instance->setCache($queueCache);
 		}
+		self::$instance->load();
 		return self::$instance;
 	}
 
@@ -60,7 +62,18 @@ class QueueFactory {
 	 * @return string
 	 */
 	protected function getConfiguredQueueClassName() {
-		return self::DEFAULT_QUEUE_CLASS;
+		$className = $this->getObjectFactory()
+			->getConfiguration()
+			->getImplementationConfiguration()
+			->get(ImplementationConfiguration::OBJECT_CLASS_QUEUE);
+		return $className;
+	}
+
+	/**
+	 * @return ObjectFactory
+	 */
+	protected function getObjectFactory() {
+		return new ObjectFactory();
 	}
 
 }

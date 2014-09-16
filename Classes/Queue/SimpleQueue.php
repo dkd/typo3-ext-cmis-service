@@ -3,6 +3,7 @@ namespace Dkd\CmisService\Queue;
 
 use Dkd\CmisService\Cache\VariableFrontendInterface;
 use Dkd\CmisService\Factory\WorkerFactory;
+use Dkd\CmisService\Task\TaskFilterInterface;
 use Dkd\CmisService\Task\TaskInterface;
 use TYPO3\CMS\Core\Locking\Locker;
 
@@ -185,6 +186,19 @@ class SimpleQueue implements QueueInterface, QueueCachableInterface {
 	 */
 	public function flush() {
 		$this->queue = array();
+		$this->save();
+	}
+
+	/**
+	 * @param TaskFilterInterface $filter
+	 * @return void
+	 */
+	public function flushByFilter(TaskFilterInterface $filter) {
+		foreach ($this->queue as $index => $task) {
+			if (TRUE === $filter->matches($task)) {
+				unset($this->queue[$index]);
+			}
+		}
 		$this->save();
 	}
 

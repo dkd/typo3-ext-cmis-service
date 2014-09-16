@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Queue;
 
+use Dkd\CmisService\Task\TaskFilterInterface;
 use Dkd\CmisService\Task\TaskInterface;
 
 /**
@@ -46,5 +47,11 @@ interface QueueInterface {
 	 * @return void
 	 */
 	public function flush();
+
+	/**
+	 * @param TaskFilterInterface $filter
+	 * @return void
+	 */
+	public function flushByFilter(TaskFilterInterface $filter);
 
 }

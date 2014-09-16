@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Tests\Unit\Factory;
 
+use Dkd\CmisService\Configuration\Definitions\ImplementationConfiguration;
 use Dkd\CmisService\Factory\QueueFactory;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
@@ -33,10 +34,26 @@ class QueueFactoryTest extends UnitTestCase {
 	 * @test
 	 * @return void
 	 */
-	public function getConfiguredQueueClassNameReturnsValidClassName() {
-		$factory = new QueueFactory();
+	public function getConfiguredQueueClassNameFetchesClassNameFromImplementationConfigurationViaObjectFactory() {
+		$implementationConfiguration = $this->getMock(
+			'Dkd\\CmisService\\Configuration\\Definitions\\MasterConfiguration',
+			array('get')
+		);
+		$implementationConfiguration->expects($this->once())->method('get')
+			->with(ImplementationConfiguration::OBJECT_CLASS_QUEUE)
+			->will($this->returnValue('foobar'));
+		$masterConfiguration = $this->getMock(
+			'Dkd\\CmisService\\Configuration\\Definitions\\MasterConfiguration',
+			array('getImplementationConfiguration')
+		);
+		$masterConfiguration->expects($this->once())->method('getImplementationConfiguration')
+			->will($this->returnValue($implementationConfiguration));
+		$objectFactory = $this->getMock('Dkd\\CmisService\\Factory\\QueueFactory', array('getConfiguration'));
+		$objectFactory->expects($this->once())->method('getConfiguration')->will($this->returnValue($masterConfiguration));
+		$factory = $this->getMock('Dkd\\CmisService\\Factory\\QueueFactory', array('getObjectFactory'));
+		$factory->expects($this->once())->method('getObjectFactory')->will($this->returnValue($objectFactory));
 		$className = $this->callInaccessibleMethod($factory, 'getConfiguredQueueClassName');
-		$this->assertTrue(class_exists($className));
+		$this->assertEquals('foobar', $className);
 	}
 
 	/**
@@ -46,9 +63,18 @@ class QueueFactoryTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function initializeQueueReturnsValidClassInstance() {
-		$factory = new QueueFactory();
+		$backup = $GLOBALS['TYPO3_DB'];
+		$GLOBALS['TYPO3_DB'] = $this->getMock(
+			'TYPO3\\CMS\\Core\\Database\\DatabaseConnection',
+			array('connectDB', 'fullQuoteStr', 'exec_SELECTcountRows')
+		);
+		$GLOBALS['TYPO3_DB']->expects($this->once())->method('exec_SELECTcountRows')->will($this->returnValue(0));
+		$factory = $this->getAccessibleMock('Dkd\\CmisService\\Factory\\QueueFactory', array('getConfiguredQueueClassName'));
+		$factory->expects($this->once())->method('getConfiguredQueueClassName')
+			->will($this->returnValue(QueueFactory::DEFAULT_QUEUE_CLASS));
 		$instance = $this->callInaccessibleMethod($factory, 'initializeQueue');
 		$this->assertInstanceOf('Dkd\\CmisService\\Queue\\QueueInterface', $instance);
+		$GLOBALS['TYPO3_DB'] = $backup;
 	}
 
 	/**
@@ -60,7 +86,10 @@ class QueueFactoryTest extends UnitTestCase {
 	public function fetchQueueCallsExpectedMethodsAndReturnsValidClassInstance() {
 		$expectedQueueClassName = QueueFactory::DEFAULT_QUEUE_CLASS;
 		$expectedQueueClassInstance = new $expectedQueueClassName();
-		$factory = $this->getAccessibleMock('Dkd\\CmisService\\Factory\\QueueFactory', array('initializeQueue'));
+		$factory = $this->getAccessibleMock(
+			'Dkd\\CmisService\\Factory\\QueueFactory',
+			array('initializeQueue', 'getConfiguredQueueClassName')
+		);
 		$factory->_setStatic('instance', NULL);
 		$factory->expects($this->once())->method('initializeQueue')->will($this->returnValue($expectedQueueClassInstance));
 		$queue = $factory->fetchQueue();
@@ -82,6 +111,18 @@ class QueueFactoryTest extends UnitTestCase {
 		$queue = $factory->fetchQueue();
 		$this->assertInstanceOf($expectedQueueClassName, $queue);
 		$this->assertSame($expectedQueueClassInstance, $queue);
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function getObjectFactoryReturnsObjectFactoryInstance() {
+		$queueFactory = new QueueFactory();
+		$result = $this->callInaccessibleMethod($queueFactory, 'getObjectFactory');
+		$this->assertInstanceOf('Dkd\\CmisService\\Factory\\ObjectFactory', $result);
 	}
 
 }

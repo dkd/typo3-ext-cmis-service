@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Tests\Unit\Task;
 
+use Dkd\CmisService\Task\RecordIndexTask;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -9,13 +10,15 @@ use TYPO3\CMS\Core\Tests\UnitTestCase;
 class RecordIndexTaskTest extends UnitTestCase {
 
 	/**
-	 * Placeholder
+	 * Unit test
 	 *
 	 * @test
 	 * @return void
 	 */
-	public function placeholder() {
-		$this->markTestIncomplete('Tests not yet implemented');
+	public function resolveExecutionObjectReturnsCmisIndexExecution() {
+		$instance = new RecordIndexTask();
+		$execution = $instance->resolveExecutionObject();
+		$this->assertInstanceOf('Dkd\\CmisService\\Execution\\Cmis\\IndexExecution', $execution);
 	}
 
 }
