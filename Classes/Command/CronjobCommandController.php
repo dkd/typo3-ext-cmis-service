@@ -1,10 +1,12 @@
 <?php
 namespace Dkd\CmisService\Command;
 
+use Dkd\CmisService\Analysis\RecordAnalyzer;
 use Dkd\CmisService\Analysis\TableConfigurationAnalyzer;
 use Dkd\CmisService\Factory\QueueFactory;
-use Dkd\CmisService\Queue\QueueInterface;
+use Dkd\CmisService\Factory\TaskFactory;
 use Dkd\CmisService\Task\TaskInterface;
+use Dkd\CmisService\Queue\QueueInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use TYPO3\CMS\Frontend\Page\PageRepository;
 
@@ -42,13 +44,32 @@ class CronjobCommandController extends CommandController {
 	 * @return void
 	 */
 	public function generateIndexingTasksCommand($table = NULL) {
-		$analyzer = $this->getTableConfigurationAnalyzer();
+		$tableAnalyzer = $this->getTableConfigurationAnalyzer();
 		if (NULL === $table) {
-			$tables = $analyzer->getIndexableTableNames();
+			$tables = $tableAnalyzer->getIndexableTableNames();
+		} elseif (FALSE !== strpos($table, ',')) {
+			$tables = explode(',', $table);
+			$tables = array_map('trim', $tables);
 		} else {
 			$tables = array($table);
 		}
-		// @TODO: fill actual tasks
+		$tasks = array();
+		$queue = $this->getQueue();
+		$taskFactory = $this->getTaskFactory();
+		foreach ($tables as $table) {
+			$records = $this->getAllEnabledRecordsFromTable($table);
+			$added = 0;
+			foreach ($records as $record) {
+				$recordAnalyzer = $this->getRecordAnalyzer($table, $record);
+				$fields = $recordAnalyzer->getIndexableColumnNames();
+				$tasks[] = $taskFactory->createRecordIndexingTask($table, $record['uid'], $fields);
+				++ $added;
+			}
+			$message = sprintf('Added %d indexing task%s for table %s', $added, (1 !== $added ? 's' : ''), $table);
+			$this->response->setContent($message . PHP_EOL);
+			$this->response->send();
+		}
+		$queue->addAll($tasks);
 	}
 
 	/**
@@ -78,10 +99,21 @@ class CronjobCommandController extends CommandController {
 		/** @var TaskInterface[] $picked */
 		$picked = array();
 		$queue = $this->getQueue();
-		do {
-			$task = $queue->pick();
+		while (0 <= --$tasks && ($task = $queue->pick())) {
 			$task->getWorker()->execute($task);
-		} while (0 < --$tasks);
+		}
+	}
+
+	/**
+	 * Reads the current queue status
+	 *
+	 * @return void
+	 */
+	public function statusCommand() {
+		$queue = $this->getQueue();
+		$count = $queue->count();
+		$message = sprintf('%d job%s currently queued', $count, (1 !== $count ? 's' : ''));
+		$this->response->setContent($message . PHP_EOL);
 	}
 
 	/**
@@ -96,6 +128,24 @@ class CronjobCommandController extends CommandController {
 		// get an "enableFields" SQL condition, string starting with " AND ".
 		$condition = $pageRepository->enableFields($table, 0, array(), TRUE);
 		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('*', $table, '1=1' . $condition);
+	}
+
+	/**
+	 * Creates an instance of TaskFactory to create Tasks.
+	 *
+	 * @return TaskFactory
+	 */
+	protected function getTaskFactory() {
+		return new TaskFactory();
+	}
+
+	/**
+	 * Creates an instance of QueueFactory to create Queue instance.
+	 *
+	 * @return QueueFactory
+	 */
+	protected function getQueueFactory() {
+		return new QueueFactory();
 	}
 
 	/**
@@ -119,14 +169,23 @@ class CronjobCommandController extends CommandController {
 	}
 
 	/**
+	 * Prepare an instance of the record analyzer.
+	 *
+	 * @param string $table
+	 * @param array $record
+	 * @return RecordAnalyzer
+	 */
+	protected function getRecordAnalyzer($table, $record) {
+		return new RecordAnalyzer($table, $record);
+	}
+
+	/**
 	 * Gets the Queue containing Tasks.
 	 *
 	 * @return QueueInterface
 	 */
 	protected function getQueue() {
-		$queueFactory = new QueueFactory();
-		$queue = $queueFactory->fetchQueue();
-		return $queue;
+		return $this->getQueueFactory()->fetchQueue();
 	}
 
 }
