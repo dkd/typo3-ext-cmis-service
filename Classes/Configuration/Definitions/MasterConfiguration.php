@@ -30,11 +30,6 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 	protected $tableConfiguration;
 
 	/**
-	 * @var NetworkConfiguration
-	 */
-	protected $networkConfiguration;
-
-	/**
 	 * @var CmisConfiguration
 	 */
 	protected $cmisConfiguration;
@@ -58,12 +53,10 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 	public function initialize(
 		ImplementationConfiguration $implementationConfiguration,
 		TableConfiguration $tableConfiguration,
-		NetworkConfiguration $networkConfiguration,
 		CmisConfiguration $cmisConfiguration,
 		StanbolConfiguration $stanbolConfiguration) {
 		$this->implementationConfiguration = $implementationConfiguration;
 		$this->tableConfiguration = $tableConfiguration;
-		$this->networkConfiguration = $networkConfiguration;
 		$this->cmisConfiguration = $cmisConfiguration;
 		$this->stanbolConfiguration = $stanbolConfiguration;
 	}
@@ -84,15 +77,6 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 	 */
 	public function getCmisConfiguration() {
 		return $this->cmisConfiguration;
-	}
-
-	/**
-	 * Get the ConfigurationDefinition describing network parameters
-	 *
-	 * @return NetworkConfiguration
-	 */
-	public function getNetworkConfiguration() {
-		return $this->networkConfiguration;
 	}
 
 	/**
