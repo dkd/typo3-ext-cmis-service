@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Factory;
 
+use Dkd\CmisService\Execution\Cmis\EvictionExecution;
 use Dkd\CmisService\Execution\Cmis\IndexExecution;
 
 /**
@@ -13,6 +14,13 @@ class ExecutionFactory {
 	 */
 	public function createIndexExecution() {
 		return new IndexExecution();
+	}
+
+	/**
+	 * @return EvictionExecution
+	 */
+	public function createEvictionExecution() {
+		return new EvictionExecution();
 	}
 
 }

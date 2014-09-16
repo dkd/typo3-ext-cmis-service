@@ -5,9 +5,9 @@ use Dkd\CmisService\Execution\Result;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
- * Class IndexExecutionTest
+ * Class EvictionExecutionTest
  */
-class IndexExecutionTest extends UnitTestCase {
+class EvictionExecutionTest extends UnitTestCase {
 
 	/**
 	 * Unit test
@@ -17,7 +17,7 @@ class IndexExecutionTest extends UnitTestCase {
 	 */
 	public function executeCreatesResultObjectAndStoresAsProperty() {
 		$result = new Result();
-		$instance = $this->getMock('Dkd\\CmisService\\Execution\\Cmis\\IndexExecution', array('createResultObject'));
+		$instance = $this->getMock('Dkd\\CmisService\\Execution\\Cmis\\EvictionExecution', array('createResultObject'));
 		$instance->expects($this->once())->method('createResultObject')->will($this->returnValue($result));
 		$outputResult = $instance->execute();
 		$this->assertAttributeEquals($result, 'result', $instance);

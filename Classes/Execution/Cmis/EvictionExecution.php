@@ -3,14 +3,15 @@ namespace Dkd\CmisService\Execution\Cmis;
 
 use Dkd\CmisService\Execution\AbstractExecution;
 use Dkd\CmisService\Execution\ExecutionInterface;
+use Dkd\CmisService\Execution\Result;
 
 /**
- * Class IndexExecution
+ * Class EvictionExecution
  */
-class IndexExecution extends AbstractExecution implements ExecutionInterface {
+class EvictionExecution extends AbstractExecution implements ExecutionInterface {
 
 	/**
-	 * Index a record, creating a document in the index.
+	 * Evict a document from the index.
 	 *
 	 * @return Result
 	 */

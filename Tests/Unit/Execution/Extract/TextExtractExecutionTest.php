@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Tests\Unit\Execution\Extract;
 
+use Dkd\CmisService\Execution\Result;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -14,8 +15,13 @@ class TextExtractionTest extends UnitTestCase {
 	 * @test
 	 * @return void
 	 */
-	public function placeholder() {
-		$this->markTestIncomplete('This test has not been implemented yet.');
+	public function executeCreatesResultObjectAndStoresAsProperty() {
+		$result = new Result();
+		$instance = $this->getMock('Dkd\\CmisService\\Execution\\Extract\\TextExtractExecution', array('createResultObject'));
+		$instance->expects($this->once())->method('createResultObject')->will($this->returnValue($result));
+		$outputResult = $instance->execute();
+		$this->assertAttributeEquals($result, 'result', $instance);
+		$this->assertSame($outputResult, $result);
 	}
 
 }

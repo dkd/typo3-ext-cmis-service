@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Tests\Unit\Execution;
 
+use Dkd\CmisService\Execution\Result;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -9,13 +10,18 @@ use TYPO3\CMS\Core\Tests\UnitTestCase;
 class NoopExecutionTest extends UnitTestCase {
 
 	/**
-	 * Placeholder: tests not implemented
+	 * Unit test
 	 *
 	 * @test
 	 * @return void
 	 */
-	public function placeholder() {
-		$this->markTestIncomplete('This test has not been implemented yet.');
+	public function executeCreatesResultObjectAndStoresAsProperty() {
+		$result = new Result();
+		$instance = $this->getMock('Dkd\\CmisService\\Execution\\NoopExecution', array('createResultObject'));
+		$instance->expects($this->once())->method('createResultObject')->will($this->returnValue($result));
+		$outputResult = $instance->execute();
+		$this->assertAttributeEquals($result, 'result', $instance);
+		$this->assertSame($outputResult, $result);
 	}
 
 }
