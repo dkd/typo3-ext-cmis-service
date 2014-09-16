@@ -2,7 +2,6 @@
 namespace Dkd\CmisService\Tests\Unit\Configuration\Reader;
 
 use Dkd\CmisService\Configuration\Reader\TypoScriptConfigurationReader;
-use Dkd\CmisService\Factory\ObjectFactory;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 

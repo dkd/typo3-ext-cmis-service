@@ -3,8 +3,8 @@ namespace Dkd\CmisService\Command;
 
 use Dkd\CmisService\Analysis\TableConfigurationAnalyzer;
 use Dkd\CmisService\Factory\QueueFactory;
-use Dkd\CmisService\Task\TaskInterface;
 use Dkd\CmisService\Queue\QueueInterface;
+use Dkd\CmisService\Task\TaskInterface;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use TYPO3\CMS\Frontend\Page\PageRepository;
 
