@@ -171,6 +171,13 @@ class SimpleQueue implements QueueInterface, QueueCachableInterface {
 	}
 
 	/**
+	 * @return integer
+	 */
+	public function count() {
+		return count($this->queue);
+	}
+
+	/**
 	 * Flushes every Task from the Queue.
 	 *
 	 * @api

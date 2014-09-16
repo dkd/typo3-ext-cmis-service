@@ -45,6 +45,32 @@ class SimpleQueueTest extends UnitTestCase {
 	 * @test
 	 * @return void
 	 */
+	public function countCountsInternalArray() {
+		$queue = $this->getAccessibleMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('save'));
+		$queue->_set('queue', array('foo' => 'bar'));
+		$result = $queue->count();
+		$this->assertEquals(1, $result);
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function countCountsInternalArrayWithMultipleItems() {
+		$queue = $this->getAccessibleMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('save'));
+		$queue->_set('queue', array('foo' => 'bar', 'abc' => 'def', '123' => '456'));
+		$result = $queue->count();
+		$this->assertEquals(3, $result);
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
 	public function savingCallsSetOnCacheFrontend() {
 		$queue = $this->getMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('lock', 'release'), array(), '', FALSE);
 		$cache = $this->getMock(

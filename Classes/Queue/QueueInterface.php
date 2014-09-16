@@ -38,6 +38,11 @@ interface QueueInterface {
 	public function load();
 
 	/**
+	 * @return integer
+	 */
+	public function count();
+
+	/**
 	 * @return void
 	 */
 	public function flush();
