@@ -11,4 +11,16 @@ plugin.tx_cmisservice.settings {
         }
 
     }
+    cmis {
+        # Hostname of CMIS server
+        hostname = localhost
+        # Port number of CMIS server
+        port = 8080
+    }
+    stanbol {
+        # Hostname of Stanbol semantic engine
+        hostname = localhost
+        # Port number of Stanbol semantic engine
+        port = 9090
+    }
 }

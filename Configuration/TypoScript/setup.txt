@@ -18,4 +18,14 @@ plugin.tx_cmisservice.settings {
         }
     }
 
+    # Configuration for services: CMIS and Stanbol
+    cmis {
+        hostname = {$plugin.tx_cmisservice.settings.cmis.hostname}
+        port = {$plugin.tx_cmisservice.settings.cmis.port}
+    }
+    stanbol {
+        hostname = {$plugin.tx_cmisservice.settings.stanbol.hostname}
+        port = {$plugin.tx_cmisservice.settings.stanbol.port}
+    }
+
 }
