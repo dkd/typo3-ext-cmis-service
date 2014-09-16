@@ -1,6 +1,9 @@
 <?php
 namespace Dkd\CmisService\Execution;
 
-class Exception {
+/**
+ * Class Exception
+ */
+class Exception extends \RuntimeException {
 
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Tests\Unit\Execution;
 
+use Dkd\CmisService\Execution\Exception;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -9,13 +10,15 @@ use TYPO3\CMS\Core\Tests\UnitTestCase;
 class ExceptionTest extends UnitTestCase {
 
 	/**
-	 * Placeholder
+	 * Unit test
 	 *
 	 * @test
 	 * @return void
 	 */
-	public function placeholder() {
-		$this->markTestIncomplete('Tests not yet implemented');
+	public function canBeThrownAsException() {
+		$exception = new Exception('Message', 123);
+		$this->setExpectedException('Dkd\\CmisService\\Execution\\Exception', 'Message', 123);
+		throw $exception;
 	}
 
 }
