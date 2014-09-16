@@ -44,12 +44,23 @@ abstract class AbstractConfigurationDefinition implements ConfigurationDefinitio
 	 * @api
 	 */
 	public function get($path) {
+		// Note: in order to allow values `0` and `'0'` to be used
+		// without being overridden by defaults, we check these weak
+		// empty types in addition to checking empty().
+
+		// first read: deep arrays accessed by dotted.path
 		$value = ObjectAccess::getPropertyPath($this->definitions, $path);
+		// second read: flat array indexed by 'dotted.path'
+		if (TRUE === empty($value) && 0 !== $value && '0' !== $value && TRUE === isset($this->definitions[$path])) {
+			$value = $this->definitions[$path];
+		}
+		// third attempt: read the default using index 'dotted.path'
+		if (TRUE === empty($value) && 0 !== $value && '0' !== $value && TRUE === isset($this->defaults[$path])) {
+			$value = $this->defaults[$path];
+		}
+		// final attempt: read default from deep array by dotted.path
 		if (TRUE === empty($value) && 0 !== $value && '0' !== $value) {
 			$value = ObjectAccess::getPropertyPath($this->defaults, $path);
-		}
-		if (TRUE === empty($value) && 0 !== $value && '0' !== $value) {
-			$value = $this->defaults[$path];
 		}
 		return $value;
 	}

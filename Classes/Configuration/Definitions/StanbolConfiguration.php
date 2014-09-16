@@ -6,4 +6,15 @@ namespace Dkd\CmisService\Configuration\Definitions;
  */
 class StanbolConfiguration extends AbstractConfigurationDefinition implements ConfigurationDefinitionInterface {
 
+	const HOSTNAME = 'hostname';
+	const PORT = 'port';
+
+	/**
+	 * @var array
+	 */
+	protected $defaults = array(
+		self::HOSTNAME => 'localhost',
+		self::PORT => 9090
+	);
+
 }

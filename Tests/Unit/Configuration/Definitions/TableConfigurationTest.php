@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Tests\Unit\Configuration\Definitions;
 
+use Dkd\CmisService\Configuration\Definitions\TableConfiguration;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -9,13 +10,18 @@ use TYPO3\CMS\Core\Tests\UnitTestCase;
 class TableConfigurationTest extends UnitTestCase {
 
 	/**
-	 * Placeholder
+	 * Unit test
 	 *
 	 * @test
 	 * @return void
 	 */
-	public function placeholder() {
-		$this->markTestIncomplete('Tests not yet implemented');
+	public function getConfiguredTableNamesReturnsArrayKeysOfDefinitions() {
+		$instance = new TableConfiguration();
+		$instance->setDefinitions(array(
+			'foo' => array(),
+			'bar' => array()
+		));
+		$this->assertEquals(array('foo', 'bar'), $instance->getConfiguredTableNames());
 	}
 
 }

@@ -16,7 +16,7 @@ class ImplementationConfiguration extends AbstractConfigurationDefinition implem
 	protected $defaults = array(
 		self::OBJECT_CLASS_QUEUE => 'Dkd\\CmisService\\Queue\\SimpleQueue',
 		self::OBJECT_CLASS_WORKER => 'Dkd\\CmisService\\Queue\\SimpleWorker',
-		self::OBJECT_CLASS_LOGGER => 'Dkd\\CmisService\\Logging\\SimpleLogger'
+		self::OBJECT_CLASS_LOGGER => 'TYPO3\\CMS\\Core\\Log\\Logger'
 	);
 
 }

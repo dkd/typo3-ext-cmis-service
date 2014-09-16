@@ -11,14 +11,6 @@ namespace Dkd\CmisService\Configuration\Definitions;
  */
 class MasterConfiguration extends AbstractConfigurationDefinition implements ConfigurationDefinitionInterface {
 
-	const OBJECT_CLASS_CONFIGURATION_READER = 'objects.configuration.reader.className';
-	const OBJECT_CLASS_CONFIGURATION_WRITER = 'objects.configuration.writer.className';
-
-	protected $defaults = array(
-		self::OBJECT_CLASS_CONFIGURATION_READER => 'Dkd\\CmisService\\Configuration\\Reader\\YamlConfigurationReader',
-		self::OBJECT_CLASS_CONFIGURATION_WRITER => 'Dkd\\CmisService\\Configuration\\Writer\\YamlConfigurationWriter'
-	);
-
 	/**
 	 * @var ImplementationConfiguration
 	 */

@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Tests\Unit\Configuration\Definitions;
 
+use Dkd\CmisService\Configuration\Definitions\StanbolConfiguration;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -9,13 +10,31 @@ use TYPO3\CMS\Core\Tests\UnitTestCase;
 class StanbolConfigurationTest extends UnitTestCase {
 
 	/**
-	 * Placeholder
+	 * Unit test
 	 *
 	 * @test
 	 * @return void
 	 */
-	public function placeholder() {
-		$this->markTestIncomplete('Tests not yet implemented');
+	public function supportsHostnameSetting() {
+		$instance = new StanbolConfiguration();
+		$instance->setDefinitions(array(
+			StanbolConfiguration::HOSTNAME => 'foobar'
+		));
+		$this->assertEquals('foobar', $instance->get(StanbolConfiguration::HOSTNAME));
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function supportsPortSetting() {
+		$instance = new StanbolConfiguration();
+		$instance->setDefinitions(array(
+			StanbolConfiguration::PORT => 'foobar'
+		));
+		$this->assertEquals('foobar', $instance->get(StanbolConfiguration::PORT));
 	}
 
 }
