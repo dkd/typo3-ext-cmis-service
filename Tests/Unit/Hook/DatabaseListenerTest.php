@@ -6,7 +6,7 @@ use TYPO3\CMS\Core\Tests\UnitTestCase;
 /**
  * Class ListenerTest
  */
-class ListenerTest extends UnitTestCase {
+class DatabaseListenerTest extends UnitTestCase {
 
 	/**
 	 * Placeholder
