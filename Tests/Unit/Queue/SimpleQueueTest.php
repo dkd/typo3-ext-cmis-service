@@ -247,4 +247,23 @@ class SimpleQueueTest extends UnitTestCase {
 		$queue->flush();
 	}
 
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function flushByFilterCallsExpectedMethodSequence() {
+		$filterTask = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask');
+		$task1 = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask', array('matches'));
+		$task1->expects($this->once())->method('matches')->with($filterTask)->will($this->returnValue(TRUE));
+		$task2 = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask', array('matches'));
+		$task2->expects($this->once())->method('matches')->with($filterTask)->will($this->returnValue(FALSE));
+		$queue = $this->getAccessibleMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('save'));
+		$queue->expects($this->once())->method('save');
+		$queue->_set('queue', array('foo' => $task1, 'bar' => $task2));
+		$queue->flushByFilter($filterTask);
+		$this->assertAttributeEquals(array('bar' => $task2), 'queue', $queue);
+	}
+
 }

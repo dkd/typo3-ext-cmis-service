@@ -195,7 +195,7 @@ class SimpleQueue implements QueueInterface, QueueCachableInterface {
 	 */
 	public function flushByFilter(TaskFilterInterface $filter) {
 		foreach ($this->queue as $index => $task) {
-			if (TRUE === $filter->matches($task)) {
+			if (TRUE === $task->matches($filter)) {
 				unset($this->queue[$index]);
 			}
 		}
