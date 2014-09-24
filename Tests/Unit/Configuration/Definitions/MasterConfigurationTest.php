@@ -99,4 +99,29 @@ class MasterConfigurationTest extends UnitTestCase {
 		$this->assertInstanceOf('Dkd\\CmisService\\Configuration\\Definitions\\StanbolConfiguration', $result);
 	}
 
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function setDefinitionsDelegatesSubDefinitionsToSubObjects() {
+		$configuration = new MasterConfiguration();
+		$implementation = array(1);
+		$tables = array(2);
+		$cmis = array(3);
+		$stanbol = array(4);
+		$definitions = array(
+			MasterConfiguration::SCOPE_IMPLEMENTATION => $implementation,
+			MasterConfiguration::SCOPE_TABLES => $tables,
+			MasterConfiguration::SCOPE_CMIS => $cmis,
+			MasterConfiguration::SCOPE_STANBOL => $stanbol
+		);
+		$configuration->setDefinitions($definitions);
+		$this->assertEquals($implementation, $configuration->getImplementationConfiguration()->getDefinitions());
+		$this->assertEquals($tables, $configuration->getTableConfiguration()->getDefinitions());
+		$this->assertEquals($cmis, $configuration->getCmisConfiguration()->getDefinitions());
+		$this->assertEquals($stanbol, $configuration->getStanbolConfiguration()->getDefinitions());
+	}
+
 }
