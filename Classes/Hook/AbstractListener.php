@@ -53,7 +53,7 @@ abstract class AbstractListener implements SingletonInterface {
 	 * @return void
 	 */
 	protected function createAndQueueIndexingTask($table, $uid) {
-		$task = $this->getTaskFactory()->createRecordIndexingTask($task, $uid);
+		$task = $this->getTaskFactory()->createRecordIndexingTask($table, $uid);
 		$queue = $this->getQueue();
 		$queue->flushByFilter($task);
 		$queue->add($task);
@@ -79,7 +79,7 @@ abstract class AbstractListener implements SingletonInterface {
 	 * @return void
 	 */
 	protected function removeAllIndexingTasksForTableAndUid($table, $uid) {
-		$task = $this->getTaskFactory()->createRecordIndexingTask($task, $uid);
+		$task = $this->getTaskFactory()->createRecordIndexingTask($table, $uid);
 		$this->getQueue()->flushByFilter($task);
 	}
 
