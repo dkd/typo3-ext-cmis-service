@@ -25,4 +25,18 @@ class TaskFactoryTest extends UnitTestCase {
 		$this->assertEquals(array('uid'), $task->getParameter(RecordIndexTask::OPTION_FIELDS));
 	}
 
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function createsCmisEvictionTasks() {
+		$factory = new TaskFactory();
+		$task = $factory->createEvictionTask('tt_content', 123);
+		$this->assertInstanceOf('Dkd\\CmisService\\Task\\EvictionTask', $task);
+		$this->assertEquals('tt_content', $task->getParameter(RecordIndexTask::OPTION_TABLE));
+		$this->assertEquals(123, $task->getParameter(RecordIndexTask::OPTION_UID));
+	}
+
 }
