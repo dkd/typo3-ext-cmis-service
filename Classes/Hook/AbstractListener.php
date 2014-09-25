@@ -46,6 +46,17 @@ abstract class AbstractListener implements SingletonInterface {
 	}
 
 	/**
+	 * Returns TRUE if the table is currently monitored
+	 * according to configuration and column composition.
+	 *
+	 * @param string $table
+	 * @return boolean
+	 */
+	protected function isTableMonitored($table) {
+		return in_array($table, self::$monitoredTables);
+	}
+
+	/**
 	 * Creates and queues an indexing task for $table:$uid
 	 *
 	 * @param string $table

@@ -83,6 +83,19 @@ class AbstractListenerTest extends UnitTestCase {
 	 * @test
 	 * @return void
 	 */
+	public function isTableMonitoredChecksInternalArray() {
+		$mock = $this->getAccessibleMockForAbstractClass('Dkd\\CmisService\\Hook\\AbstractListener', array(), '', FALSE);
+		$mock->_setStatic('monitoredTables', array('foobartable'));
+		$this->assertTrue($mock->_call('isTableMonitored', 'foobartable'));
+		$this->assertFalse($mock->_call('isTableMonitored', 'baztable'));
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
 	public function getObjectFactoryReturnsObjectFactoryInstance() {
 		$instance = $this->callInaccessibleMethod($this->mock, 'getObjectFactory');
 		$this->assertInstanceOf('Dkd\\CmisService\\Factory\\ObjectFactory', $instance);
