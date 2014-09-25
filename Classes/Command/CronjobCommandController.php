@@ -44,8 +44,8 @@ class CronjobCommandController extends CommandController {
 	 * @return void
 	 */
 	public function generateIndexingTasksCommand($table = NULL) {
-		$tableAnalyzer = $this->getTableConfigurationAnalyzer();
 		if (NULL === $table) {
+			$tableAnalyzer = $this->getTableConfigurationAnalyzer();
 			$tables = $tableAnalyzer->getIndexableTableNames();
 		} elseif (FALSE !== strpos($table, ',')) {
 			$tables = explode(',', $table);
@@ -53,16 +53,24 @@ class CronjobCommandController extends CommandController {
 		} else {
 			$tables = array($table);
 		}
+		$this->createAndAddIndexingTasks($tables);
+	}
+
+	/**
+	 * Generate all required indexing tasks for all tables
+	 * in array $tables
+	 *
+	 * @param array $tables
+	 * @return void
+	 */
+	protected function createAndAddIndexingTasks($tables) {
 		$tasks = array();
 		$queue = $this->getQueue();
-		$taskFactory = $this->getTaskFactory();
 		foreach ($tables as $table) {
 			$records = $this->getAllEnabledRecordsFromTable($table);
 			$added = 0;
 			foreach ($records as $record) {
-				$recordAnalyzer = $this->getRecordAnalyzer($table, $record);
-				$fields = $recordAnalyzer->getIndexableColumnNames();
-				$tasks[] = $taskFactory->createRecordIndexingTask($table, $record['uid'], $fields);
+				$tasks[] = $this->createRecordIndexingTask($table, $record);
 				++ $added;
 			}
 			$message = sprintf('Added %d indexing task%s for table %s', $added, (1 !== $added ? 's' : ''), $table);
@@ -70,6 +78,18 @@ class CronjobCommandController extends CommandController {
 			$this->response->send();
 		}
 		$queue->addAll($tasks);
+	}
+
+	/**
+	 * @param string $table
+	 * @param array $record
+	 * @return TaskInterface
+	 */
+	protected function createRecordIndexingTask($table, $record) {
+		$taskFactory = $this->getTaskFactory();
+		$recordAnalyzer = $this->getRecordAnalyzer($table, $record);
+		$fields = $recordAnalyzer->getIndexableColumnNames();
+		return $taskFactory->createRecordIndexingTask($table, $record['uid'], $fields);
 	}
 
 	/**

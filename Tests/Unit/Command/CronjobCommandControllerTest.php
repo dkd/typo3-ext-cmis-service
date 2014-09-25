@@ -212,7 +212,8 @@ class CronjobCommandControllerTest extends UnitTestCase {
 			'TYPO3\\CMS\\Core\\Database\\DatabaseConnection',
 			array('connectDB', 'fullQuoteStr', 'exec_SELECTgetRows')
 		);
-		$GLOBALS['TYPO3_DB']->expects($this->once())->method('exec_SELECTgetRows')->will($this->returnValue(array()));
+		$records = array(array('uid' => 123), array('uid' => 321));
+		$GLOBALS['TYPO3_DB']->expects($this->once())->method('exec_SELECTgetRows')->will($this->returnValue($records));
 		$GLOBALS['TCA']['foobar'] = array(
 			'columns' => array(),
 			'ctrl' => array()
@@ -223,19 +224,79 @@ class CronjobCommandControllerTest extends UnitTestCase {
 		$response->expects($this->atLeastOnce())->method('setContent');
 		$commandController = $this->getAccessibleMock(
 			'Dkd\\CmisService\\Command\\CronjobCommandController',
-			array('getTableConfigurationAnalyzer', 'getQueue')
+			array('getTableConfigurationAnalyzer', 'getQueue', 'createRecordIndexingTask')
 		);
 		$commandController->_set('response', $response);
 		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
-		$tableConfigurationAnalyzer = $this->getMock(
-			'Dkd\\CmisService\\Analysis\\TableConfigurationAnalyzer',
-			array('getIndexableTableNames')
-		);
-		$commandController->expects($this->once())->method('getTableConfigurationAnalyzer')
-			->will($this->returnValue($tableConfigurationAnalyzer));
-		$tableConfigurationAnalyzer->expects($this->never())->method('getIndexableTableNames');
+		$commandController->expects($this->exactly(2))->method('createRecordIndexingTask');
 		$commandController->generateIndexingTasksCommand('foobar');
 		$GLOBALS['TYPO3_DB'] = $backup;
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function generateIndexingTasksCommandWithTablesOnlyProcessesSpecifiedTables() {
+		$backup = $GLOBALS['TYPO3_DB'];
+		$GLOBALS['TYPO3_DB'] = $this->getMock(
+			'TYPO3\\CMS\\Core\\Database\\DatabaseConnection',
+			array('connectDB', 'fullQuoteStr', 'exec_SELECTgetRows')
+		);
+		$records = array(array('uid' => 123), array('uid' => 321));
+		$GLOBALS['TYPO3_DB']->expects($this->exactly(2))->method('exec_SELECTgetRows')->will($this->returnValue($records));
+		$GLOBALS['TCA']['foobar'] = array(
+			'columns' => array(),
+			'ctrl' => array()
+		);
+		$GLOBALS['TCA']['foobaz'] = array(
+			'columns' => array(),
+			'ctrl' => array()
+		);
+		$queue = $this->getMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('addAll'));
+		$queue->expects($this->once())->method('addAll')->will($this->returnValue(TRUE));
+		$response = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Request\\Response', array('setContent', 'send'));
+		$response->expects($this->atLeastOnce())->method('setContent');
+		$commandController = $this->getAccessibleMock(
+			'Dkd\\CmisService\\Command\\CronjobCommandController',
+			array('getTableConfigurationAnalyzer', 'getQueue', 'createRecordIndexingTask')
+		);
+		$commandController->_set('response', $response);
+		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
+		$commandController->expects($this->exactly(4))->method('createRecordIndexingTask');
+		$commandController->generateIndexingTasksCommand('foobar,foobaz');
+		$GLOBALS['TYPO3_DB'] = $backup;
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function createRecordIndexingTaskCallsExpectedMethodSequence() {
+		$taskFactory = $this->getMock('Dkd\\CmisService\\Factory\\TaskFactory', array('createRecordIndexingTask'));
+		$taskFactory->expects($this->once())->method('createRecordIndexingTask')
+			->with('foobar', 123, array('uid'))
+			->will($this->returnValue('baz'));
+		$recordAnalyzer = $this->getMock(
+			'Dkd\\CmisService\\Analysis\\RecordAnalyzer',
+			array('getIndexableColumnNames'),
+			array(),
+			'',
+			FALSE
+		);
+		$recordAnalyzer->expects($this->once())->method('getIndexableColumnNames')->will($this->returnValue(array('uid')));
+		$commandController = $this->getMock(
+			'Dkd\\CmisService\\Command\\CronjobCommandController',
+			array('getTaskFactory', 'getRecordAnalyzer')
+		);
+		$commandController->expects($this->at(0))->method('getTaskFactory')->will($this->returnValue($taskFactory));
+		$commandController->expects($this->at(1))->method('getRecordAnalyzer')->will($this->returnValue($recordAnalyzer));
+		$result = $this->callInaccessibleMethod($commandController, 'createRecordIndexingTask', 'foobar', array('uid' => 123));
+		$this->assertEquals('baz', $result);
 	}
 
 	/**
@@ -248,6 +309,30 @@ class CronjobCommandControllerTest extends UnitTestCase {
 		$commandController = new CronjobCommandController();
 		$result = $this->callInaccessibleMethod($commandController, 'getPageRepository');
 		$this->assertInstanceOf('TYPO3\\CMS\\Frontend\\Page\\PageRepository', $result);
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function getTaskFactoryReturnsTaskFactoryInstance() {
+		$commandController = new CronjobCommandController();
+		$result = $this->callInaccessibleMethod($commandController, 'getTaskFactory');
+		$this->assertInstanceOf('Dkd\\CmisService\\Factory\\TaskFactory', $result);
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function getQueueFactoryReturnsQueueFactoryInstance() {
+		$commandController = new CronjobCommandController();
+		$result = $this->callInaccessibleMethod($commandController, 'getQueueFactory');
+		$this->assertInstanceOf('Dkd\\CmisService\\Factory\\QueueFactory', $result);
 	}
 
 }
