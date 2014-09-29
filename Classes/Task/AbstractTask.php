@@ -82,6 +82,16 @@ abstract class AbstractTask implements TaskInterface {
 	}
 
 	/**
+	 * Validate the arguments provided to the Task.
+	 *
+	 * @return boolean
+	 * @throws \InvalidArgumentException
+	 */
+	public function validate() {
+		return TRUE;
+	}
+
+	/**
 	 * Finishes the task - unassigns the Worker and updates the
 	 * status to "Done". Task execution implies that if an error
 	 * has occurred, this method is not reached.

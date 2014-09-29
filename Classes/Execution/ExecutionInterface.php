@@ -1,6 +1,8 @@
 <?php
 namespace Dkd\CmisService\Execution;
 
+use Dkd\CmisService\Task\TaskInterface;
+
 /**
  * Interface for Executions
  *
@@ -21,8 +23,9 @@ interface ExecutionInterface {
 	/**
 	 * Run this Execution, returning the Result hereof.
 	 *
+	 * @param TaskInterface $task The task to be executed
 	 * @return Result
 	 */
-	public function execute();
+	public function execute(TaskInterface $task);
 
 }

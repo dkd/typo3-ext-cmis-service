@@ -2,6 +2,7 @@
 namespace Dkd\CmisService\Tests\Unit\Execution\Cmis;
 
 use Dkd\CmisService\Execution\Result;
+use Dkd\CmisService\Tests\Fixtures\Task\DummyTask;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -19,7 +20,8 @@ class EvictionExecutionTest extends UnitTestCase {
 		$result = new Result();
 		$instance = $this->getMock('Dkd\\CmisService\\Execution\\Cmis\\EvictionExecution', array('createResultObject'));
 		$instance->expects($this->once())->method('createResultObject')->will($this->returnValue($result));
-		$outputResult = $instance->execute();
+		$task = new DummyTask();
+		$outputResult = $instance->execute($task);
 		$this->assertAttributeEquals($result, 'result', $instance);
 		$this->assertSame($outputResult, $result);
 	}

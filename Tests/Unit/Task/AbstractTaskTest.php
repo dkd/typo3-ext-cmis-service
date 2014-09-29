@@ -169,4 +169,16 @@ class AbstractTaskTest extends UnitTestCase {
 		$this->assertNull($task->getParameter('invalidname'));
 	}
 
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function defaultValidationReturnsTrue() {
+		$task = $this->getMockForAbstractClass('Dkd\\CmisService\\Task\\AbstractTask');
+		$result = $task->validate();
+		$this->assertTrue($result);
+	}
+
 }

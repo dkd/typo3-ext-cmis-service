@@ -90,6 +90,7 @@ class SimpleQueue implements QueueInterface, QueueCachableInterface {
 	 * @return void
 	 */
 	public function add(TaskInterface $task) {
+		$task->validate();
 		$id = $task->getId();
 		$this->lock();
 		$task->queue();
@@ -108,6 +109,9 @@ class SimpleQueue implements QueueInterface, QueueCachableInterface {
 	 * @return void
 	 */
 	public function addAll(array $tasks) {
+		foreach ($tasks as $task) {
+			$task->validate();
+		}
 		$this->lock();
 		foreach ($tasks as $task) {
 			$id = $task->getId();

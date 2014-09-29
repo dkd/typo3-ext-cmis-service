@@ -2,6 +2,7 @@
 namespace Dkd\CmisService\Tests\Unit\Queue;
 
 use Dkd\CmisService\Queue\SimpleQueue;
+use Dkd\CmisService\Tests\Fixtures\Task\ErroringTask;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Locking\Locker;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
@@ -147,11 +148,43 @@ class SimpleQueueTest extends UnitTestCase {
 	 * @test
 	 * @return void
 	 */
+	public function addTaskWithErrorsCausesExceptionBeforeAnyOtherAction() {
+		$queue = $this->getMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('lock'), array(), '', FALSE);
+		$queue->expects($this->never())->method('lock');
+		$errorTask = new ErroringTask();
+		$this->setExpectedException('InvalidArgumentException');
+		$queue->add($errorTask);
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function addAllTasksWithErrorsCausesExceptionBeforeAnyOtherAction() {
+		$queue = $this->getMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('lock'), array(), '', FALSE);
+		$queue->expects($this->never())->method('lock');
+		$errorTasks = array(
+			$errorTask = new ErroringTask(),
+			$errorTask = new ErroringTask(),
+		);
+		$this->setExpectedException('InvalidArgumentException');
+		$queue->addAll($errorTasks);
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
 	public function addCallsExpectedMethodSequence() {
 		$queue = $this->getMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('lock', 'save', 'release'), array(), '', FALSE);
-		$task = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask', array('getId', 'queue'));
-		$task->expects($this->at(0))->method('getId')->will($this->returnValue('dummy-task'));
-		$task->expects($this->at(1))->method('queue');
+		$task = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask', array('getId', 'queue', 'validate'));
+		$task->expects($this->at(0))->method('validate')->will($this->returnValue(TRUE));
+		$task->expects($this->at(1))->method('getId')->will($this->returnValue('dummy-task'));
+		$task->expects($this->at(2))->method('queue');
 		$queue->expects($this->at(0))->method('lock')->will($this->returnValue(TRUE));
 		$queue->expects($this->at(1))->method('save')->will($this->returnValue(TRUE));
 		$queue->expects($this->at(2))->method('release')->will($this->returnValue(TRUE));
@@ -166,12 +199,14 @@ class SimpleQueueTest extends UnitTestCase {
 	 */
 	public function addAllCallsExpectedMethodSequence() {
 		$queue = $this->getMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('lock', 'save', 'release'), array(), '', FALSE);
-		$task1 = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask', array('getId', 'queue'));
-		$task1->expects($this->at(0))->method('getId')->will($this->returnValue('dummy-task-1'));
-		$task1->expects($this->at(1))->method('queue');
-		$task2 = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask', array('getId', 'queue'));
-		$task2->expects($this->at(0))->method('getId')->will($this->returnValue('dummy-task-2'));
-		$task2->expects($this->at(1))->method('queue');
+		$task1 = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask', array('getId', 'queue', 'validate'));
+		$task1->expects($this->at(0))->method('validate')->will($this->returnValue(TRUE));
+		$task1->expects($this->at(1))->method('getId')->will($this->returnValue('dummy-task-1'));
+		$task1->expects($this->at(2))->method('queue');
+		$task2 = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask', array('getId', 'queue', 'validate'));
+		$task2->expects($this->at(0))->method('validate')->will($this->returnValue(TRUE));
+		$task2->expects($this->at(1))->method('getId')->will($this->returnValue('dummy-task-2'));
+		$task2->expects($this->at(2))->method('queue');
 		$tasks = array($task1, $task2);
 		$queue->expects($this->at(0))->method('lock')->will($this->returnValue(TRUE));
 		$queue->expects($this->at(1))->method('save')->will($this->returnValue(TRUE));

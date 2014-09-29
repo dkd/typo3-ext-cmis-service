@@ -75,6 +75,14 @@ interface TaskInterface {
 	public function finish();
 
 	/**
+	 * Validate the arguments provided to the Task.
+	 *
+	 * @return boolean
+	 * @throws \InvalidArgumentException
+	 */
+	public function validate();
+
+	/**
 	 * Assigns a Worker which will execute this Task
 	 *
 	 * @param WorkerInterface $worker
