@@ -56,4 +56,19 @@ abstract class AbstractExecution implements ExecutionInterface {
 		return $this->result = $this->createResultObject();
 	}
 
+	/**
+	 * Validates parameters and type of Task, throwing a
+	 * InvalidArgumentException if this Execution is
+	 * unable to execute the Task due to Task's attributes.
+	 *
+	 * Default implementation: no validation.
+	 *
+	 * @param TaskInterface $task
+	 * @return boolean
+	 * @throws \InvalidArgumentException
+	 */
+	public function validate(TaskInterface $task) {
+		return TRUE;
+	}
+
 }

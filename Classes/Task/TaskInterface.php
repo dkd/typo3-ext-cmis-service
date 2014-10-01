@@ -2,6 +2,7 @@
 namespace Dkd\CmisService\Task;
 
 use Dkd\CmisService\Queue\WorkerInterface;
+use Dkd\CmisService\Execution\ExecutionInterface;
 
 /**
  * Interface TaskInterface
@@ -102,7 +103,7 @@ interface TaskInterface {
 	 * befitting this Task, possibly conditioned by
 	 * parameters defined in the Task.
 	 *
-	 * @return ExcecutionInterface
+	 * @return ExecutionInterface
 	 */
 	public function resolveExecutionObject();
 
