@@ -13,6 +13,19 @@ use Dkd\CmisService\Task\TaskInterface;
 class IndexExecution extends AbstractExecution implements ExecutionInterface {
 
 	/**
+	 * @param TaskInterface $task
+	 * @return boolean
+	 */
+	public function validate(TaskInterface $task) {
+		if (FALSE === $task instanceof RecordIndexTask) {
+			throw new \InvalidArgumentException(
+				'Error in CMIS IndexExecution during Task validation. ' .
+				'Task must be a Dkd\\CmisService\\Task\\RecordIndexTask or subclass; we received a ' . get_class($task));
+		}
+		return TRUE;
+	}
+
+	/**
 	 * Index a record, creating a document in the index.
 	 *
 	 * @param RecordIndexTask $task

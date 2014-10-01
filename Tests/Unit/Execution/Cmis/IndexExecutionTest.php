@@ -18,6 +18,35 @@ class IndexExecutionTest extends UnitTestCase {
 	 * @test
 	 * @return void
 	 */
+	public function validateReturnsTrueGivenExpectedTaskType() {
+		$execution = new IndexExecution();
+		$goodTask = new RecordIndexTask();
+		$result = $execution->validate($goodTask);
+		$this->assertTrue($result);
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function validateOnInvalidTaskThrowsInvalidArgumentExceptionIncludingBothPassedAndRequiredTaskTypesInMessage() {
+		$execution = new IndexExecution();
+		$badTask = new DummyTask();
+		$goodTask = new RecordIndexTask();
+		$expectedMessage = 'Error in CMIS IndexExecution during Task validation. ' .
+			'Task must be a ' . get_class($goodTask) . ' or subclass; we received a ' . get_class($badTask);
+		$this->setExpectedException('InvalidArgumentException', $expectedMessage);
+		$execution->validate($badTask);
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
 	public function executeCreatesResultObjectAndStoresAsProperty() {
 		$result = new Result();
 		$instance = $this->getMock(

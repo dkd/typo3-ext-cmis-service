@@ -13,6 +13,19 @@ use Dkd\CmisService\Task\TaskInterface;
 class EvictionExecution extends AbstractExecution implements ExecutionInterface {
 
 	/**
+	 * @param TaskInterface $task
+	 * @return boolean
+	 */
+	public function validate(TaskInterface $task) {
+		if (FALSE === $task instanceof EvictionTask) {
+			throw new \InvalidArgumentException(
+				'Error in CMIS IndexExecution during Task validation. ' .
+				'Task must be a Dkd\\CmisService\\Task\\EvictionTask or subclass; we received a ' . get_class($task));
+		}
+		return TRUE;
+	}
+
+	/**
 	 * Evict a document from the index.
 	 *
 	 * @param EvictionTask $task
