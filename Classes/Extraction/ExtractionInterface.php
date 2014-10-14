@@ -14,7 +14,7 @@ interface ExtractionInterface {
 	 * Perform extraction, returning a simple string.
 	 *
 	 * @param mixed $content
-	 * @return string
+	 * @return mixed
 	 */
 	public function extract($content);
 
