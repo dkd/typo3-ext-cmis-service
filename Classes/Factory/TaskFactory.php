@@ -14,13 +14,15 @@ class TaskFactory {
 	 * @param string $table
 	 * @param integer $uid
 	 * @param array|NULL fields
+	 * @param boolean $includeRelations
 	 * @return RecordIndexTask
 	 */
-	public function createRecordIndexingTask($table, $uid, $fields = NULL) {
+	public function createRecordIndexingTask($table, $uid, $fields = NULL, $includeRelations = FALSE) {
 		$task = new RecordIndexTask();
 		$task->setParameter(RecordIndexTask::OPTION_TABLE, $table);
 		$task->setParameter(RecordIndexTask::OPTION_UID, $uid);
 		$task->setParameter(RecordIndexTask::OPTION_FIELDS, $fields);
+		$task->setParameter(RecordIndexTask::OPTION_RELATIONS, $includeRelations);
 		return $task;
 	}
 
