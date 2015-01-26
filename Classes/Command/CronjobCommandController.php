@@ -64,32 +64,38 @@ class CronjobCommandController extends CommandController {
 	 * @return void
 	 */
 	protected function createAndAddIndexingTasks($tables) {
-		$tasks = array();
-		$queue = $this->getQueue();
+		$indexingTasks = array();
+		$relationIndexingTasks = array();
 		foreach ($tables as $table) {
 			$records = $this->getAllEnabledRecordsFromTable($table);
-			$added = 0;
 			foreach ($records as $record) {
-				$tasks[] = $this->createRecordIndexingTask($table, $record);
-				++ $added;
+				$indexingTasks[] = $this->createRecordIndexingTask($table, $record);
+				$relationIndexingTasks[] = $this->createRecordIndexingTask($table, $record, TRUE);
 			}
-			$message = sprintf('Added %d indexing task%s for table %s', $added, (1 !== $added ? 's' : ''), $table);
-			$this->response->setContent($message . PHP_EOL);
-			$this->response->send();
 		}
+		$tasks = array_merge($indexingTasks, $relationIndexingTasks);
+		$queue = $this->getQueue();
 		$queue->addAll($tasks);
+		$countTasks = count($indexingTasks);
+		$countRelations = count($relationIndexingTasks);
+		$messageText = 'Added %d %s task%s for table %s.';
+		$message = sprintf($messageText, $countTasks, 'indexing', (1 !== $countTasks ? 's' : ''), $table) . PHP_EOL;
+		$message .= sprintf($messageText, $countRelations, 'relation indexing', (1 !== $countRelations ? 's' : ''), $table);
+		$this->response->setContent($message . PHP_EOL);
+		$this->response->send();
 	}
 
 	/**
 	 * @param string $table
 	 * @param array $record
+	 * @param boolean $includeRelations
 	 * @return TaskInterface
 	 */
-	protected function createRecordIndexingTask($table, $record) {
+	protected function createRecordIndexingTask($table, $record, $includeRelations = FALSE) {
 		$taskFactory = $this->getTaskFactory();
 		$recordAnalyzer = $this->getRecordAnalyzer($table, $record);
 		$fields = $recordAnalyzer->getIndexableColumnNames();
-		return $taskFactory->createRecordIndexingTask($table, $record['uid'], $fields);
+		return $taskFactory->createRecordIndexingTask($table, $record['uid'], $fields, $includeRelations);
 	}
 
 	/**

@@ -228,7 +228,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 		);
 		$commandController->_set('response', $response);
 		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
-		$commandController->expects($this->exactly(2))->method('createRecordIndexingTask');
+		$commandController->expects($this->exactly(4))->method('createRecordIndexingTask');
 		$commandController->generateIndexingTasksCommand('foobar');
 		$GLOBALS['TYPO3_DB'] = $backup;
 	}
@@ -265,7 +265,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 		);
 		$commandController->_set('response', $response);
 		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
-		$commandController->expects($this->exactly(4))->method('createRecordIndexingTask');
+		$commandController->expects($this->exactly(8))->method('createRecordIndexingTask');
 		$commandController->generateIndexingTasksCommand('foobar,foobaz');
 		$GLOBALS['TYPO3_DB'] = $backup;
 	}
