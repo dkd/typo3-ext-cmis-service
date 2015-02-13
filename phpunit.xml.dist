@@ -1,4 +1,4 @@
-<phpunit bootstrap="./bootstrap.php"
+<phpunit bootstrap="typo3/sysext/core/Build/UnitTestsBootstrap.php"
          backupGlobals="false"
          backupStaticAttributes="false"
          colors="true"
@@ -14,14 +14,13 @@
          verbose="false">
     <testsuites>
         <testsuite name="EXT:cmis_service">
-            <directory>.</directory>
+            <directory>Tests</directory>
         </testsuite>
     </testsuites>
     <filter>
-        <whitelist>
-            <addUncoveredFilesFromWhitelist>true</addUncoveredFilesFromWhitelist>
-            <processUncoveredFilesFromWhitelist>true</processUncoveredFilesFromWhitelist>
-            <directory>../Classes</directory>
+        <whitelist addUncoveredFilesFromWhitelist="true"
+                   processUncoveredFilesFromWhitelist="true">
+            <directory>Classes/</directory>
         </whitelist>
     </filter>
 </phpunit>

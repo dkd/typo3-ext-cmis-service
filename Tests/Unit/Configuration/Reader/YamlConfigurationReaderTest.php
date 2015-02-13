@@ -17,11 +17,7 @@ class YamlConfigurationReaderTest extends UnitTestCase {
 	 */
 	protected function getGoodFixturePath() {
 		$fixture = 'Tests/Fixtures/Data/Dummy.yml';
-		if (TRUE === defined('TYPO3_MODE')) {
-			$fixture = ExtensionManagementUtility::extPath('cmis_service', $fixture);
-		} else {
-			$fixture = realpath($fixture);
-		}
+		$fixture = realpath($fixture);
 		return $fixture;
 	}
 
@@ -32,11 +28,6 @@ class YamlConfigurationReaderTest extends UnitTestCase {
 	 */
 	protected function getBadFixturePath() {
 		$fixture = 'Bad/Fixture/Path.yml';
-		if (TRUE === defined('TYPO3_MODE')) {
-			$fixture = ExtensionManagementUtility::extPath('cmis_service', $fixture);
-		} else {
-			$fixture = realpath($fixture);
-		}
 		return $fixture;
 	}
 
