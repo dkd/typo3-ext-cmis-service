@@ -21,9 +21,9 @@ class DatabaseListener extends AbstractListener implements PostProcessQueryHookI
 	/**
 	 * Post-processor for the SELECTquery method.
 	 *
-	 * @param string $select_fields Fields to be selected
-	 * @param string $from_table Table to select data from
-	 * @param string $where_clause Where clause
+	 * @param string $selectFields Fields to be selected
+	 * @param string $fromTable Table to select data from
+	 * @param string $whereClause Where clause
 	 * @param string $groupBy Group by statement
 	 * @param string $orderBy Order by statement
 	 * @param integer $limit Database return limit
@@ -31,9 +31,9 @@ class DatabaseListener extends AbstractListener implements PostProcessQueryHookI
 	 * @return void
 	 */
 	public function exec_SELECTquery_postProcessAction(
-		&$select_fields,
-		&$from_table,
-		&$where_clause,
+		&$selectFields,
+		&$fromTable,
+		&$whereClause,
 		&$groupBy,
 		&$orderBy,
 		&$limit,
@@ -47,7 +47,7 @@ class DatabaseListener extends AbstractListener implements PostProcessQueryHookI
 	 *
 	 * @param string $table Database table name
 	 * @param array $fieldsValues Field values as key => value pairs
-	 * @param string /array $noQuoteFields List/array of keys NOT to quote
+	 * @param string|array $noQuoteFields List/array of keys NOT to quote
 	 * @param DatabaseConnection $parentObject
 	 * @return void
 	 */
@@ -67,7 +67,7 @@ class DatabaseListener extends AbstractListener implements PostProcessQueryHookI
 	 * @param string $table Database table name
 	 * @param array $fields Field names
 	 * @param array $rows Table rows
-	 * @param string /array $noQuoteFields List/array of keys NOT to quote
+	 * @param string|array $noQuoteFields List/array of keys NOT to quote
 	 * @param DatabaseConnection $parentObject
 	 * @return void
 	 */
@@ -89,7 +89,7 @@ class DatabaseListener extends AbstractListener implements PostProcessQueryHookI
 	 * @param string $table Database table name
 	 * @param string $where WHERE clause
 	 * @param array $fieldsValues Field values as key => value pairs
-	 * @param string /array $noQuoteFields List/array of keys NOT to quote
+	 * @param string|array $noQuoteFields List/array of keys NOT to quote
 	 * @param DatabaseConnection $parentObject
 	 * @return void
 	 */
