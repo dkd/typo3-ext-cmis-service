@@ -12,10 +12,16 @@ plugin.tx_cmisservice.settings {
 
     }
     cmis {
-        # Hostname of CMIS server
-        hostname = localhost
-        # Port number of CMIS server
-        port = 8080
+        # CMIS binding type - defaults to "browser" which uses JSON-over-HTTP
+        bindingType = browser
+        # URL of the "CMIS Browser Binding" for the repository you with to use
+        url = http://localhost:7070/alfresco/api/-default-/public/cmis/versions/1.1/browser
+        # Username for authorization in CMIS
+        username =
+        # Password for authorization in CMIS
+        password =
+        # CMIS Repository ID of repository to use as primary content repository
+        contentRepositoryId = -default-
     }
     stanbol {
         # Hostname of Stanbol semantic engine

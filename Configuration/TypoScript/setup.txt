@@ -20,8 +20,11 @@ plugin.tx_cmisservice.settings {
 
     # Configuration for services: CMIS and Stanbol
     cmis {
-        hostname = {$plugin.tx_cmisservice.settings.cmis.hostname}
-        port = {$plugin.tx_cmisservice.settings.cmis.port}
+        bindingType = {$plugin.tx_cmisservice.settings.cmis.bindingType}
+        url = {$plugin.tx_cmisservice.settings.cmis.url}
+        username = {$plugin.tx_cmisservice.settings.cmis.username}
+        password = {$plugin.tx_cmisservice.settings.cmis.password}
+        contentRepositoryId = {$plugin.tx_cmisservice.settings.cmis.contentRepositoryId}
     }
     stanbol {
         hostname = {$plugin.tx_cmisservice.settings.stanbol.hostname}
