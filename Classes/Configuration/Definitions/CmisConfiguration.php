@@ -9,7 +9,7 @@ use Dkd\PhpCmis\SessionParameter;
  */
 class CmisConfiguration extends AbstractConfigurationDefinition implements ConfigurationDefinitionInterface {
 
-	const ID = 'id';
+	const ID = 'contentRepositoryId';
 	const URL = 'url';
 	const USERNAME = 'username';
 	const PASSWORD = 'password';

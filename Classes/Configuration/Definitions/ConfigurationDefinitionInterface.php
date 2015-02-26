@@ -1,13 +1,15 @@
 <?php
 namespace Dkd\CmisService\Configuration\Definitions;
 
+use Dkd\CmisService\SingletonInterface;
+
 /**
  * Configuration Definition Interface
  *
  * Methods to be implemented in classes supporting
  * ConfigurationDefinition behavior.
  */
-interface ConfigurationDefinitionInterface {
+interface ConfigurationDefinitionInterface extends SingletonInterface {
 
 	/**
 	 * API

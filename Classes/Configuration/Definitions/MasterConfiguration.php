@@ -82,21 +82,16 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 		$implementation = $tables = $cmis = $stanbol = array();
 		if (TRUE === isset($definitions[self::SCOPE_IMPLEMENTATION])) {
 			$implementation = (array) $definitions[self::SCOPE_IMPLEMENTATION];
-			unset($definitions[self::SCOPE_IMPLEMENTATION]);
 		}
 		if (TRUE === isset($definitions[self::SCOPE_TABLES])) {
 			$tables = (array) $definitions[self::SCOPE_TABLES];
-			unset($definitions[self::SCOPE_TABLES]);
 		}
 		if (TRUE === isset($definitions[self::SCOPE_CMIS])) {
 			$cmis = (array) $definitions[self::SCOPE_CMIS];
-			unset($definitions[self::SCOPE_CMIS]);
 		}
 		if (TRUE === isset($definitions[self::SCOPE_STANBOL])) {
 			$stanbol = (array) $definitions[self::SCOPE_STANBOL];
-			unset($definitions[self::SCOPE_STANBOL]);
 		}
-		parent::setDefinitions($definitions);
 		$this->implementationConfiguration->setDefinitions($implementation);
 		$this->tableConfiguration->setDefinitions($tables);
 		$this->cmisConfiguration->setDefinitions($cmis);
@@ -137,6 +132,18 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 	 */
 	public function getTableConfiguration() {
 		return $this->tableConfiguration;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getDefinitions() {
+		return array(
+			self::SCOPE_TABLES => $this->getTableConfiguration()->getDefinitions(),
+			self::SCOPE_IMPLEMENTATION => $this->getImplementationConfiguration()->getDefinitions(),
+			self::SCOPE_STANBOL => $this->getStanbolConfiguration()->getDefinitions(),
+			self::SCOPE_CMIS => $this->getCmisConfiguration()->getDefinitions()
+		);
 	}
 
 }
