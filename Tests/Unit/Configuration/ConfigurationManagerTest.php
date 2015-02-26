@@ -118,7 +118,7 @@ class ConfigurationManagerTest extends UnitTestCase {
 		$dummyConfiguration = new DummyMasterConfiguration();
 		$manager = new ConfigurationManager($mockReader, $dummyWriter, $mockCache);
 		$mockCache->expects($this->once())->method('read')
-			->with(ConfigurationManager::CACHE_RESOURCE)
+			->with(GeneralUtility::getFileAbsFileName(ConfigurationManager::CACHE_RESOURCE))
 			->will($this->returnValue($dummyConfiguration));
 		$mockReader->expects($this->never())->method('read');
 		$this->assertSame($dummyConfiguration, $manager->getMasterConfiguration());
@@ -168,7 +168,7 @@ class ConfigurationManagerTest extends UnitTestCase {
 		$mockReader = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Configuration\\DummyReader', array('checksum'));
 		$mockWriter = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Configuration\\DummyWriter', array('checksum', 'write'));
 		$mockWriter->expects($this->once())->method('write')
-			->with($mockConfiguration, 'voidResourceIdentifier')
+			->with($mockConfiguration, GeneralUtility::getFileAbsFileName('voidResourceIdentifier'))
 			->will($this->returnValue(TRUE));
 		$manager = $this->getMock(
 			'Dkd\\CmisService\\Configuration\\ConfigurationManager',
@@ -214,7 +214,7 @@ class ConfigurationManagerTest extends UnitTestCase {
 			array($mockReader, $mockWriter, $mockCache)
 		);
 		$manager->expects($this->once())->method('removeResource')
-			->with(ConfigurationManager::CACHE_RESOURCE)
+			->with(GeneralUtility::getFileAbsFileName(ConfigurationManager::CACHE_RESOURCE))
 			->will($this->returnValue(TRUE));
 		$result = $manager->expireCachedDefinition();
 		$this->assertNull($result);
@@ -259,21 +259,20 @@ class ConfigurationManagerTest extends UnitTestCase {
 		$mockReader = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Configuration\\DummyReader', array('checksum'));
 		$mockWriter = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Configuration\\DummyWriter', array('write'));
 		$mockCache = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Configuration\\DummyReader', array('checksum', 'read'));
-		$dummyConfiguration = new DummyMasterConfiguration();
 		$mockReader->expects($this->once())->method('checksum')
 			->will($this->returnValue('foobarchecksum'));
 		$mockCache->expects($this->once())->method('checksum')
 			->will($this->returnValue('differentchecksum'));
 		$mockCache->expects($this->never())->method('read');
-		$mockWriter->expects($this->once())->method('write')
-			->with($dummyConfiguration, ConfigurationManager::CACHE_RESOURCE)
-			->will($this->returnValue(TRUE));
 		$manager = $this->getMock(
 			'Dkd\\CmisService\\Configuration\\ConfigurationManager',
-			array('getMasterConfiguration'),
+			array('expireCachedDefinition', 'export'),
 			array($mockReader, $mockWriter, $mockCache)
 		);
-		$manager->expects($this->once())->method('getMasterConfiguration')->will($this->returnValue($dummyConfiguration));
+		$manager->expects($this->once())->method('expireCachedDefinition');
+		$manager->expects($this->once())->method('export')
+			->with(GeneralUtility::getFileAbsFileName(ConfigurationManager::CACHE_RESOURCE))
+			->willReturn(TRUE);
 		$result = $this->callInaccessibleMethod($manager, 'createOrUpdateCachedDefinition');
 		$this->assertTrue($result);
 	}

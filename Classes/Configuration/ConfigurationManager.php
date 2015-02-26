@@ -4,6 +4,7 @@ namespace Dkd\CmisService\Configuration;
 use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
 use Dkd\CmisService\Configuration\Reader\ConfigurationReaderInterface;
 use Dkd\CmisService\Configuration\Writer\ConfigurationWriterInterface;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Configuration Manager
@@ -100,15 +101,6 @@ class ConfigurationManager {
 	}
 
 	/**
-	 * Object lifetime termination.
-	 *
-	 * @return void
-	 */
-	public function __destruct() {
-		$this->createOrUpdateCachedDefinition();
-	}
-
-	/**
 	 * Gets (with on-the-fly loading) the active MasterConfiguration
 	 * definition used by the system.
 	 *
@@ -116,14 +108,17 @@ class ConfigurationManager {
 	 * @api
 	 */
 	public function getMasterConfiguration() {
-		if (TRUE === $this->masterConfiguration instanceof MasterConfiguration) {
-			return $this->masterConfiguration;
+		if (FALSE === $this->masterConfiguration instanceof MasterConfiguration) {
+			$definitionClassName = 'Dkd\\CmisService\\Configuration\\Definitions\\MasterConfiguration';
+			$cachedResource = GeneralUtility::getFileAbsFileName(self::CACHE_RESOURCE);
+			if (TRUE === $this->cache instanceof ConfigurationReaderInterface && TRUE === $this->cache->exists($cachedResource)) {
+				$this->masterConfiguration = $this->cache->read($cachedResource, $definitionClassName);
+			} else {
+				$this->masterConfiguration = $this->reader->read(self::MASTER_RESOURCE, $definitionClassName);
+				$this->createOrUpdateCachedDefinition();
+			}
 		}
-		$definitionClassName = 'Dkd\\CmisService\\Configuration\\Definitions\\MasterConfiguration';
-		if (TRUE === $this->cache instanceof ConfigurationReaderInterface) {
-			return $this->masterConfiguration = $this->cache->read(self::CACHE_RESOURCE, $definitionClassName);
-		}
-		return $this->masterConfiguration = $this->reader->read(self::MASTER_RESOURCE, $definitionClassName);
+		return $this->masterConfiguration;
 	}
 
 	/**
@@ -142,6 +137,7 @@ class ConfigurationManager {
 			throw new \RuntimeException('Cannot export configuration - no ConfigurationWriter configured', 1409181458);
 		}
 		$definition = $this->getMasterConfiguration();
+		$targetResourceIdentifier = GeneralUtility::getFileAbsFileName($targetResourceIdentifier);
 		return $this->writer->write($definition, $targetResourceIdentifier);
 	}
 
@@ -157,7 +153,7 @@ class ConfigurationManager {
 		if (FALSE === $this->cache instanceof ConfigurationReaderInterface) {
 			return NULL;
 		}
-		$this->removeResource(self::CACHE_RESOURCE);
+		$this->removeResource(GeneralUtility::getFileAbsFileName(self::CACHE_RESOURCE));
 		return NULL;
 	}
 
@@ -172,16 +168,18 @@ class ConfigurationManager {
 	 * @return boolean|NULL
 	 */
 	protected function createOrUpdateCachedDefinition() {
-		if (FALSE === $this->writer instanceof ConfigurationWriterInterface) {
+		if (
+			FALSE === $this->writer instanceof ConfigurationWriterInterface
+			|| FALSE === $this->cache instanceof ConfigurationReaderInterface
+		) {
 			return NULL;
 		}
-		if (FALSE === $this->cache instanceof ConfigurationReaderInterface) {
-			return NULL;
-		}
+		$cachedResourceIdentifier = GeneralUtility::getFileAbsFileName(self::CACHE_RESOURCE);
 		$currentChecksum = $this->reader->checksum(self::MASTER_RESOURCE);
-		$cachedChecksum = $this->cache->checksum(self::CACHE_RESOURCE);
+		$cachedChecksum = $this->cache->checksum($cachedResourceIdentifier);
 		if ($cachedChecksum !== $currentChecksum) {
-			return $this->writer->write($this->getMasterConfiguration(), self::CACHE_RESOURCE);
+			$this->expireCachedDefinition();
+			return $this->export($cachedResourceIdentifier);
 		}
 		return NULL;
 	}
