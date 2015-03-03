@@ -66,20 +66,20 @@ class ObjectFactoryTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function getExtensionTypoScriptSettingsCallsExpectedMethodSequence() {
-		$expectedTypoScript = array('foo' => 'bar');
+		$expectedTypoScript = array('plugin' => array('tx_cmisservice' => array('settings' => array('foo' => 'bar'))));
 		$mockExtbaseConfigurationManager = $this->getMock(
 			'TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager',
 			array('getConfiguration')
 		);
 		$mockExtbaseConfigurationManager->expects($this->once())->method('getConfiguration')
-			->with(ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT, 'Dkd.CmisService')
+			->with(ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT)
 			->will($this->returnValue($expectedTypoScript));
 		$factory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory', array('makeInstance'));
 		$factory->expects($this->once())->method('makeInstance')
 			->with('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager')
 			->will($this->returnValue($mockExtbaseConfigurationManager));
 		$result = $factory->getExtensionTypoScriptSettings();
-		$this->assertSame($expectedTypoScript, $result);
+		$this->assertSame($expectedTypoScript['plugin']['tx_cmisservice']['settings'], $result);
 	}
 
 	/**

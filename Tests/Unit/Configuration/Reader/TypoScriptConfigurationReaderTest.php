@@ -203,8 +203,8 @@ class TypoScriptConfigurationReaderTest extends UnitTestCase {
 			'Dkd\\CmisService\\Configuration\\Reader\\TypoScriptConfigurationReader',
 			array('getObjectFactory')
 		);
-		$objectFactory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory', array('getExtensionTypoScriptSettings'));
-		$objectFactory->expects($this->once())->method('getExtensionTypoScriptSettings')->will($this->returnValue($typoScript));
+		$objectFactory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory', array('getAllTypoScript'));
+		$objectFactory->expects($this->once())->method('getAllTypoScript')->will($this->returnValue($typoScript));
 		$reader->expects($this->once())->method('getObjectFactory')->will($this->returnValue($objectFactory));
 		$result = $this->callInaccessibleMethod($reader, 'getTypoScriptSettings');
 		$this->assertSame($typoScript, $result);

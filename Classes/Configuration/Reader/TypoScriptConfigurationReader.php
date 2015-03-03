@@ -36,7 +36,7 @@ class TypoScriptConfigurationReader implements ConfigurationReaderInterface {
 				'"Dkd\\CmisService\\Configuration\\Definitions\\ConfigurationDefinitionInterface"', 1409923995);
 		}
 		$typoScript = $this->getTypoScriptSettings();
-		$typoScript = ObjectAccess::getPropertyPath($typoScript, $resourceIdentifier);
+		$typoScript = (array) ObjectAccess::getPropertyPath($typoScript, $resourceIdentifier);
 		/** @var ConfigurationDefinitionInterface $definition */
 		$definition = new $definitionClassName();
 		$definition->setDefinitions($typoScript);
@@ -106,7 +106,7 @@ class TypoScriptConfigurationReader implements ConfigurationReaderInterface {
 	 */
 	protected function getTypoScriptSettings() {
 		$objectFactory = $this->getObjectFactory();
-		$typoScript = $objectFactory->getExtensionTypoScriptSettings();
+		$typoScript = $objectFactory->getAllTypoScript();
 		return $typoScript;
 	}
 

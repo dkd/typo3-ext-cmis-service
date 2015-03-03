@@ -27,6 +27,11 @@ class ObjectFactory {
 	protected static $logger;
 
 	/**
+	 * @var array
+	 */
+	protected static $typoScript = array();
+
+	/**
 	 * Make an instance of $className, if any additional parameters
 	 * are present they will be used as constructor arguments.
 	 *
@@ -123,17 +128,34 @@ class ObjectFactory {
 	}
 
 	/**
+	 * Gets the global TypoScript setup array.
+	 *
+	 * @return array
+	 */
+	public function getAllTypoScript() {
+		if (TRUE === empty(self::$typoScript)) {
+			/** @var ConfigurationManagerInterface $extbaseConfigurationManager */
+			$extbaseConfigurationManager = $this->makeInstance('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager');
+			$allTypoScript = (array) $extbaseConfigurationManager->getConfiguration(
+				ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT
+			);
+			self::$typoScript = GeneralUtility::removeDotsFromTS($allTypoScript);
+		}
+		return self::$typoScript;
+	}
+
+	/**
 	 * Gets all TypoScript inside plugin.tx_cmisservice.settings.
 	 *
 	 * @return array
 	 */
 	public function getExtensionTypoScriptSettings() {
-		/** @var ConfigurationManagerInterface $extbaseConfigurationManager */
-		$extbaseConfigurationManager = $this->makeInstance('TYPO3\\CMS\\Extbase\\Configuration\\ConfigurationManager');
-		return $extbaseConfigurationManager->getConfiguration(
-			ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT,
-			'Dkd.CmisService'
-		);
+		$allTypoScript = $this->getAllTypoScript();
+		$extensionConfiguration = array();
+		if (TRUE === isset($allTypoScript['plugin']['tx_cmisservice']['settings'])) {
+			$extensionConfiguration = $allTypoScript['plugin']['tx_cmisservice']['settings'];
+		}
+		return $extensionConfiguration;
 	}
 
 	/**
