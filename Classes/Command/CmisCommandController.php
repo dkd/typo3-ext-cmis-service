@@ -3,19 +3,110 @@ namespace Dkd\CmisService\Command;
 
 use Dkd\CmisService\Analysis\RecordAnalyzer;
 use Dkd\CmisService\Analysis\TableConfigurationAnalyzer;
+use Dkd\CmisService\Factory\CmisObjectFactory;
+use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Factory\QueueFactory;
 use Dkd\CmisService\Factory\TaskFactory;
+use Dkd\CmisService\Initialization;
 use Dkd\CmisService\Task\TaskInterface;
 use Dkd\CmisService\Queue\QueueInterface;
+use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
+use Dkd\PhpCmis\Data\DocumentInterface;
+use Dkd\PhpCmis\Data\FolderInterface;
+use Symfony\Component\Yaml\Yaml;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use TYPO3\CMS\Frontend\Page\PageRepository;
 
 /**
- * Cronjob Command Controller
+ * CMIS Command Controller
  *
- * Handles scheduled
+ * Main CLI interface for interacting with the
+ * CMIS Service of this TYPO3 site.
  */
-class CronjobCommandController extends CommandController {
+class CmisCommandController extends CommandController {
+
+	const RESOURCE_CONFIGURATION = 'configuration';
+	const RESOURCE_TREE = 'tree';
+
+	/**
+	 * @return void
+	 */
+	public function initializeObject() {
+		$initializer = new Initialization();
+		$initializer->start();
+	}
+
+	/**
+	 * Dump resource data
+	 *
+	 * Dumps, as YAML, selected resource data. Supported
+	 * resources are:
+	 *
+	 * - configuration
+	 * - tree
+	 *
+	 * If no resource is specified, `configuration` is assumed.
+	 *
+	 * @param string $resource
+	 * @param boolean $brief
+	 * @return void
+	 */
+	public function dumpCommand($resource = self::RESOURCE_CONFIGURATION, $brief = TRUE) {
+		$data = array();
+		if (self::RESOURCE_CONFIGURATION === $resource) {
+			$data = $this->getObjectFactory()->getConfiguration()->getDefinitions();
+		} elseif (self::RESOURCE_TREE === $resource) {
+			$rootFolder = $this->getCmisObjectFactory()->getSession()->getRootFolder();
+			$data = $this->convertTreeBranchesToArrayValue($rootFolder->getChildren(), $brief);
+		}
+		$yaml = Yaml::dump($data, 99);
+		$this->response->setContent($yaml);
+		$this->response->send();
+	}
+
+	/**
+	 * Recursive method to make a succint representation
+	 * of a single branch and any children of that branch.
+	 *
+	 * @param CmisObjectInterface[] $object
+	 * @param boolean $brief
+	 * @return array|string
+	 */
+	protected function convertTreeBranchesToArrayValue(array $objects, $brief = TRUE) {
+		$values = array();
+		foreach ($objects as $object) {
+			/** @var DocumentInterface|FolderInterface $object */
+			$value = NULL;
+			$type = $object->getProperty('cmis:baseTypeId')->getFirstValue();
+			$date = $object->getCreationDate()->format('Y-m-d');
+			if (TRUE === $brief) {
+				$name = $object->getName() . ' (' . $object->getId() . ')';
+			} else {
+				$name = $type . ',' . $date . ' ' . $object->getName();
+			}
+			if (TRUE === $object instanceof FolderInterface) {
+				$value = $this->convertTreeBranchesToArrayValue($object->getChildren(), $brief);
+				if (array_fill(0, count($value), NULL) == array_values($value)) {
+					// every value is NULL; flip value array so it becomes a list of names
+					$value = array_keys($value);
+				}
+			} elseif (TRUE === $object instanceof DocumentInterface) {
+				if (FALSE === $brief) {
+					$value = array(
+						'id' => $object->getId(),
+						'typo3uuid' => $object->getProperty('typo3uuid'),
+						'created' => $date . ' by ' . $object->getCreatedBy(),
+						'modified' => $object->getLastModificationDate()->format('Y-m-d') . ' by ' . $object->getLastModifiedBy(),
+						'type' => $type,
+					);
+				}
+			} else {
+				$value = get_class($object);
+			}
+			$values[$name] = $value;
+		}
+		return $values;
+	}
 
 	/**
 	 * Truncate Queue
@@ -122,12 +213,13 @@ class CronjobCommandController extends CommandController {
 	 * @return void
 	 */
 	public function pickTasksCommand($tasks = 1) {
-		/** @var TaskInterface[] $picked */
-		$picked = array();
 		$queue = $this->getQueue();
 		while (0 <= --$tasks && ($task = $queue->pick())) {
-			$task->getWorker()->execute($task);
+			$result = $task->getWorker()->execute($task);
+			$this->response->appendContent($result->getMessage() . PHP_EOL);
+			$this->response->appendContent(var_export($result->getPayload(), TRUE) . PHP_EOL);
 		}
+		$this->response->send();
 	}
 
 	/**
@@ -159,6 +251,7 @@ class CronjobCommandController extends CommandController {
 	/**
 	 * Creates an instance of TaskFactory to create Tasks.
 	 *
+	 * @codeCoverageIgnore
 	 * @return TaskFactory
 	 */
 	protected function getTaskFactory() {
@@ -168,6 +261,7 @@ class CronjobCommandController extends CommandController {
 	/**
 	 * Creates an instance of QueueFactory to create Queue instance.
 	 *
+	 * @codeCoverageIgnore
 	 * @return QueueFactory
 	 */
 	protected function getQueueFactory() {
@@ -175,9 +269,30 @@ class CronjobCommandController extends CommandController {
 	}
 
 	/**
+	 * Creates an instance of ObjectFactory to create new objects.
+	 *
+	 * @codeCoverageIgnore
+	 * @return ObjectFactory
+	 */
+	protected function getObjectFactory() {
+		return new ObjectFactory();
+	}
+
+	/**
+	 * Creates an instance of CmisObjectFactory to create new CMIS objects.
+	 *
+	 * @codeCoverageIgnore
+	 * @return CmisObjectFactory
+	 */
+	protected function getCmisObjectFactory() {
+		return new CmisObjectFactory();
+	}
+
+	/**
 	 * Gets an instance of the PageRepository which is used as
 	 * support class to generate enableFields conditions.
 	 *
+	 * @codeCoverageIgnore
 	 * @return PageRepository
 	 */
 	protected function getPageRepository() {
@@ -188,6 +303,7 @@ class CronjobCommandController extends CommandController {
 	 * Prepare an instance of the table configuration analyzer
 	 * which reads and checks tables and fields for indexability.
 	 *
+	 * @codeCoverageIgnore
 	 * @return TableConfigurationAnalyzer
 	 */
 	protected function getTableConfigurationAnalyzer() {
@@ -208,6 +324,7 @@ class CronjobCommandController extends CommandController {
 	/**
 	 * Gets the Queue containing Tasks.
 	 *
+	 * @codeCoverageIgnore
 	 * @return QueueInterface
 	 */
 	protected function getQueue() {

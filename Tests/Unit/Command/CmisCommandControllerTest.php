@@ -1,16 +1,16 @@
 <?php
 namespace Dkd\CmisService\Tests\Unit\Command;
 
-use Dkd\CmisService\Command\CronjobCommandController;
+use Dkd\CmisService\Command\CmisCommandController;
 use Dkd\CmisService\Tests\Fixtures\Queue\DummyWorker;
 use Dkd\CmisService\Tests\Fixtures\Task\DummyTask;
 use TYPO3\CMS\Core\Core\Bootstrap;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
- * Class CronjobCommandControllerTest
+ * Class CmisCommandControllerTest
  */
-class CronjobCommandControllerTest extends UnitTestCase {
+class CmisCommandControllerTest extends UnitTestCase {
 
 	/**
 	 * Setup
@@ -49,7 +49,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 		$queueFactory = $this->getMock('Dkd\\CmisService\\Factory\\QueueFactory', array('fetchQueue'));
 		$queueFactory->expects($this->once())->method('fetchQueue')->will($this->returnValue('foobar'));
 		$commandController = $this->getAccessibleMock(
-			'Dkd\\CmisService\\Command\\CronjobCommandController',
+			'Dkd\\CmisService\\Command\\CmisCommandController',
 			array('getQueueFactory')
 		);
 		$commandController->expects($this->once())->method('getQueueFactory')->will($this->returnValue($queueFactory));
@@ -64,7 +64,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function truncateQueueCallsFlush() {
-		$commandController = $this->getMock('Dkd\\CmisService\\Command\\CronjobCommandController', array('getQueue'));
+		$commandController = $this->getMock('Dkd\\CmisService\\Command\\CmisCommandController', array('getQueue'));
 		$queue = $this->getMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('flush'));
 		$queue->expects($this->once())->method('flush');
 		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
@@ -78,7 +78,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function pickTaskDelegatesToPickTasksWithOneAsArgument() {
-		$commandController = $this->getMock('Dkd\\CmisService\\Command\\CronjobCommandController', array('pickTasksCommand'));
+		$commandController = $this->getMock('Dkd\\CmisService\\Command\\CmisCommandController', array('pickTasksCommand'));
 		$commandController->expects($this->once())->method('pickTasksCommand')->with(1);
 		$commandController->pickTaskCommand();
 	}
@@ -95,7 +95,11 @@ class CronjobCommandControllerTest extends UnitTestCase {
 		$dummyTask->assign($dummyWorker);
 		$queue = $this->getMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('pick'));
 		$queue->expects($this->exactly(3))->method('pick')->will($this->returnValue($dummyTask));
-		$commandController = $this->getMock('Dkd\\CmisService\\Command\\CronjobCommandController', array('getQueue'));
+		$response = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Request\\Response', array('appendContent', 'send'));
+		$response->expects($this->exactly(6))->method('appendContent');
+		$response->expects($this->once())->method('send');
+		$commandController = $this->getAccessibleMock('Dkd\\CmisService\\Command\\CmisCommandController', array('getQueue'));
+		$commandController->_set('response', $response);
 		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
 		$commandController->pickTasksCommand(3);
 	}
@@ -111,7 +115,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 		$queue->expects($this->once())->method('count')->will($this->returnValue(2));
 		$response = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Request\\Response', array('setContent', 'send'));
 		$response->expects($this->atLeastOnce())->method('setContent');
-		$commandController = $this->getAccessibleMock('Dkd\\CmisService\\Command\\CronjobCommandController', array('getQueue'));
+		$commandController = $this->getAccessibleMock('Dkd\\CmisService\\Command\\CmisCommandController', array('getQueue'));
 		$commandController->_set('response', $response);
 		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
 		$commandController->statusCommand();
@@ -124,7 +128,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function getTableConfigurationAnalyzerReturnsTableConfigurationAnalyzerInstance() {
-		$commandController = new CronjobCommandController();
+		$commandController = new CmisCommandController();
 		$result = $this->callInaccessibleMethod($commandController, 'getTableConfigurationAnalyzer');
 		$this->assertInstanceOf('Dkd\\CmisService\\Analysis\\TableConfigurationAnalyzer', $result);
 	}
@@ -136,7 +140,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function getRecordAnalyzerReturnsRecordAnalyzerInstance() {
-		$commandController = new CronjobCommandController();
+		$commandController = new CmisCommandController();
 		$result = $this->callInaccessibleMethod($commandController, 'getRecordAnalyzer', 'tt_content', array('uid' => 123));
 		$this->assertInstanceOf('Dkd\\CmisService\\Analysis\\RecordAnalyzer', $result);
 		$this->assertAttributeEquals('tt_content', 'table', $result);
@@ -152,7 +156,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 	public function getAllEnabledRecordsFromTableDelegatesToGlobalConnectionAndAppliesEnableFields() {
 		$pageRepository = $this->getMock('TYPO3\\CMS\\Frontend\\Page\\PageRepository', array('enableFields'));
 		$pageRepository->expects($this->once())->method('enableFields')->with('dummytable', 0, array(), TRUE);
-		$commandController = $this->getMock('Dkd\\CmisService\\Command\\CronjobCommandController', array('getPageRepository'));
+		$commandController = $this->getMock('Dkd\\CmisService\\Command\\CmisCommandController', array('getPageRepository'));
 		$commandController->expects($this->once())->method('getPageRepository')->will($this->returnValue($pageRepository));
 		$backup = $GLOBALS['TYPO3_DB'];
 		$GLOBALS['TYPO3_DB'] = $this->getMock('TYPO3\\CMS\\Core\\Database\\DatabaseConnection', array('exec_SELECTgetRows'));
@@ -183,7 +187,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 		$response = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Request\\Response', array('setContent', 'send'));
 		$response->expects($this->atLeastOnce())->method('setContent');
 		$commandController = $this->getAccessibleMock(
-			'Dkd\\CmisService\\Command\\CronjobCommandController',
+			'Dkd\\CmisService\\Command\\CmisCommandController',
 			array('getTableConfigurationAnalyzer', 'getQueue')
 		);
 		$commandController->_set('response', $response);
@@ -223,7 +227,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 		$response = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Request\\Response', array('setContent', 'send'));
 		$response->expects($this->atLeastOnce())->method('setContent');
 		$commandController = $this->getAccessibleMock(
-			'Dkd\\CmisService\\Command\\CronjobCommandController',
+			'Dkd\\CmisService\\Command\\CmisCommandController',
 			array('getTableConfigurationAnalyzer', 'getQueue', 'createRecordIndexingTask')
 		);
 		$commandController->_set('response', $response);
@@ -260,7 +264,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 		$response = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Request\\Response', array('setContent', 'send'));
 		$response->expects($this->atLeastOnce())->method('setContent');
 		$commandController = $this->getAccessibleMock(
-			'Dkd\\CmisService\\Command\\CronjobCommandController',
+			'Dkd\\CmisService\\Command\\CmisCommandController',
 			array('getTableConfigurationAnalyzer', 'getQueue', 'createRecordIndexingTask')
 		);
 		$commandController->_set('response', $response);
@@ -290,7 +294,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 		);
 		$recordAnalyzer->expects($this->once())->method('getIndexableColumnNames')->will($this->returnValue(array('uid')));
 		$commandController = $this->getMock(
-			'Dkd\\CmisService\\Command\\CronjobCommandController',
+			'Dkd\\CmisService\\Command\\CmisCommandController',
 			array('getTaskFactory', 'getRecordAnalyzer')
 		);
 		$commandController->expects($this->at(0))->method('getTaskFactory')->will($this->returnValue($taskFactory));
@@ -306,7 +310,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function getPageRepositoryReturnsPageRepository() {
-		$commandController = new CronjobCommandController();
+		$commandController = new CmisCommandController();
 		$result = $this->callInaccessibleMethod($commandController, 'getPageRepository');
 		$this->assertInstanceOf('TYPO3\\CMS\\Frontend\\Page\\PageRepository', $result);
 	}
@@ -318,7 +322,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function getTaskFactoryReturnsTaskFactoryInstance() {
-		$commandController = new CronjobCommandController();
+		$commandController = new CmisCommandController();
 		$result = $this->callInaccessibleMethod($commandController, 'getTaskFactory');
 		$this->assertInstanceOf('Dkd\\CmisService\\Factory\\TaskFactory', $result);
 	}
@@ -330,7 +334,7 @@ class CronjobCommandControllerTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function getQueueFactoryReturnsQueueFactoryInstance() {
-		$commandController = new CronjobCommandController();
+		$commandController = new CmisCommandController();
 		$result = $this->callInaccessibleMethod($commandController, 'getQueueFactory');
 		$this->assertInstanceOf('Dkd\\CmisService\\Factory\\QueueFactory', $result);
 	}
