@@ -53,6 +53,10 @@ class CmisConfigurationTest extends UnitTestCase {
 	 * @return array
 	 */
 	public function getSessionParametersTestValues() {
+		$instance = new CmisConfiguration();
+		$method = new \ReflectionMethod($instance, 'createHttpInvoker');
+		$method->setAccessible(TRUE);
+		$invoker = $method->invokeArgs($instance, array('username', 'password'));
 		return array(
 			array(
 				array(
@@ -66,8 +70,8 @@ class CmisConfigurationTest extends UnitTestCase {
 					SessionParameter::BROWSER_URL => 'url',
 					SessionParameter::BINDING_TYPE => 'binding',
 					SessionParameter::REPOSITORY_ID => 'id',
-					SessionParameter::USER => 'username',
-					SessionParameter::PASSWORD => 'password'
+					SessionParameter::BROWSER_SUCCINCT => FALSE,
+					SessionParameter::HTTP_INVOKER_OBJECT => $invoker
 				)
 			)
 		);
