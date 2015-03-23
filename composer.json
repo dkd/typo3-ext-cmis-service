@@ -1,5 +1,5 @@
 {
-    "name": "dkd/typo3-ext-cmis-service",
+    "name": "dkd/cmis-service",
     "type": "typo3-cms-extension",
     "description": "TYPO3 Extension CMIS Service",
     "keywords": ["cmis", "typo3"],
