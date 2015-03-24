@@ -1,8 +1,8 @@
 <?php
 namespace Dkd\CmisService\Task;
 
-use Dkd\CmisService\Queue\WorkerInterface;
 use Dkd\CmisService\Execution\ExecutionInterface;
+use Dkd\CmisService\Queue\WorkerInterface;
 
 /**
  * Interface TaskInterface

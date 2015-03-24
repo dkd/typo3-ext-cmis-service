@@ -5,6 +5,7 @@ use Dkd\CmisService\Analysis\Detection\IndexableTableDetector;
 use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Factory\QueueFactory;
 use Dkd\CmisService\Factory\TaskFactory;
+use Dkd\CmisService\Initialization;
 use Dkd\CmisService\Queue\QueueInterface;
 use Dkd\CmisService\SingletonInterface;
 
@@ -31,6 +32,8 @@ abstract class AbstractListener implements SingletonInterface {
 	 * Constructor
 	 */
 	public function __construct() {
+		$initialization = new Initialization();
+		$initialization->start();
 		$this->initializeMonitoredTables();
 	}
 

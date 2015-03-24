@@ -34,7 +34,7 @@ class YamlConfigurationReader implements ConfigurationReaderInterface {
 			throw new \RuntimeException('Configuration definition class "' . $definitionClassName . '" must implement interface ' .
 				'"Dkd\\CmisService\\Configuration\\Definitions\\ConfigurationDefinitionInterface"', 1409923995);
 		}
-		$yamlArray = Yaml::parse($resourceIdentifier);
+		$yamlArray = (array) Yaml::parse($resourceIdentifier);
 		$definition = new $definitionClassName();
 		$definition->setDefinitions($yamlArray);
 		return $definition;

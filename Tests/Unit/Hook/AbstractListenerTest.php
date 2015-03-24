@@ -1,10 +1,10 @@
 <?php
 namespace Dkd\CmisService\Tests\Unit\Hook;
 
+use Dkd\CmisService\Hook\AbstractListener;
 use Dkd\CmisService\Queue\SimpleQueue;
 use Dkd\CmisService\Tests\Fixtures\Task\DummyTask;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
-use Dkd\CmisService\Hook\AbstractListener;
 
 /**
  * Class AbstractListenerTest

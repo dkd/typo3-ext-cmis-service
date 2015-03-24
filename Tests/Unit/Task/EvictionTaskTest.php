@@ -5,7 +5,7 @@ use Dkd\CmisService\Factory\TaskFactory;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
- * Class RecordIndexTaskTest
+ * Class EvictionTaskTest
  */
 class EvictionTaskTest extends UnitTestCase {
 
