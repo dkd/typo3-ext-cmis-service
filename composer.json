@@ -40,7 +40,7 @@
     "require": {
         "dkd/php-cmis": "dev-master",
         "symfony/yaml": "~2.5.3",
-        "typo3/cms": "~6.2.11",
+        "typo3/cms": ">=6.2.11",
         "psr/log": "1.0.*@dev"
     },
     "require-dev": {
