@@ -1,9 +1,4 @@
 <?php
-
-// TEMPORARY MEASURE: use composer autoloader until we are shipping w/ libs
-// @TODO: remove when release mechanism is built
-require_once \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath('cmis_service', 'vendor/autoload.php');
-
 // caches definitions:
 // Queue - assigned to "system" group to avoid clearing cached states on anything but admin access.
 $caches = &$GLOBALS['TYPO3_CONF_VARS']['SYS']['caching']['cacheConfigurations'];

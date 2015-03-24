@@ -45,7 +45,7 @@
         "mikey179/vfsStream": "~1.3.0",
         "typo3-ci/typo3sniffpool": "*",
         "typo3-ci/typo3cms": "*",
-        "typo3/cms": "~6.2.4",
+        "typo3/cms": "~6.2.11",
         "psr/log": "1.0.*@dev"
     }
 }
