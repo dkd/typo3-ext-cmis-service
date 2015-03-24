@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Factory;
 use Dkd\CmisService\Task\EvictionTask;
+use Dkd\CmisService\Task\InitializationTask;
 use Dkd\CmisService\Task\RecordIndexTask;
 
 /**
@@ -38,6 +39,15 @@ class TaskFactory {
 		$task->setParameter(EvictionTask::OPTION_TABLE, $table);
 		$task->setParameter(EvictionTask::OPTION_UID, $uid);
 		return $task;
+	}
+
+	/**
+	 * Creates a Task to initialize the CMIS data storage.
+	 *
+	 * @return InitializationTask
+	 */
+	public function createInitializationTask() {
+		return new InitializationTask();
 	}
 
 }
