@@ -3,16 +3,19 @@ namespace Dkd\CmisService\Command;
 
 use Dkd\CmisService\Analysis\RecordAnalyzer;
 use Dkd\CmisService\Analysis\TableConfigurationAnalyzer;
+use Dkd\CmisService\Execution\Result;
 use Dkd\CmisService\Factory\CmisObjectFactory;
 use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Factory\QueueFactory;
 use Dkd\CmisService\Factory\TaskFactory;
+use Dkd\CmisService\Factory\WorkerFactory;
 use Dkd\CmisService\Initialization;
-use Dkd\CmisService\Task\TaskInterface;
 use Dkd\CmisService\Queue\QueueInterface;
+use Dkd\CmisService\Task\TaskInterface;
 use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
 use Dkd\PhpCmis\Data\DocumentInterface;
 use Dkd\PhpCmis\Data\FolderInterface;
+use Dkd\PhpCmis\PropertyIds;
 use Symfony\Component\Yaml\Yaml;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use TYPO3\CMS\Frontend\Page\PageRepository;
@@ -26,7 +29,11 @@ use TYPO3\CMS\Frontend\Page\PageRepository;
 class CmisCommandController extends CommandController {
 
 	const RESOURCE_CONFIGURATION = 'configuration';
+	const RESOURCE_OBJECT = 'object';
 	const RESOURCE_TREE = 'tree';
+	const ACTION_DUMP = 'dump';
+	const ACTION_DELETE = 'delete';
+	const ACTION_DOWNLOAD = 'download';
 
 	/**
 	 * @return void
@@ -37,6 +44,36 @@ class CmisCommandController extends CommandController {
 	}
 
 	/**
+	 * Manipulate object
+	 *
+	 * Perform $action on object with $id in repository.
+	 *
+	 * Available commands are:
+	 *
+	 * - dump (forward to dumpCommand; dumps object properties)
+	 * - delete (removes CMIS object by UUID)
+	 * - download (content stream output to STDOUT)
+	 *
+	 * @param string $action
+	 * @param string $id
+	 * @return void
+	 */
+	public function objectCommand($action, $id) {
+		$session = $this->getCmisObjectFactory()->getSession();
+		if (self::ACTION_DUMP === $action) {
+			$this->dumpCommand(self::RESOURCE_OBJECT, $id, FALSE);
+		} elseif (self::ACTION_DELETE === $action) {
+			$session->delete($session->createObjectId($id));
+			$this->response->appendContent('Object "' . $id . '" has been deleted.' . PHP_EOL);
+		} elseif (self::ACTION_DOWNLOAD === $action) {
+			$this->response->setContent($session->getContentStream($session->createObjectId($id)));
+		} else {
+			$this->response->setContent('Unsupported command: ' . $action . PHP_EOL);
+		}
+		$this->response->send();
+	}
+
+	/**
 	 * Dump resource data
 	 *
 	 * Dumps, as YAML, selected resource data. Supported
@@ -44,20 +81,29 @@ class CmisCommandController extends CommandController {
 	 *
 	 * - configuration
 	 * - tree
+	 * - object
 	 *
 	 * If no resource is specified, `configuration` is assumed.
+	 * When dumping objects, the $id parameter is required
 	 *
 	 * @param string $resource
+	 * @param string $id
 	 * @param boolean $brief
 	 * @return void
 	 */
-	public function dumpCommand($resource = self::RESOURCE_CONFIGURATION, $brief = TRUE) {
+	public function dumpCommand($resource = self::RESOURCE_CONFIGURATION, $id = NULL, $brief = TRUE) {
 		$data = array();
+		$session = $this->getCmisObjectFactory()->getSession();
 		if (self::RESOURCE_CONFIGURATION === $resource) {
 			$data = $this->getObjectFactory()->getConfiguration()->getDefinitions();
 		} elseif (self::RESOURCE_TREE === $resource) {
-			$rootFolder = $this->getCmisObjectFactory()->getSession()->getRootFolder();
+			$rootFolder = $session->getRootFolder();
 			$data = $this->convertTreeBranchesToArrayValue($rootFolder->getChildren(), $brief);
+		} elseif (self::RESOURCE_OBJECT === $resource) {
+			$data = array();
+			foreach ($session->getObject($session->createObjectId($id))->getProperties() as $propertyName => $property) {
+				$data[$propertyName] = $property->getFirstValue();
+			}
 		}
 		$yaml = Yaml::dump($data, 99);
 		$this->response->setContent($yaml);
@@ -86,7 +132,7 @@ class CmisCommandController extends CommandController {
 			}
 			if (TRUE === $object instanceof FolderInterface) {
 				$value = $this->convertTreeBranchesToArrayValue($object->getChildren(), $brief);
-				if (array_fill(0, count($value), NULL) == array_values($value)) {
+				if (0 < count($value) && array_fill(0, count($value), NULL) == array_values($value)) {
 					// every value is NULL; flip value array so it becomes a list of names
 					$value = array_keys($value);
 				}
@@ -190,6 +236,33 @@ class CmisCommandController extends CommandController {
 	}
 
 	/**
+	 * Initialize the CMIS repository
+	 *
+	 * It is safe to re-run this command multiple times!
+	 *
+	 * Analyse the CMIS repository's data storage to
+	 * detect any TYPO3-specific data types that may be
+	 * missing, then creates those data types. If a
+	 * required object type already exists is is left
+	 * untouched.
+	 *
+	 * Also takes into consideration any custom setup
+	 * which adds types.
+	 *
+	 * This CLI command circumvents the Queue and directly
+	 * executes the InitializationTask.
+	 *
+	 * @return void
+	 */
+	public function initializeCommand() {
+		$taskFactory = $this->getTaskFactory();
+		$initializationTask = $taskFactory->createInitializationTask();
+		$worker = $this->getWorkerFactory()->createWorker();
+		$result = $worker->execute($initializationTask);
+		$this->echoResultToConsole($result);
+	}
+
+	/**
 	 * Pick and execute one (1) Task from the Queue
 	 *
 	 * Picks the next-in-line Task from the Queue and runs
@@ -216,8 +289,7 @@ class CmisCommandController extends CommandController {
 		$queue = $this->getQueue();
 		while (0 <= --$tasks && ($task = $queue->pick())) {
 			$result = $task->getWorker()->execute($task);
-			$this->response->appendContent($result->getMessage() . PHP_EOL);
-			$this->response->appendContent(var_export($result->getPayload(), TRUE) . PHP_EOL);
+			$this->echoResultToConsole($result);
 		}
 		$this->response->send();
 	}
@@ -249,6 +321,18 @@ class CmisCommandController extends CommandController {
 	}
 
 	/**
+	 * @param Result $result
+	 * @return void
+	 */
+	protected function echoResultToConsole(Result $result) {
+		$payload = $result->getPayload();
+		$this->response->appendContent($result->getMessage() . PHP_EOL);
+		if (0 < count($payload)) {
+			$this->response->appendContent(var_export($payload, TRUE) . PHP_EOL);
+		}
+	}
+
+	/**
 	 * Creates an instance of TaskFactory to create Tasks.
 	 *
 	 * @codeCoverageIgnore
@@ -276,6 +360,16 @@ class CmisCommandController extends CommandController {
 	 */
 	protected function getObjectFactory() {
 		return new ObjectFactory();
+	}
+
+	/**
+	 * Creates an instance of WorkerFactory to create new workers.
+	 *
+	 * @codeCoverageIgnore
+	 * @return WorkerFactory
+	 */
+	protected function getWorkerFactory() {
+		return new WorkerFactory();
 	}
 
 	/**

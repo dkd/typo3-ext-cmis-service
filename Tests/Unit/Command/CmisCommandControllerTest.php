@@ -96,7 +96,7 @@ class CmisCommandControllerTest extends UnitTestCase {
 		$queue = $this->getMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('pick'));
 		$queue->expects($this->exactly(3))->method('pick')->will($this->returnValue($dummyTask));
 		$response = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Request\\Response', array('appendContent', 'send'));
-		$response->expects($this->exactly(6))->method('appendContent');
+		$response->expects($this->exactly(3))->method('appendContent');
 		$response->expects($this->once())->method('send');
 		$commandController = $this->getAccessibleMock('Dkd\\CmisService\\Command\\CmisCommandController', array('getQueue'));
 		$commandController->_set('response', $response);
