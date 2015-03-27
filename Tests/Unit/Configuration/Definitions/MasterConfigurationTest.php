@@ -105,7 +105,66 @@ class MasterConfigurationTest extends UnitTestCase {
 	 * @test
 	 * @return void
 	 */
-	public function setDefinitionsDelegatesSubDefinitionsToSubObjects() {
+	public function setDefinitionsDelegatesSubDefinitionsToSubObjectsWithMultiServerAndDefaultServer() {
+		$configuration = new MasterConfiguration();
+		$implementation = array(1);
+		$tables = array(2);
+		$cmis = array(3);
+		$stanbol = array(4);
+		$definitions = array(
+			MasterConfiguration::SCOPE_IMPLEMENTATION => $implementation,
+			MasterConfiguration::SCOPE_TABLES => $tables,
+			MasterConfiguration::SCOPE_CMIS => array(
+				MasterConfiguration::CMIS_OPTION_SERVERS => array(
+					MasterConfiguration::CMIS_DEFAULT_SERVER => $cmis
+				)
+			),
+			MasterConfiguration::SCOPE_STANBOL => $stanbol
+		);
+		$configuration->setDefinitions($definitions);
+		$this->assertEquals($implementation, $configuration->getImplementationConfiguration()->getDefinitions());
+		$this->assertEquals($tables, $configuration->getTableConfiguration()->getDefinitions());
+		$this->assertEquals($cmis, $configuration->getCmisConfiguration()->getDefinitions());
+		$this->assertEquals($stanbol, $configuration->getStanbolConfiguration()->getDefinitions());
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function setDefinitionsDelegatesSubDefinitionsToSubObjectsWithMultiServerAndConfiguredServer() {
+		$configuration = new MasterConfiguration();
+		$implementation = array(1);
+		$tables = array(2);
+		$cmis = array(3);
+		$stanbol = array(4);
+		$definitions = array(
+			MasterConfiguration::SCOPE_IMPLEMENTATION => $implementation,
+			MasterConfiguration::SCOPE_TABLES => $tables,
+			MasterConfiguration::SCOPE_CMIS => array(
+				MasterConfiguration::CMIS_OPTION_SERVERS => array(
+					'foobarserver' => $cmis
+				),
+				MasterConfiguration::CMIS_OPTION_SERVER => 'foobarserver'
+			),
+			MasterConfiguration::SCOPE_STANBOL => $stanbol
+		);
+		$configuration->setDefinitions($definitions);
+		$this->assertEquals($implementation, $configuration->getImplementationConfiguration()->getDefinitions());
+		$this->assertEquals($tables, $configuration->getTableConfiguration()->getDefinitions());
+		$this->assertEquals($cmis, $configuration->getCmisConfiguration()->getDefinitions());
+		$this->assertEquals($stanbol, $configuration->getStanbolConfiguration()->getDefinitions());
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function setDefinitionsDelegatesSubDefinitionsToSubObjectsWithSingleServer() {
 		$configuration = new MasterConfiguration();
 		$implementation = array(1);
 		$tables = array(2);

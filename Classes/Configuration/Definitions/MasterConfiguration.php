@@ -11,6 +11,9 @@ namespace Dkd\CmisService\Configuration\Definitions;
  */
 class MasterConfiguration extends AbstractConfigurationDefinition implements ConfigurationDefinitionInterface {
 
+	const CMIS_OPTION_SERVER = 'server';
+	const CMIS_OPTION_SERVERS = 'servers';
+	const CMIS_DEFAULT_SERVER = 'default';
 	const SCOPE_IMPLEMENTATION = 'implementation';
 	const SCOPE_TABLES = 'tables';
 	const SCOPE_CMIS = 'cmis';
@@ -79,22 +82,35 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 	 * @return void
 	 */
 	public function setDefinitions(array $definitions) {
-		$implementation = $tables = $cmis = $stanbol = array();
+		$implementation = $tables = $cmisServerConfiguration = $cmis = $stanbol = array();
 		if (TRUE === isset($definitions[self::SCOPE_IMPLEMENTATION])) {
 			$implementation = (array) $definitions[self::SCOPE_IMPLEMENTATION];
 		}
 		if (TRUE === isset($definitions[self::SCOPE_TABLES])) {
 			$tables = (array) $definitions[self::SCOPE_TABLES];
 		}
-		if (TRUE === isset($definitions[self::SCOPE_CMIS])) {
+		if (TRUE === isset($definitions[self::SCOPE_CMIS][self::CMIS_OPTION_SERVERS])) {
+			// pick the currently selected CMIS server by checking the
+			// plugin.tx_cmisservice.settings.cmis.server value. The
+			// value set in this position must be the name of a key as
+			// plugin.tx_cmisservice.settings.cmis.servers.KEYNAME in
+			// which all the CMIS server options must be defined.
 			$cmis = (array) $definitions[self::SCOPE_CMIS];
+			if (FALSE === isset($cmis[self::CMIS_OPTION_SERVER])) {
+				$serverConfigurationKey = self::CMIS_DEFAULT_SERVER;
+			} else {
+				$serverConfigurationKey = $cmis[self::CMIS_OPTION_SERVER];
+			}
+			$cmisServerConfiguration = $cmis[self::CMIS_OPTION_SERVERS][$serverConfigurationKey];
+		} elseif (TRUE === isset($definitions[self::SCOPE_CMIS])) {
+			$cmisServerConfiguration = (array) $definitions[self::SCOPE_CMIS];
 		}
 		if (TRUE === isset($definitions[self::SCOPE_STANBOL])) {
 			$stanbol = (array) $definitions[self::SCOPE_STANBOL];
 		}
 		$this->implementationConfiguration->setDefinitions($implementation);
 		$this->tableConfiguration->setDefinitions($tables);
-		$this->cmisConfiguration->setDefinitions($cmis);
+		$this->cmisConfiguration->setDefinitions($cmisServerConfiguration);
 		$this->stanbolConfiguration->setDefinitions($stanbol);
 	}
 

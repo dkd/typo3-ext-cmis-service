@@ -11,7 +11,7 @@ plugin.tx_cmisservice.settings {
         }
 
     }
-    cmis {
+    cmis.servers.default {
         # CMIS binding type - defaults to "browser" which uses JSON-over-HTTP
         bindingType = browser
         # URL of the "CMIS Browser Binding" for the repository you with to use
@@ -23,6 +23,7 @@ plugin.tx_cmisservice.settings {
         # CMIS Repository ID of repository to use as primary content repository
         contentRepositoryId = -default-
     }
+    cmis.server = default
     stanbol {
         # Hostname of Stanbol semantic engine
         hostname = localhost
