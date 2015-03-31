@@ -20,6 +20,21 @@ class DataHandlerListener extends AbstractListener {
 	const COMMAND_TRANSLATE = 'localize';
 
 	/**
+	 * Treat a record after it has been initialised by TYPO3. Creates
+	 * indexing tasks for the record.
+	 *
+	 * @param string $status The TCEmain operation status, fx. 'update'
+	 * @param string $table The table TCEmain is currently processing
+	 * @param string $id The records id (if any)
+	 * @param array $fieldArray The field names and their values to be processed
+	 * @param DataHandler $reference Reference to the parent object (TCEmain)
+	 * @return void
+	 */
+	public function processDatamap_postProcessFieldArray($status, $table, $id, &$fieldArray, &$reference) {
+		$this->handleCommand($status, $table, $id);
+	}
+
+	/**
 	 * Executed after a record has been modified in database
 	 * using traditional methods of record updates/deletions/additions.
 	 *
