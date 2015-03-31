@@ -47,7 +47,11 @@ class MasterConfigurationTest extends UnitTestCase {
 		list ($implementationMock, $tableMock, $cmisMock, $stanbolMock) = $this->getSubDefinitionMocks();
 		$this->assertAttributeEquals($implementationMock, 'implementationConfiguration', $configuration);
 		$this->assertAttributeEquals($tableMock, 'tableConfiguration', $configuration);
-		$this->assertAttributeEquals($cmisMock, 'cmisConfiguration', $configuration);
+		$this->assertAttributeEquals(
+			array(MasterConfiguration::CMIS_DEFAULT_SERVER => $cmisMock),
+			'cmisConfigurations',
+			$configuration
+		);
 		$this->assertAttributeEquals($stanbolMock, 'stanbolConfiguration', $configuration);
 	}
 

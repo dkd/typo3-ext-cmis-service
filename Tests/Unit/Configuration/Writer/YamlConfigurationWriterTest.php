@@ -41,7 +41,6 @@ class YamlConfigurationWriterTest extends UnitTestCase {
 	 */
 	public function writesYamlFiles() {
 		$definition = new DummyMasterConfiguration();
-		$definition->setDefinitions(array('foo' => array('bar' => TRUE)));
 		$writer = new YamlConfigurationWriter();
 		$virtualFile = vfsStream::url('temp/cmis-service-test-yaml.yml');
 		$writer->write($definition, $virtualFile);

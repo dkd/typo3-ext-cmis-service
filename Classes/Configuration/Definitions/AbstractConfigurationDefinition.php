@@ -91,4 +91,19 @@ abstract class AbstractConfigurationDefinition implements ConfigurationDefinitio
 		return $this->definitions;
 	}
 
+	/**
+	 * Extract all ConfigurationDefinitionInterface instances
+	 * and creates an array of extracted definitions.
+	 *
+	 * @param ConfigurationDefinitionInterface[] $definitions
+	 * @return array
+	 */
+	protected function extractAllDefinitions(array $definitions) {
+		$extracted = array();
+		foreach ($definitions as $key => $definition) {
+			$extracted[$key] = $definition->getDefinitions();
+		}
+		return $extracted;
+	}
+
 }
