@@ -3,7 +3,8 @@ namespace Dkd\CmisService\Factory;
 
 use Dkd\CmisService\Configuration\Definitions\CmisConfiguration;
 use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
-use Dkd\PhpCmis\Session;
+use Dkd\PhpCmis\SessionInterface;
+use Dkd\PhpCmis\SessionFactory;
 
 /**
  * Class CmisObjectFactory
@@ -21,10 +22,10 @@ class CmisObjectFactory {
 	 * be used to communicate with the repository.
 	 *
 	 * @param string $serverName configuration name in array of server configurations
-	 * @return Session
+	 * @return SessionInterface
 	 */
 	public function getSession($serverName = MasterConfiguration::CMIS_DEFAULT_SERVER) {
-		if (FALSE === self::$sessions[$serverName] instanceof Session) {
+		if (FALSE === self::$sessions[$serverName] instanceof SessionInterface) {
 			$parameters = $this->getSessionParameters($serverName);
 			self::$sessions[$serverName] = $this->createSessionObject($parameters);
 		}
@@ -53,6 +54,7 @@ class CmisObjectFactory {
 
 	/**
 	 * @return ObjectFactory
+	 * @codeCoverageIgnore
 	 */
 	protected function getObjectFactory() {
 		return new ObjectFactory();
@@ -61,10 +63,11 @@ class CmisObjectFactory {
 	/**
 	 * @codeCoverageIgnore
 	 * @param array $parameters
-	 * @return Session
+	 * @return SessionInterface
 	 */
 	protected function createSessionObject(array $parameters) {
-		return new Session($parameters);
+		$sessionFactory = new SessionFactory();
+		return $sessionFactory->createSession($parameters);
 	}
 
 }
