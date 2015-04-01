@@ -2,8 +2,6 @@
 namespace Dkd\CmisService\Tests\Unit\Factory;
 
 use Dkd\CmisService\Factory\CmisObjectFactory;
-use Dkd\PhpCmis\Enum\BindingType;
-use Dkd\PhpCmis\SessionParameter;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
 /**
@@ -15,7 +13,7 @@ class CmisObjectFactoryTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function testGetSessionGetsSessionWithDefinedParameters() {
-		$objectFactory = $this->getMock('Dkd\\CmisService\\Factory\\CmisObjectFactory', array('getConfiguration'));
+		$objectFactory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory', array('getConfiguration'));
 		$masterConfiguration = $this->getMock(
 			'Dkd\\CmisService\\Configuration\\Definitions\\MasterConfiguration',
 			array('getCmisConfiguration')
