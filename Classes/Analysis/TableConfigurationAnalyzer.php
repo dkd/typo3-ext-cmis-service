@@ -76,6 +76,14 @@ class TableConfigurationAnalyzer {
 	}
 
 	/**
+	 * @param string $table
+	 */
+	public function getLabelFieldListFromTable($table) {
+		$control = $GLOBALS['TCA'][$table]['ctrl'];
+		return explode(',', trim($control['label'] . ',' . $control['label_alt'], ','));
+	}
+
+	/**
 	 * Gets the names-only of every recognized field
 	 * on $table, whether or not that field is indexable
 	 *

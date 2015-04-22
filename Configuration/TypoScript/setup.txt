@@ -19,14 +19,18 @@ plugin.tx_cmisservice.settings {
     }
 
     # Configuration for services: CMIS and Stanbol
-    cmis.servers.default {
-        bindingType = {$plugin.tx_cmisservice.settings.cmis.servers.default.bindingType}
-        url = {$plugin.tx_cmisservice.settings.cmis.servers.default.url}
-        username = {$plugin.tx_cmisservice.settings.cmis.servers.default.username}
-        password = {$plugin.tx_cmisservice.settings.cmis.servers.default.password}
-        contentRepositoryId = {$plugin.tx_cmisservice.settings.cmis.servers.default.contentRepositoryId}
+    cmis {
+        servers {
+            default {
+                bindingType = {$plugin.tx_cmisservice.settings.cmis.servers.default.bindingType}
+                url = {$plugin.tx_cmisservice.settings.cmis.servers.default.url}
+                username = {$plugin.tx_cmisservice.settings.cmis.servers.default.username}
+                password = {$plugin.tx_cmisservice.settings.cmis.servers.default.password}
+                contentRepositoryId = {$plugin.tx_cmisservice.settings.cmis.servers.default.contentRepositoryId}
+            }
+        }
+        server = {$plugin.tx_cmisservice.settings.cmis.server}
     }
-    cmis.server = {$plugin.tx_cmisservice.settings.cmis.server}
     stanbol {
         hostname = {$plugin.tx_cmisservice.settings.stanbol.hostname}
         port = {$plugin.tx_cmisservice.settings.stanbol.port}

@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "be0a7a420ff369b8080be94cf61f151e",
+    "hash": "914911391da08497deb47d40566da144",
     "packages": [],
     "packages-dev": [
         {
@@ -61,11 +61,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/dkd/php-cmis-client.git",
-                "reference": "3650801288fa68880521b039e555c4f675d68968"
+                "reference": "ce910caf0049ad4abfab3f829d08143bf098bdf3"
             },
             "require": {
                 "dkd/enumeration": "~0.1",
-                "doctrine/cache": "~1.3.1",
+                "dkd/php-populate": "~1.0",
+                "doctrine/cache": "~1.4",
                 "guzzlehttp/guzzle": "~5.0",
                 "guzzlehttp/streams": "~3.0",
                 "league/url": "~3.2",
@@ -100,20 +101,62 @@
             "keywords": [
                 "cmis"
             ],
-            "time": "2015-02-13 14:34:30"
+            "time": "2015-04-21 11:25:08"
         },
         {
-            "name": "doctrine/cache",
-            "version": "v1.3.1",
+            "name": "dkd/php-populate",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
-                "url": "https://github.com/doctrine/cache.git",
-                "reference": "cf483685798a72c93bf4206e3dd6358ea07d64e7"
+                "url": "https://github.com/dkd/php-populate.git",
+                "reference": "db8e84f1a9263176c07313a5a3e82a4dc051760c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/cache/zipball/cf483685798a72c93bf4206e3dd6358ea07d64e7",
-                "reference": "cf483685798a72c93bf4206e3dd6358ea07d64e7",
+                "url": "https://api.github.com/repos/dkd/php-populate/zipball/db8e84f1a9263176c07313a5a3e82a4dc051760c",
+                "reference": "db8e84f1a9263176c07313a5a3e82a4dc051760c",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "@stable",
+                "squizlabs/php_codesniffer": "@stable"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Dkd\\Populate\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Claus Due",
+                    "email": "info@dkd.de"
+                }
+            ],
+            "description": "Trait for PHP classes, allowing properties to be populated from sources like JSON, via getters but using a single method",
+            "keywords": [
+                "json",
+                "php",
+                "trait"
+            ],
+            "time": "2015-03-06 16:48:57"
+        },
+        {
+            "name": "doctrine/cache",
+            "version": "v1.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/cache.git",
+                "reference": "c9eadeb743ac6199f7eec423cb9426bc518b7b03"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/cache/zipball/c9eadeb743ac6199f7eec423cb9426bc518b7b03",
+                "reference": "c9eadeb743ac6199f7eec423cb9426bc518b7b03",
                 "shasum": ""
             },
             "require": {
@@ -124,12 +167,13 @@
             },
             "require-dev": {
                 "phpunit/phpunit": ">=3.7",
+                "predis/predis": "~1.0",
                 "satooshi/php-coveralls": "~0.6"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.4.x-dev"
+                    "dev-master": "1.5.x-dev"
                 }
             },
             "autoload": {
@@ -169,7 +213,7 @@
                 "cache",
                 "caching"
             ],
-            "time": "2014-09-17 14:24:04"
+            "time": "2015-04-15 00:11:59"
         },
         {
             "name": "doctrine/instantiator",
@@ -285,16 +329,16 @@
         },
         {
             "name": "guzzlehttp/ringphp",
-            "version": "1.0.5",
+            "version": "1.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/RingPHP.git",
-                "reference": "a903f51b692427318bc813217c0e6505287e79a4"
+                "reference": "52d868f13570a9a56e5fce6614e0ec75d0f13ac2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/RingPHP/zipball/a903f51b692427318bc813217c0e6505287e79a4",
-                "reference": "a903f51b692427318bc813217c0e6505287e79a4",
+                "url": "https://api.github.com/repos/guzzle/RingPHP/zipball/52d868f13570a9a56e5fce6614e0ec75d0f13ac2",
+                "reference": "52d868f13570a9a56e5fce6614e0ec75d0f13ac2",
                 "shasum": ""
             },
             "require": {
@@ -331,7 +375,8 @@
                     "homepage": "https://github.com/mtdowling"
                 }
             ],
-            "time": "2014-12-11 05:50:32"
+            "description": "Provides a simple API and specification that abstracts away the details of HTTP into a single PHP function.",
+            "time": "2015-03-30 01:43:20"
         },
         {
             "name": "guzzlehttp/streams",
@@ -384,17 +429,62 @@
             "time": "2014-10-12 19:18:40"
         },
         {
-            "name": "league/url",
-            "version": "3.2.1",
+            "name": "helhum/class-alias-loader",
+            "version": "1.0.99",
             "source": {
                 "type": "git",
-                "url": "https://github.com/thephpleague/url.git",
-                "reference": "74ae626949e967fd20511d074835ae6ff67d97ae"
+                "url": "https://github.com/helhum/class-alias-loader.git",
+                "reference": "486fea8c1fb7cd568c73a62a4add3a0a353827ca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/url/zipball/74ae626949e967fd20511d074835ae6ff67d97ae",
-                "reference": "74ae626949e967fd20511d074835ae6ff67d97ae",
+                "url": "https://api.github.com/repos/helhum/class-alias-loader/zipball/486fea8c1fb7cd568c73a62a4add3a0a353827ca",
+                "reference": "486fea8c1fb7cd568c73a62a4add3a0a353827ca",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Helhum\\ClassAliasLoader\\": "Classes/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Helmut Hummel",
+                    "email": "info@helhum.io"
+                }
+            ],
+            "description": "Amends the composer class loader to support class aliases to provide backwards compatibility for packages",
+            "homepage": "http://github.com/helhum/class-alias-loader",
+            "keywords": [
+                "alias",
+                "autoloader",
+                "classloader",
+                "composer"
+            ],
+            "time": "2015-03-22 20:28:13"
+        },
+        {
+            "name": "league/url",
+            "version": "3.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/url.git",
+                "reference": "a096be483bec9abcae34f4e21ec74696f7beed55"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/url/zipball/a096be483bec9abcae34f4e21ec74696f7beed55",
+                "reference": "a096be483bec9abcae34f4e21ec74696f7beed55",
                 "shasum": ""
             },
             "require": {
@@ -429,12 +519,13 @@
                 }
             ],
             "description": "League/url is a lightweight PHP Url manipulating library",
+            "homepage": "http://url.thephpleague.com",
             "keywords": [
                 "parse_url",
                 "php",
                 "url"
             ],
-            "time": "2014-11-27 10:14:00"
+            "time": "2015-03-26 10:07:42"
         },
         {
             "name": "mikey179/vfsStream",
@@ -476,16 +567,16 @@
         },
         {
             "name": "phpunit/php-code-coverage",
-            "version": "2.0.15",
+            "version": "2.0.16",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "34cc484af1ca149188d0d9e91412191e398e0b67"
+                "reference": "934fd03eb6840508231a7f73eb8940cf32c3b66c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/34cc484af1ca149188d0d9e91412191e398e0b67",
-                "reference": "34cc484af1ca149188d0d9e91412191e398e0b67",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/934fd03eb6840508231a7f73eb8940cf32c3b66c",
+                "reference": "934fd03eb6840508231a7f73eb8940cf32c3b66c",
                 "shasum": ""
             },
             "require": {
@@ -534,7 +625,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-01-24 10:06:35"
+            "time": "2015-04-11 04:35:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -671,16 +762,16 @@
         },
         {
             "name": "phpunit/php-token-stream",
-            "version": "1.4.0",
+            "version": "1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-token-stream.git",
-                "reference": "db32c18eba00b121c145575fcbcd4d4d24e6db74"
+                "reference": "eab81d02569310739373308137284e0158424330"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/db32c18eba00b121c145575fcbcd4d4d24e6db74",
-                "reference": "db32c18eba00b121c145575fcbcd4d4d24e6db74",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-token-stream/zipball/eab81d02569310739373308137284e0158424330",
+                "reference": "eab81d02569310739373308137284e0158424330",
                 "shasum": ""
             },
             "require": {
@@ -716,7 +807,7 @@
             "keywords": [
                 "tokenizer"
             ],
-            "time": "2015-01-17 09:51:32"
+            "time": "2015-04-08 04:46:07"
         },
         {
             "name": "phpunit/phpunit",
@@ -794,25 +885,25 @@
         },
         {
             "name": "phpunit/phpunit-mock-objects",
-            "version": "2.3.0",
+            "version": "2.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "c63d2367247365f688544f0d500af90a11a44c65"
+                "reference": "74ffb87f527f24616f72460e54b595f508dccb5c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/c63d2367247365f688544f0d500af90a11a44c65",
-                "reference": "c63d2367247365f688544f0d500af90a11a44c65",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/74ffb87f527f24616f72460e54b595f508dccb5c",
+                "reference": "74ffb87f527f24616f72460e54b595f508dccb5c",
                 "shasum": ""
             },
             "require": {
-                "doctrine/instantiator": "~1.0,>=1.0.1",
+                "doctrine/instantiator": "~1.0,>=1.0.2",
                 "php": ">=5.3.3",
                 "phpunit/php-text-template": "~1.2"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.3"
+                "phpunit/phpunit": "~4.4"
             },
             "suggest": {
                 "ext-soap": "*"
@@ -845,7 +936,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2014-10-03 05:12:11"
+            "time": "2015-04-02 05:36:41"
         },
         {
             "name": "psr/log",
@@ -853,12 +944,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "1af1529b49a6e065ae6802e70192aba35d79b7d8"
+                "reference": "bf2c13de4300e227d7b2fd08027673a79c519987"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/1af1529b49a6e065ae6802e70192aba35d79b7d8",
-                "reference": "1af1529b49a6e065ae6802e70192aba35d79b7d8",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/bf2c13de4300e227d7b2fd08027673a79c519987",
+                "reference": "bf2c13de4300e227d7b2fd08027673a79c519987",
                 "shasum": ""
             },
             "type": "library",
@@ -868,8 +959,8 @@
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "Psr\\Log\\": ""
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -888,7 +979,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2015-02-05 09:32:11"
+            "time": "2015-03-26 14:39:45"
         },
         {
             "name": "react/promise",
@@ -1000,16 +1091,16 @@
         },
         {
             "name": "sebastian/diff",
-            "version": "1.2.0",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/diff.git",
-                "reference": "5843509fed39dee4b356a306401e9dd1a931fec7"
+                "reference": "863df9687835c62aa423a22412d26fa2ebde3fd3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/5843509fed39dee4b356a306401e9dd1a931fec7",
-                "reference": "5843509fed39dee4b356a306401e9dd1a931fec7",
+                "url": "https://api.github.com/repos/sebastianbergmann/diff/zipball/863df9687835c62aa423a22412d26fa2ebde3fd3",
+                "reference": "863df9687835c62aa423a22412d26fa2ebde3fd3",
                 "shasum": ""
             },
             "require": {
@@ -1021,7 +1112,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.2-dev"
+                    "dev-master": "1.3-dev"
                 }
             },
             "autoload": {
@@ -1048,32 +1139,32 @@
             "keywords": [
                 "diff"
             ],
-            "time": "2014-08-15 10:29:00"
+            "time": "2015-02-22 15:13:53"
         },
         {
             "name": "sebastian/environment",
-            "version": "1.2.1",
+            "version": "1.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "6e6c71d918088c251b181ba8b3088af4ac336dd7"
+                "reference": "5a8c7d31914337b69923db26c4221b81ff5a196e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/6e6c71d918088c251b181ba8b3088af4ac336dd7",
-                "reference": "6e6c71d918088c251b181ba8b3088af4ac336dd7",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/5a8c7d31914337b69923db26c4221b81ff5a196e",
+                "reference": "5a8c7d31914337b69923db26c4221b81ff5a196e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.3"
+                "phpunit/phpunit": "~4.4"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.2.x-dev"
+                    "dev-master": "1.3.x-dev"
                 }
             },
             "autoload": {
@@ -1098,7 +1189,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2014-10-25 08:00:45"
+            "time": "2015-01-01 10:01:08"
         },
         {
             "name": "sebastian/exporter",
@@ -1221,16 +1312,16 @@
         },
         {
             "name": "sebastian/version",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/version.git",
-                "reference": "a77d9123f8e809db3fbdea15038c27a95da4058b"
+                "reference": "ab931d46cd0d3204a91e1b9a40c4bc13032b58e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/version/zipball/a77d9123f8e809db3fbdea15038c27a95da4058b",
-                "reference": "a77d9123f8e809db3fbdea15038c27a95da4058b",
+                "url": "https://api.github.com/repos/sebastianbergmann/version/zipball/ab931d46cd0d3204a91e1b9a40c4bc13032b58e4",
+                "reference": "ab931d46cd0d3204a91e1b9a40c4bc13032b58e4",
                 "shasum": ""
             },
             "type": "library",
@@ -1252,20 +1343,20 @@
             ],
             "description": "Library that helps with managing the version number of Git-hosted PHP projects",
             "homepage": "https://github.com/sebastianbergmann/version",
-            "time": "2014-12-15 14:25:24"
+            "time": "2015-02-24 06:35:25"
         },
         {
             "name": "simplyadmire/composer-plugins",
-            "version": "1.0.2",
+            "version": "1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SimplyAdmire/ComposerPlugins.git",
-                "reference": "f26dc6a96ba24f2b050161be28cb406eb8844430"
+                "reference": "15ba187d9dd973ddefeb32ee0619d74a3dff51a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SimplyAdmire/ComposerPlugins/zipball/f26dc6a96ba24f2b050161be28cb406eb8844430",
-                "reference": "f26dc6a96ba24f2b050161be28cb406eb8844430",
+                "url": "https://api.github.com/repos/SimplyAdmire/ComposerPlugins/zipball/15ba187d9dd973ddefeb32ee0619d74a3dff51a9",
+                "reference": "15ba187d9dd973ddefeb32ee0619d74a3dff51a9",
                 "shasum": ""
             },
             "require": {
@@ -1304,7 +1395,7 @@
                 "standards",
                 "typo3"
             ],
-            "time": "2014-07-25 11:48:26"
+            "time": "2015-02-24 19:19:41"
         },
         {
             "name": "squizlabs/php_codesniffer",
@@ -1383,7 +1474,7 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v2.5.10",
+            "version": "v2.5.11",
             "target-dir": "Symfony/Component/Yaml",
             "source": {
                 "type": "git",
@@ -1430,16 +1521,16 @@
         },
         {
             "name": "true/punycode",
-            "version": "1.0.1",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/true/php-punycode.git",
-                "reference": "59dca474914324763397be2ea3d6ad3bc48f4688"
+                "reference": "21c0025130b4e2b2d0b7dbe5f86e9e1512507656"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/true/php-punycode/zipball/59dca474914324763397be2ea3d6ad3bc48f4688",
-                "reference": "59dca474914324763397be2ea3d6ad3bc48f4688",
+                "url": "https://api.github.com/repos/true/php-punycode/zipball/21c0025130b4e2b2d0b7dbe5f86e9e1512507656",
+                "reference": "21c0025130b4e2b2d0b7dbe5f86e9e1512507656",
                 "shasum": ""
             },
             "require": {
@@ -1449,7 +1540,7 @@
             "require-dev": {
                 "phpunit/phpunit": "4.x",
                 "satooshi/php-coveralls": "dev-master",
-                "squizlabs/php_codesniffer": "2.0.x-dev"
+                "squizlabs/php_codesniffer": "~2.0"
             },
             "type": "library",
             "autoload": {
@@ -1473,7 +1564,7 @@
                 "idna",
                 "punycode"
             ],
-            "time": "2014-08-26 14:21:01"
+            "time": "2015-03-12 16:49:35"
         },
         {
             "name": "typo3-ci/typo3cms",
@@ -1595,24 +1686,25 @@
         },
         {
             "name": "typo3/cms",
-            "version": "6.2.9",
+            "version": "7.1.0",
             "source": {
                 "type": "git",
-                "url": "git://git.typo3.org/Packages/TYPO3.CMS.git",
-                "reference": "177cd38666bb4e7a026c60cdeda252596bf2c587"
+                "url": "https://github.com/TYPO3/TYPO3.CMS.git",
+                "reference": "5fa3e3899f93a5fcc022ad2564c1f23855c81e5f"
             },
             "dist": {
                 "type": "tar",
-                "url": "http://get.typo3.org/6.2.9",
-                "reference": "6.2.9",
-                "shasum": "2ff12af0c7a21c1542b9cbac5da813ff1b403dae"
+                "url": "http://get.typo3.org/7.1.0",
+                "reference": "7.1.0",
+                "shasum": "82f3ce50a83c0ae266649d8051f0456f97cfa3f7"
             },
             "require": {
                 "ext-fileinfo": "*",
                 "ext-pcre": "*",
                 "ext-session": "*",
                 "ext-xml": "*",
-                "php": ">=5.3.7",
+                "helhum/class-alias-loader": "1.0.*@dev",
+                "php": ">=5.5.0",
                 "typo3/cms-composer-installers": "1.1.*@dev"
             },
             "replace": {
@@ -1631,7 +1723,6 @@
                 "typo3/cms-documentation": "self.version",
                 "typo3/cms-extbase": "self.version",
                 "typo3/cms-extensionmanager": "self.version",
-                "typo3/cms-extra-page-cm-options": "self.version",
                 "typo3/cms-feedit": "self.version",
                 "typo3/cms-felogin": "self.version",
                 "typo3/cms-filelist": "self.version",
@@ -1652,7 +1743,6 @@
                 "typo3/cms-lowlevel": "self.version",
                 "typo3/cms-opendocs": "self.version",
                 "typo3/cms-openid": "self.version",
-                "typo3/cms-perm": "self.version",
                 "typo3/cms-recordlist": "self.version",
                 "typo3/cms-recycler": "self.version",
                 "typo3/cms-reports": "self.version",
@@ -1675,8 +1765,10 @@
                 "typo3/cms-workspaces": "self.version"
             },
             "require-dev": {
-                "mikey179/vfsstream": "1.3.*@dev",
-                "phpunit/phpunit": "~4.4.0"
+                "fortawesome/font-awesome": "4.2.*",
+                "mikey179/vfsstream": "1.4.*@dev",
+                "phpunit/phpunit": "~4.4.0",
+                "twbs/bootstrap": "3.3.*"
             },
             "suggest": {
                 "ext-gd": "GDlib/Freetype is required for building images with text (GIFBUILDER) and can also be used to scale images",
@@ -1688,7 +1780,30 @@
             "type": "typo3-cms-core",
             "extra": {
                 "branch-alias": {
-                    "dev-TYPO3_6-2": "6.2.x-dev"
+                    "dev-master": "7.x-dev"
+                },
+                "class-alias-maps": [
+                    "typo3/sysext/core/Migrations/Code/ClassAliasMap.php"
+                ]
+            },
+            "autoload": {
+                "psr-0": {
+                    "TYPO3\\Flow\\": "typo3/sysext/core/Resources/PHP/TYPO3.Flow/Classes/"
+                },
+                "psr-4": {
+                    "Psr\\Log\\": "typo3/contrib/Psr/Log/",
+                    "TYPO3\\CMS\\Backend\\": "typo3/sysext/backend/Classes/",
+                    "TYPO3\\CMS\\Core\\": "typo3/sysext/core/Classes/",
+                    "TYPO3\\CMS\\Cshmanual\\": "typo3/sysext/cshmanual/Classes/",
+                    "TYPO3\\CMS\\Extbase\\": "typo3/sysext/extbase/Classes/",
+                    "TYPO3\\CMS\\Extensionmanager\\": "typo3/sysext/extensionmanager/Classes/",
+                    "TYPO3\\CMS\\Fluid\\": "typo3/sysext/fluid/Classes/",
+                    "TYPO3\\CMS\\Frontend\\": "typo3/sysext/frontend/Classes/",
+                    "TYPO3\\CMS\\Install\\": "typo3/sysext/install/Classes/",
+                    "TYPO3\\CMS\\Lang\\": "typo3/sysext/lang/Classes/",
+                    "TYPO3\\CMS\\Recordlist\\": "typo3/sysext/recordlist/Classes/",
+                    "TYPO3\\CMS\\Saltedpasswords\\": "typo3/sysext/saltedpasswords/Classes/",
+                    "TYPO3\\CMS\\Sv\\": "typo3/sysext/sv/Classes/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1715,7 +1830,7 @@
                 "extbase",
                 "typo3"
             ],
-            "time": "2014-12-10 10:45:08"
+            "time": "2015-02-24 14:34:50"
         },
         {
             "name": "typo3/cms-composer-installers",
@@ -1777,6 +1892,16 @@
                 "typo3"
             ],
             "time": "2014-12-14 21:40:52"
+        },
+        {
+            "name": "typo3/identity",
+            "version": "0.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.typo3.org/TYPO3CMS/Extensions/Identity.git",
+                "reference": "refs/heads/master"
+            },
+            "type": "library"
         }
     ],
     "aliases": [],

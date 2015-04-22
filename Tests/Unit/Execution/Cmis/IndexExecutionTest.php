@@ -51,9 +51,11 @@ class IndexExecutionTest extends UnitTestCase {
 		$result = new Result();
 		$instance = $this->getMock(
 			'Dkd\\CmisService\\Execution\\Cmis\\IndexExecution',
-			array('createResultObject', 'loadRecordFromDatabase', 'performTextExtraction')
+			array('createResultObject', 'loadRecordFromDatabase', 'performTextExtraction', 'resolveCmisDocumentByTableAndUid')
 		);
+		$document = $this->getMock('Dkd\\PhpCmis\\DataObjects\\Document', array(), array(), '', FALSE);
 		$instance->expects($this->once())->method('createResultObject')->will($this->returnValue($result));
+		$instance->expects($this->once())->method('resolveCmisDocumentByTableAndUid')->will($this->returnValue($document));
 		$task = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask', array('getParameter'));
 		$task->expects($this->at(0))->method('getParameter')
 			->with(RecordIndexTask::OPTION_FIELDS)

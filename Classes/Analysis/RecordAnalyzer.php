@@ -46,4 +46,23 @@ class RecordAnalyzer {
 		return $columnDetector->getIndexableColumnNamesFromTable($this->table);
 	}
 
+	/**
+	 * Gets an always-filled title for the record being
+	 * analysed. If no title can be resolved based on the
+	 * record's columns and TCA configuration for label,
+	 * a default $table:$uid format is returned.
+	 *
+	 * @return string
+	 */
+	public function getTitleForRecord() {
+		$tableConfigurationAnalyzer = new TableConfigurationAnalyzer();
+		$labelFields = $tableConfigurationAnalyzer->getLabelFieldListFromTable($this->table);
+		foreach ($labelFields as $labelFieldName) {
+			if (FALSE === empty($this->record[$labelFieldName])) {
+				return $this->record[$labelFieldName];
+			}
+		}
+		return $this->table . ':' . $this->record['uid'];
+	}
+
 }

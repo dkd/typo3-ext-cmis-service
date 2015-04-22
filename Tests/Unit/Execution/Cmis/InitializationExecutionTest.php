@@ -48,7 +48,11 @@ class InitializationExecutionTest extends UnitTestCase {
 	 */
 	public function executeReturnsResultObject() {
 		$task = new DummyTask();
-		$execution = new InitializationExecution();
+		$execution = $this->getMock(
+			'Dkd\\CmisService\\Execution\\Cmis\\InitializationExecution',
+			array('validatePresenceOfCustomCmisTypes')
+		);
+		$execution->expects($this->once())->method('validatePresenceOfCustomCmisTypes');
 		$result = $execution->execute($task);
 		$this->assertInstanceOf('Dkd\\CmisService\\Execution\\Result', $result);
 	}

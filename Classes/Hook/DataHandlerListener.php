@@ -81,16 +81,16 @@ class DataHandlerListener extends AbstractListener {
 		$taskFactory = $this->getTaskFactory();
 		switch ($command) {
 			case self::COMMAND_DELETE:
-				// passthrough
+				// fallthrough
 			case self::COMMAND_HIDE:
 				$task = $taskFactory->createEvictionTask($table, $uid);
 				break;
 			case self::COMMAND_MOVE:
-				// passthrough
+				// fallthrough
 			case self::COMMAND_UPDATE:
-				// passthrough
+				// fallthrough
 			case self::COMMAND_TRANSLATE:
-				// passthrough
+				// fallthrough
 			case self::COMMAND_CREATE:
 				$task = $taskFactory->createRecordIndexingTask($table, $uid);
 				break;

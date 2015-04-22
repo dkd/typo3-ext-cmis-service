@@ -15,4 +15,28 @@ class TableConfiguration extends AbstractConfigurationDefinition implements Conf
 		return array_keys($this->definitions);
 	}
 
+	/**
+	 * @param string $table
+	 * @return boolean
+	 */
+	public function isTableConfigured($table) {
+		return in_array($table, $this->getConfiguredTableNames());
+	}
+
+	/**
+	 * @param string $table
+	 * @return array
+	 */
+	public function getSingleTableConfiguration($table) {
+		return (array) $this->get($table);
+	}
+
+	/**
+	 * @param string $table
+	 * @return array
+	 */
+	public function getSingleTableDefaultValues($table) {
+		return (array) $this->get($table . '.defaults');
+	}
+
 }

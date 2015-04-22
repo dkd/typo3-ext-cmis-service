@@ -54,7 +54,6 @@ class CmisObjectFactory {
 
 	/**
 	 * @return ObjectFactory
-	 * @codeCoverageIgnore
 	 */
 	protected function getObjectFactory() {
 		return new ObjectFactory();

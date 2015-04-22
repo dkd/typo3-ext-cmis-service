@@ -33,7 +33,8 @@ $EM_CONF[$_EXTKEY] = array(
 	'constraints' => array(
 		'depends' => array(
 			'typo3' => '6.2.11-6.2.99',
-			'cms' => ''
+			'cms' => '',
+			'identity' => ''
 		),
 		'conflicts' => array(
 		),
@@ -44,5 +45,3 @@ $EM_CONF[$_EXTKEY] = array(
 	),
 	'_md5_values_when_last_written' => 'a:0:{}',
 );
-
-?>

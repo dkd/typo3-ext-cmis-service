@@ -2,15 +2,16 @@
 namespace Dkd\CmisService\Execution\Cmis;
 
 use Dkd\CmisService\Analysis\Detection\ExtractionMethodDetector;
-use Dkd\CmisService\Execution\AbstractExecution;
 use Dkd\CmisService\Execution\ExecutionInterface;
+use Dkd\CmisService\Execution\Result;
+use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Task\RecordIndexTask;
 use Dkd\CmisService\Task\TaskInterface;
 
 /**
  * Class IndexExecution
  */
-class IndexExecution extends AbstractExecution implements ExecutionInterface {
+class IndexExecution extends AbstractCmisExecution implements ExecutionInterface {
 
 	/**
 	 * @param TaskInterface $task
@@ -32,15 +33,21 @@ class IndexExecution extends AbstractExecution implements ExecutionInterface {
 	 * @return Result
 	 */
 	public function execute(TaskInterface $task) {
+		$objectFactory = new ObjectFactory();
 		/** @var RecordIndexTask $task */
 		$this->result = $this->createResultObject();
 		$fields = (array) $task->getParameter(RecordIndexTask::OPTION_FIELDS);
 		$table = $task->getParameter(RecordIndexTask::OPTION_TABLE);
 		$uid = $task->getParameter(RecordIndexTask::OPTION_UID);
 		$record = $this->loadRecordFromDatabase($table, $uid, $fields);
+		$data = array();
+		$document = $this->resolveCmisDocumentByTableAndUid($table, $uid);
 		foreach ($fields as $fieldName) {
-			$this->performTextExtraction($task, $uid, $fieldName, $record);
+			$data[$fieldName] = $this->performTextExtraction($task, $uid, $fieldName, $record);
 		}
+		$this->result->setCode(Result::OK);
+		$this->result->setMessage('SIMULATED: Indexed record ' . $uid . ' from ' . $table);
+		$this->result->setPayload($data);
 		return $this->result;
 	}
 

@@ -1,16 +1,30 @@
 <?php
 namespace Dkd\CmisService\Execution\Cmis;
 
-use Dkd\CmisService\Execution\AbstractExecution;
+use Dkd\CmisService\CmisApi;
+use Dkd\CmisService\Constants;
+use Dkd\CmisService\Execution\Cmis\AbstractCmisExecution;
 use Dkd\CmisService\Execution\ExecutionInterface;
 use Dkd\CmisService\Execution\Result;
+use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Task\InitializationTask;
 use Dkd\CmisService\Task\TaskInterface;
+use Dkd\PhpCmis\Exception\CmisContentAlreadyExistsException;
+use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
 
 /**
  * Class InitializationExecution
  */
-class InitializationExecution extends AbstractExecution implements ExecutionInterface {
+class InitializationExecution extends AbstractCmisExecution implements ExecutionInterface {
+
+	/**
+	 * @var array
+	 */
+	protected $requiredCustomTypes = array(
+		Constants::CMIS_PROPERTY_TYPO3UUID,
+		Constants::CMIS_PROPERTY_TYPO3TABLE,
+		Constants::CMIS_PROPERTY_TYPO3UID,
+	);
 
 	/**
 	 * Validates that this Task is an instance of
@@ -38,8 +52,31 @@ class InitializationExecution extends AbstractExecution implements ExecutionInte
 	public function execute(TaskInterface $task) {
 		/** @var EvictionTask $task */
 		$this->result = $this->createResultObject();
-		$this->result->setMessage('CMIS Repository initialized!');
+		try {
+			$this->validatePresenceOfCustomCmisTypes($this->requiredCustomTypes);
+			$this->result->setMessage('CMIS Repository initialized!');
+		} catch (\InvalidArgumentException $error) {
+			$this->result->setMessage($error->getMessage());
+		}
 		return $this->result;
+	}
+
+	/**
+	 * @param array $typeIds
+	 * @throws CmisObjectNotFoundException
+	 */
+	protected function validatePresenceOfCustomCmisTypes(array $typeIds) {
+		$session = $this->getCmisObjectFactory()->getSession();
+		foreach ($typeIds as $typeId) {
+			$session->getTypeDefinition($typeId);
+		}
+	}
+
+	/**
+	 * @return ObjectFactory
+	 */
+	protected function getObjectFactory() {
+		return new ObjectFactory();
 	}
 
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Execution;
 
+use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Task\TaskInterface;
 
 /**
@@ -69,6 +70,14 @@ abstract class AbstractExecution implements ExecutionInterface {
 	 */
 	public function validate(TaskInterface $task) {
 		return TRUE;
+	}
+
+	/**
+	 * @return ObjectFactory
+	 * @codeCoverageIgnore
+	 */
+	protected function getObjectFactory() {
+		return new ObjectFactory();
 	}
 
 }
