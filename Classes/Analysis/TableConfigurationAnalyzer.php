@@ -61,7 +61,7 @@ class TableConfigurationAnalyzer {
 	 */
 	public function getIndexableFieldTypeNames() {
 		return array(
-			'input', 'text'
+			'input', 'checkbox', 'text', 'file', 'select', 'inline', 'group'
 		);
 	}
 
@@ -76,7 +76,11 @@ class TableConfigurationAnalyzer {
 	}
 
 	/**
+	 * Gets an array of column names which may contain
+	 * title values for records from $table.
+	 *
 	 * @param string $table
+	 * @return array
 	 */
 	public function getLabelFieldListFromTable($table) {
 		$control = $GLOBALS['TCA'][$table]['ctrl'];

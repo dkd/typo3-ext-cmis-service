@@ -13,10 +13,12 @@ class ExtractionMethodDetector extends AbstractDetector implements DetectorInter
 	const METHOD_MULTIVALUE = 'MultiValue';
 	const METHOD_SINGLERELATION = 'SingleRelationLabel';
 	const METHOD_MULTIRELATION = 'MultipleRelationLabel';
+	const METHOD_BOOLEAN = 'Boolean';
 	const DEFAULT_METHOD = self::METHOD_PASSTHROUGH;
 	const GROUPFIELDTYPE_FILE = 'files';
 	const GROUPFIELDTYPE_DB = 'db';
 	const FIELDTYPE_TEXT = 'text';
+	const FIELDTYPE_CHECKBOX = 'checkbox';
 	const FIELDTYPE_SELECT = 'select';
 	const FIELDTYPE_GROUP = 'group';
 	const FIELDTYPE_INLINE = 'inline';
@@ -77,6 +79,11 @@ class ExtractionMethodDetector extends AbstractDetector implements DetectorInter
 		if (FALSE === isset($configurationArray['config'])) {
 			return self::DEFAULT_METHOD;
 		}
+		if (TRUE === $this->isFieldCheckbox($configurationArray)) {
+			// field is a checkbox and we explicitly extract the value
+			// as boolean only.
+			return self::METHOD_BOOLEAN;
+		}
 		if (TRUE === $this->isFieldRichTextEditor($configurationArray)) {
 			// narrow match: field is text and explicitly defines RTE,
 			// other text-type fields may require other methods.
@@ -101,6 +108,14 @@ class ExtractionMethodDetector extends AbstractDetector implements DetectorInter
 		}
 
 		return self::DEFAULT_METHOD;
+	}
+
+	/**
+	 * @param array $configurationArray
+	 * @return boolean
+	 */
+	protected function isFieldCheckbox(array $configurationArray) {
+		return 'checkbox' === $this->getFieldType($configurationArray);
 	}
 
 	/**
