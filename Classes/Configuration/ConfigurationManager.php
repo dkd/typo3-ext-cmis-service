@@ -5,6 +5,7 @@ use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
 use Dkd\CmisService\Configuration\Reader\ConfigurationReaderInterface;
 use Dkd\CmisService\Configuration\Writer\ConfigurationWriterInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
 
 /**
  * Configuration Manager
@@ -84,6 +85,13 @@ class ConfigurationManager {
 	protected $masterConfiguration;
 
 	/**
+	 * Global, active (TypoScript) configuration
+	 *
+	 * @var array
+	 */
+	protected $globalConfiguration;
+
+	/**
 	 * Constructor method. See class doc comment for usage.
 	 *
 	 * @param ConfigurationReaderInterface $reader
@@ -93,11 +101,38 @@ class ConfigurationManager {
 	public function __construct(
 			ConfigurationReaderInterface $reader,
 			ConfigurationWriterInterface $writer = NULL,
-			ConfigurationReaderInterface $cache = NULL
+			ConfigurationReaderInterface $cache = NULL,
+			array $globalConfiguration = array()
 	) {
 		$this->reader = $reader;
 		$this->writer = $writer;
 		$this->cache = $cache;
+		$this->globalConfiguration = $globalConfiguration;
+	}
+
+	/**
+	 * Gets a global configuration option or array by
+	 * dotted path, e.g. "config.absRefPrefix" etc.
+	 * Pass NULL for all global configuration. If
+	 * $path is an array, each value is looked up
+	 * and the first to return a not-NULL value is
+	 * then returned.
+	 *
+	 * @param mixed $path
+	 * @return mixed
+	 */
+	public function getGlobalConfiguration($path = NULL) {
+		if (is_array($path)) {
+			foreach ($path as $candidate) {
+				$value = $this->getGlobalConfiguration($candidate);
+				if (NULL !== $value) {
+					return $value;
+				}
+			}
+		} elseif (NULL === $path) {
+			return $this->globalConfiguration;
+		}
+		return ObjectAccess::getPropertyPath($this->globalConfiguration, $path);
 	}
 
 	/**

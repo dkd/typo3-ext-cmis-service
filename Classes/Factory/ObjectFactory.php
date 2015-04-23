@@ -26,7 +26,12 @@ class ObjectFactory {
 	/**
 	 * @var LoggerInterface
 	 */
-	protected static $logger;
+	protected static $logger = NULL;
+
+	/**
+	 * @var ConfigurationManager
+	 */
+	protected static $configurationManager = NULL;
 
 	/**
 	 * @var array
@@ -71,20 +76,29 @@ class ObjectFactory {
 	 * @return ConfigurationManager
 	 */
 	public function getConfigurationManager() {
-		$managerClassName = $this->getConfigurationManagerClassName();
-		$readerClassName = $this->getConfigurationReaderClassName();
-		$writerClassName = $this->getConfigurationWriterClassName();
-		$cacheClassName = $this->getConfigurationReaderCacheClassName();
-		$writer = $cache = NULL;
-		$reader = $this->makeInstance($readerClassName);
-		if (NULL !== $writerClassName) {
-			$writer = $this->makeInstance($writerClassName);
+		if (NULL === self::$configurationManager) {
+			$managerClassName = $this->getConfigurationManagerClassName();
+			$readerClassName = $this->getConfigurationReaderClassName();
+			$writerClassName = $this->getConfigurationWriterClassName();
+			$cacheClassName = $this->getConfigurationReaderCacheClassName();
+			$writer = $cache = NULL;
+			$reader = $this->makeInstance($readerClassName);
+			if (NULL !== $writerClassName) {
+				$writer = $this->makeInstance($writerClassName);
+			}
+			if (NULL !== $cacheClassName) {
+				$cache = $this->makeInstance($cacheClassName);
+			}
+			$setup = $this->getAllTypoScript();
+			self::$configurationManager = $this->makeInstance(
+				'Dkd\\CmisService\\Configuration\\ConfigurationManager',
+				$reader,
+				$writer,
+				$cache,
+				$setup
+			);
 		}
-		if (NULL !== $cacheClassName) {
-			$cache = $this->makeInstance($cacheClassName);
-		}
-		$manager = $this->makeInstance('Dkd\\CmisService\\Configuration\\ConfigurationManager', $reader, $writer, $cache);
-		return $manager;
+		return self::$configurationManager;
 	}
 
 	/**
@@ -93,12 +107,10 @@ class ObjectFactory {
 	 * @return LoggerInterface
 	 */
 	public function getLogger() {
-		if (TRUE === self::$logger instanceof LoggerInterface) {
-			return self::$logger;
+		if (NULL === self::$logger) {
+			self::$logger = $this->makeInstance('TYPO3\\CMS\\Core\\Log\\LogManager')->getLogger(self::LOGGER_NAME);
 		}
-		/** @var LogManager $logManager */
-		$logManager = $this->makeInstance('TYPO3\\CMS\\Core\\Log\\LogManager');
-		return self::$logger = $logManager->getLogger(self::LOGGER_NAME);
+		return self::$logger;
 	}
 
 	/**
