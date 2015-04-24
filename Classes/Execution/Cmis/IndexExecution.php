@@ -2,11 +2,15 @@
 namespace Dkd\CmisService\Execution\Cmis;
 
 use Dkd\CmisService\Analysis\Detection\ExtractionMethodDetector;
+use Dkd\CmisService\Analysis\RecordAnalyzer;
+use Dkd\CmisService\Constants;
 use Dkd\CmisService\Execution\ExecutionInterface;
 use Dkd\CmisService\Execution\Result;
 use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Task\RecordIndexTask;
 use Dkd\CmisService\Task\TaskInterface;
+use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
+use Dkd\PhpCmis\PropertyIds;
 
 /**
  * Class IndexExecution
@@ -41,14 +45,55 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 		$uid = $task->getParameter(RecordIndexTask::OPTION_UID);
 		$record = $this->loadRecordFromDatabase($table, $uid, $fields);
 		$data = array();
-		$document = $this->resolveCmisDocumentByTableAndUid($table, $uid);
 		foreach ($fields as $fieldName) {
-			$data[$fieldName] = $this->performTextExtraction($task, $uid, $fieldName, $record);
+			$data[$fieldName] = $this->performTextExtraction($table, $uid, $fieldName, $record);
+		}
+		$recordAnalyzer = new RecordAnalyzer($table, $record);
+		$cmisPropertyValues = $this->remapFieldsToDocumentProperties($data, $recordAnalyzer);
+		$document = $this->resolveCmisDocumentByTableAndUid($table, $uid);
+		$document->updateProperties($cmisPropertyValues);
+		if (TRUE === (boolean) $task->getParameter(RecordIndexTask::OPTION_RELATIONS)) {
+			// The Task was configured to also index the relations from
+			// this document to other CMIS documents (which have already
+			// been indexed by a previous Task). We therefore now turn
+			// all TYPO3 relations into CMIS relationships in a sync-type
+			// manner; both creating and removing relationships as needed.
+			$this->synchronizeRelationships($document, $data);
 		}
 		$this->result->setCode(Result::OK);
-		$this->result->setMessage('SIMULATED: Indexed record ' . $uid . ' from ' . $table);
+		$this->result->setMessage('Indexed record ' . $uid . ' from ' . $table);
 		$this->result->setPayload($data);
 		return $this->result;
+	}
+
+	/**
+	 * Synchronizes the relationships between $document and other
+	 * CMIS objects, as detected by the data that was extracted.
+	 *
+	 * @param CmisObjectInterface $document CMIS object to use in relationships
+	 * @param array $record The original TYPO3 record, untouched
+	 * @param array $data The extracted data not yet mapped to CMIS properties.
+	 * @return void
+	 */
+	protected function synchronizeRelationships(CmisObjectInterface $document, array $record, array $data) {
+		// @TODO: implement method
+	}
+
+	/**
+	 * Maps properties which require mapping, translating
+	 * the name from the TYPO3 column name into a CMIS
+	 * Document property name.
+	 *
+	 * @param array $data
+	 * @param RecordAnalyzer $recordAnalyzer
+	 * @return array
+	 */
+	protected function remapFieldsToDocumentProperties(array $data, RecordAnalyzer $recordAnalyzer) {
+		$cmisPropertyValues = array(
+			PropertyIds::NAME => $recordAnalyzer->getTitleForRecord(),
+			Constants::CMIS_PROPERTY_RAWDATA => $data
+		);
+		return $cmisPropertyValues;
 	}
 
 	/**

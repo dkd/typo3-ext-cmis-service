@@ -11,6 +11,7 @@ class ExtractionMethodDetector extends AbstractDetector implements DetectorInter
 	const METHOD_PASSTHROUGH = 'Passthrough';
 	const METHOD_RICHTEXT = 'RichTextEditor';
 	const METHOD_MULTIVALUE = 'MultiValue';
+	const METHOD_SINGLEVALUE = 'SingleValue';
 	const METHOD_SINGLERELATION = 'SingleRelationLabel';
 	const METHOD_MULTIRELATION = 'MultipleRelationLabel';
 	const METHOD_BOOLEAN = 'Boolean';
@@ -89,6 +90,12 @@ class ExtractionMethodDetector extends AbstractDetector implements DetectorInter
 			// other text-type fields may require other methods.
 			return self::METHOD_RICHTEXT;
 		}
+		if (TRUE === $this->isFieldSimpleSingleValued($configurationArray)) {
+			// narrow match, group- and field type fields which do not
+			// reference database tables, is not a file field and allows
+			// only a single value.
+			return self::METHOD_SINGLEVALUE;
+		}
 		if (TRUE === $this->isFieldSimpleMultiValued($configurationArray)) {
 			// narrow match, group- and field type fields which do not
 			// reference any database table and is not a file field
@@ -165,6 +172,24 @@ class ExtractionMethodDetector extends AbstractDetector implements DetectorInter
 		$hasSizeOne = (TRUE === isset($configuration['size']) ? 1 === (integer) $configuration['size'] : FALSE);
 		$hasMaxItemsOne = (TRUE === isset($configuration['maxitems']) ? 1 === (integer) $configuration['maxitems'] : FALSE);
 		return ($isDatabaseField && $doesNotHaveManyToMany && ($hasSizeOne || $hasMaxItemsOne));
+	}
+
+	/**
+	 * Returns TRUE if the field contains simple values
+	 * and allows only a single value in TCA, for example
+	 * if field is a "select" or "group" without a table
+	 * and without size or with size=1 or maxitems=1
+	 *
+	 * @param array $configurationArray
+	 * @return boolean
+	 */
+	protected function isFieldSimpleSingleValued(array $configurationArray) {
+		$isCorrectFieldType = $this->isFieldSimpleMultiValued($configurationArray);
+		$configuration = $configurationArray['config'];
+		$isSelectWithoutSize = 'select' === $this->getFieldType($configurationArray) && FALSE === isset($configuration['size']);
+		$maxItems = TRUE === isset($configuration['maxitems']) ? (integer) $configuration['maxitems'] : 0;
+		$size = TRUE === isset($configuration['size']) ? (integer) $configuration['size'] : 0;
+		return ($isCorrectFieldType && (1 === $maxItems || 1 === $size || $isSelectWithoutSize));
 	}
 
 	/**
