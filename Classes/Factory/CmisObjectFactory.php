@@ -12,7 +12,7 @@ use Dkd\PhpCmis\SessionFactory;
 class CmisObjectFactory {
 
 	/**
-	 * @var Session[]
+	 * @var SessionInterface[]
 	 */
 	private static $sessions = array();
 
@@ -37,7 +37,7 @@ class CmisObjectFactory {
 	 * from the master configuration without having
 	 * to create another factory.
 	 *
-	 * @return CmisConfiguration
+	 * @return array
 	 */
 	public function getConfiguredServerNames() {
 		return $this->getObjectFactory()->getConfiguration()->getCmisConfigurationNames();
