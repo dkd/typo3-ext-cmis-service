@@ -58,7 +58,7 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 			// been indexed by a previous Task). We therefore now turn
 			// all TYPO3 relations into CMIS relationships in a sync-type
 			// manner; both creating and removing relationships as needed.
-			$this->synchronizeRelationships($document, $data);
+			$this->synchronizeRelationships($document, $fields, $record, $data);
 		}
 		$this->result->setCode(Result::OK);
 		$this->result->setMessage('Indexed record ' . $uid . ' from ' . $table);
@@ -71,11 +71,12 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 	 * CMIS objects, as detected by the data that was extracted.
 	 *
 	 * @param CmisObjectInterface $document CMIS object to use in relationships
+	 * @param array $fields Array of field names to process
 	 * @param array $record The original TYPO3 record, untouched
 	 * @param array $data The extracted data not yet mapped to CMIS properties.
 	 * @return void
 	 */
-	protected function synchronizeRelationships(CmisObjectInterface $document, array $record, array $data) {
+	protected function synchronizeRelationships(CmisObjectInterface $document, array $fields, array $record, array $data) {
 		// @TODO: implement method
 	}
 

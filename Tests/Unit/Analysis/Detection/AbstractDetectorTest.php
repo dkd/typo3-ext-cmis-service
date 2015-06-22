@@ -9,17 +9,11 @@ use TYPO3\CMS\Core\Tests\UnitTestCase;
 class AbstractDetectorTest extends UnitTestCase {
 
 	/**
-	 * Unit test
-	 *
 	 * @test
 	 * @return void
 	 */
-	public function resolveTableConfigurationForFieldReturnsTcaValues() {
-		$GLOBALS['TCA']['foobar']['columns']['barfoo'] = 'baz';
-		$instance = $this->getMockForAbstractClass('Dkd\\CmisService\\Analysis\\Detection\\AbstractDetector');
-		$result = $this->callInaccessibleMethod($instance, 'resolveTableConfigurationForField', 'foobar', 'barfoo');
-		$this->assertEquals('baz', $result);
-		unset($GLOBALS['TCA']['foobar']);
+	public function testNotImplemented() {
+		$this->markTestIncomplete('Not yet implemented');
 	}
 
 }

@@ -149,4 +149,18 @@ class TableConfigurationAnalyzerTest extends UnitTestCase {
 
 	}
 
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
+	public function resolveTableConfigurationForFieldReturnsTcaValues() {
+		$GLOBALS['TCA']['foobar']['columns']['barfoo'] = array('baz' => TRUE);
+		$instance = new TableConfigurationAnalyzer();
+		$result = $instance->getConfigurationForField('foobar', 'barfoo');
+		$this->assertEquals(array('baz' => TRUE), $result);
+		unset($GLOBALS['TCA']['foobar']);
+	}
+
 }

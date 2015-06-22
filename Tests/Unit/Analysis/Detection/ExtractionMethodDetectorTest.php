@@ -1,6 +1,7 @@
 <?php
 namespace Dkd\CmisService\Tests\Unit\Analysis\Detection;
 
+use Dkd\CmisService\Analysis\ColumnAnalyzer;
 use Dkd\CmisService\Analysis\Detection\ExtractionMethodDetector;
 use TYPO3\CMS\Core\Tests\UnitTestCase;
 
@@ -72,14 +73,9 @@ class ExtractionMethodDetectorTest extends UnitTestCase {
 			'Dkd\\CmisService\\Analysis\\Detection\\ExtractionMethodDetector',
 			array('resolveTableConfigurationForField', 'determineExtractionMethod', 'resolveExtractionByTypeNameOrClassName')
 		);
-		$mock->expects($this->at(0))->method('resolveTableConfigurationForField')
-			->with('table', 'field')
-			->will($this->returnValue('foobar'));
-		$mock->expects($this->at(1))->method('determineExtractionMethod')
-			->with('foobar')
+		$mock->expects($this->at(0))->method('determineExtractionMethod')
 			->will($this->returnValue('baz'));
-		$mock->expects($this->at(2))->method('resolveExtractionByTypeNameOrClassName')
-			->with('baz')
+		$mock->expects($this->at(1))->method('resolveExtractionByTypeNameOrClassName')
 			->will($this->returnValue('foo'));
 		$result = $mock->resolveExtractionForColumn('table', 'field');
 		$this->assertEquals('foo', $result);
@@ -96,7 +92,8 @@ class ExtractionMethodDetectorTest extends UnitTestCase {
 	 */
 	public function determineExtractionMethodReturnsExpectedType(array $configuration, $expectedType) {
 		$detector = new ExtractionMethodDetector();
-		$result = $this->callInaccessibleMethod($detector, 'determineExtractionMethod', $configuration);
+		$configurationAnalyzer = new ColumnAnalyzer($configuration);
+		$result = $this->callInaccessibleMethod($detector, 'determineExtractionMethod', $configurationAnalyzer);
 		$this->assertEquals($expectedType, $result);
 	}
 
@@ -126,7 +123,7 @@ class ExtractionMethodDetectorTest extends UnitTestCase {
 			),
 			array(
 				array('config' => array('type' => 'select', 'items' => array())),
-				ExtractionMethodDetector::METHOD_MULTIVALUE
+				ExtractionMethodDetector::METHOD_SINGLEVALUE
 			),
 
 			// relations WITH maximum size EQUAL one expect SingleRelation

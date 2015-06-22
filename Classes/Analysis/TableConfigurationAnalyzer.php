@@ -125,5 +125,41 @@ class TableConfigurationAnalyzer {
 		return $GLOBALS['TCA'][$table]['columns'][$field]['config']['type'];
 	}
 
+	/**
+	 * @param string $table
+	 * @param string $field
+	 * @return ColumnAnalyzer
+	 */
+	public function getColumnAnalyzerForField($table, $field) {
+		$configuration = (array) $this->getConfigurationForField($table, $field);
+		return new ColumnAnalyzer($configuration);
+	}
+
+	/**
+	 * Returns the configuration array which describes
+	 * how a specific field is supposed to be edited. We
+	 * need the location above the "config" array rather
+	 * than the "config" array itself - since the RTE
+	 * is enabled by a flag outside this array.
+	 *
+	 * Returns NULL if the field is unknown or has no
+	 * configuration which indicates a setup problem, e.g.
+	 * some TCA relation pointing to a table or field that's
+	 * unknown, misspelled, missing, incorrect case, etc.
+	 *
+	 * It is up to the consumer to react to a NULL value
+	 * and either ignore or dispatch errors accordingly.
+	 *
+	 * @param string $table
+	 * @param string $field
+	 * @return array|NULL
+	 */
+	public function getConfigurationForField($table, $field) {
+		if (isset($GLOBALS['TCA'][$table]['columns'][$field]) && is_array($GLOBALS['TCA'][$table]['columns'][$field])) {
+			return $GLOBALS['TCA'][$table]['columns'][$field];
+		}
+		return NULL;
+	}
+
 }
 
