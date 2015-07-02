@@ -131,6 +131,22 @@ class ColumnAnalyzer {
 	}
 
 	/**
+	 * Returns TRUE if the field is configured to contain one
+	 * or more file references as a CSV value. Will silently
+	 * ignore misconfigured/mismatched fields, e.g. will return
+	 * FALSE for anything other than a legacy file field.
+	 *
+	 * @return boolean
+	 */
+	public function isFieldLegacyFileReference() {
+		$configurationArray = $this->configurationArray;
+		$fieldConfiguration = $configurationArray['config'];
+		$fieldType = $this->getFieldType();
+		$internalType = !empty($fieldConfiguration['internal_type']) ? $fieldConfiguration['internal_type'] : NULL;
+		return (self::FIELDTYPE_GROUP === $fieldType && self::GROUPFIELDTYPE_FILE === $internalType);
+	}
+
+	/**
 	 * Reads the type of the field defined in configuration.
 	 *
 	 * @return string

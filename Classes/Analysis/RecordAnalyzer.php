@@ -28,11 +28,25 @@ class RecordAnalyzer {
 	 * Constructor
 	 *
 	 * @param string $table
-	 * @param string $record
+	 * @param array $record
 	 */
-	public function __construct($table, $record) {
-		$this->table = $table;
+	public function __construct($table, array $record) {
+		$this->table = (string) $table;
 		$this->record = $record;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getTable() {
+		return $this->table;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getRecord() {
+		return $this->record;
 	}
 
 	/**

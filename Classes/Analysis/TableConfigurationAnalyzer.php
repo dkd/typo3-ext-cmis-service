@@ -161,5 +161,18 @@ class TableConfigurationAnalyzer {
 		return NULL;
 	}
 
+	/**
+	 * Returns the configured "uploadFolder" from the field
+	 * TCA, or NULL if no "uploadFolder" is defined.
+	 *
+	 * @param string $table
+	 * @param string $field
+	 * @return array
+	 */
+	public function getUploadFolderForField($table, $field) {
+		$configuration = $this->getConfigurationForField($table, $field);
+		return TRUE === isset($configuration['uploadfolder']) ? $configuration['uploadfolder'] : NULL;
+	}
+
 }
 

@@ -16,6 +16,7 @@ class ExtractionMethodDetector extends AbstractDetector implements DetectorInter
 	const METHOD_SINGLEVALUE = 'SingleValue';
 	const METHOD_SINGLERELATION = 'SingleRelationLabel';
 	const METHOD_MULTIRELATION = 'MultipleRelationLabel';
+	const METHOD_LEGACYFILE = 'LegacyFileReference';
 	const METHOD_BOOLEAN = 'Boolean';
 	const DEFAULT_METHOD = self::METHOD_PASSTHROUGH;
 
@@ -76,7 +77,12 @@ class ExtractionMethodDetector extends AbstractDetector implements DetectorInter
 		if (NULL === $columnAnalyzer->getFieldType()) {
 			return self::DEFAULT_METHOD;
 		}
-		if (TRUE === $columnAnalyzer->isFieldType(ColumnAnalyzer::FIELDTYPE_CHECKBOX)) {
+		if (TRUE === $columnAnalyzer->isFieldLegacyFileReference()) {
+			// legacy file reference; we need an extractor that works
+			// differently from the database relation extractor that
+			// handles non-legacy FAL file references.
+			return self::METHOD_LEGACYFILE;
+		} elseif (TRUE === $columnAnalyzer->isFieldType(ColumnAnalyzer::FIELDTYPE_CHECKBOX)) {
 			// field is a checkbox and we explicitly extract the value
 			// as boolean only.
 			return self::METHOD_BOOLEAN;

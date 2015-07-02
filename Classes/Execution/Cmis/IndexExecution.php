@@ -3,6 +3,7 @@ namespace Dkd\CmisService\Execution\Cmis;
 
 use Dkd\CmisService\Analysis\Detection\ExtractionMethodDetector;
 use Dkd\CmisService\Analysis\RecordAnalyzer;
+use Dkd\CmisService\Analysis\TableConfigurationAnalyzer;
 use Dkd\CmisService\Constants;
 use Dkd\CmisService\Execution\ExecutionInterface;
 use Dkd\CmisService\Execution\Result;
@@ -58,7 +59,7 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 			// been indexed by a previous Task). We therefore now turn
 			// all TYPO3 relations into CMIS relationships in a sync-type
 			// manner; both creating and removing relationships as needed.
-			$this->synchronizeRelationships($document, $fields, $record, $data);
+			$this->synchronizeRelationships($document, $recordAnalyzer, $data);
 		}
 		$this->result->setCode(Result::OK);
 		$this->result->setMessage('Indexed record ' . $uid . ' from ' . $table);
@@ -71,13 +72,24 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 	 * CMIS objects, as detected by the data that was extracted.
 	 *
 	 * @param CmisObjectInterface $document CMIS object to use in relationships
-	 * @param array $fields Array of field names to process
-	 * @param array $record The original TYPO3 record, untouched
+	 * @param RecordAnalyzer $recordAnalyzer An instance of RecordAnalyzer for record
 	 * @param array $data The extracted data not yet mapped to CMIS properties.
 	 * @return void
 	 */
-	protected function synchronizeRelationships(CmisObjectInterface $document, array $fields, array $record, array $data) {
-		// @TODO: implement method
+	protected function synchronizeRelationships(CmisObjectInterface $document, RecordAnalyzer $recordAnalyzer, array $data) {
+		$tableConfigurationAnalyzer = new TableConfigurationAnalyzer();
+		$table = $recordAnalyzer->getTable();
+		foreach ($recordAnalyzer->getIndexableColumnNames() as $fieldName) {
+			$columnAnalyzer = $tableConfigurationAnalyzer->getColumnAnalyzerForField($table, $fieldName);
+			if ($columnAnalyzer->isFieldDatabaseRelation()) {
+				// @TODO: extract target relation UUID(s) based on target TCA table/uid
+			} elseif ($columnAnalyzer->isFieldLegacyFileReference()) {
+				// @TODO: detect the already "imported" legacy file placed in CMIS
+				// Extracted by LegacyFileReferenceExtractor which executed during the
+				// first indexing step (without relations). We now need these as UUIDs
+				// that can be used in relationships with the CMIS document.
+			}
+		}
 	}
 
 	/**
