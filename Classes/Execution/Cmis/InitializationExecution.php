@@ -18,6 +18,14 @@ use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
 class InitializationExecution extends AbstractCmisExecution implements ExecutionInterface {
 
 	/**
+	 * Contexts passed to Logger implementations when messages
+	 * are dispatched from this class.
+	 *
+	 * @var array
+	 */
+	protected $logContexts = array('cmis_service', 'execution', 'cmis', 'initialization');
+
+	/**
 	 * @var array
 	 */
 	protected $requiredCustomTypes = array(
@@ -56,6 +64,8 @@ class InitializationExecution extends AbstractCmisExecution implements Execution
 			$this->validatePresenceOfCustomCmisTypes($this->requiredCustomTypes);
 			$this->result->setMessage('CMIS Repository initialized!');
 		} catch (\InvalidArgumentException $error) {
+			$this->result->setCode(Result::ERR);
+			$this->result->setError($error);
 			$this->result->setMessage($error->getMessage());
 		}
 		return $this->result;

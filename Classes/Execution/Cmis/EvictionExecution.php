@@ -13,6 +13,14 @@ use Dkd\CmisService\Task\TaskInterface;
 class EvictionExecution extends AbstractExecution implements ExecutionInterface {
 
 	/**
+	 * Contexts passed to Logger implementations when messages
+	 * are dispatched from this class.
+	 *
+	 * @var array
+	 */
+	protected $logContexts = array('cmis_service', 'execution', 'cmis', 'eviction');
+
+	/**
 	 * @param TaskInterface $task
 	 * @return boolean
 	 */
@@ -34,6 +42,7 @@ class EvictionExecution extends AbstractExecution implements ExecutionInterface 
 	public function execute(TaskInterface $task) {
 		/** @var EvictionTask $task */
 		$this->result = $this->createResultObject();
+		// @TODO: fill function
 		return $this->result;
 	}
 

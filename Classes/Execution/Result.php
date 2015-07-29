@@ -25,6 +25,11 @@ class Result {
 	protected $payload = array();
 
 	/**
+	 * @var \Exception
+	 */
+	protected $error;
+
+	/**
 	 * Create a Result instance
 	 *
 	 * @param string $message
@@ -92,6 +97,21 @@ class Result {
 	 */
 	public function getPayload() {
 		return $this->payload;
+	}
+
+	/**
+	 * @return \Exception
+	 */
+	public function getError() {
+		return $this->error;
+	}
+
+	/**
+	 * @param \Exception $error
+	 * @return void
+	 */
+	public function setError(\Exception $error) {
+		$this->error = $error;
 	}
 
 }

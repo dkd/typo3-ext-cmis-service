@@ -2,6 +2,7 @@
 namespace Dkd\CmisService\Tests\Unit\Command;
 
 use Dkd\CmisService\Command\CmisCommandController;
+use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Tests\Fixtures\Queue\DummyWorker;
 use Dkd\CmisService\Tests\Fixtures\Task\DummyTask;
 use TYPO3\CMS\Core\Core\Bootstrap;
@@ -64,10 +65,13 @@ class CmisCommandControllerTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function truncateQueueCallsFlush() {
-		$commandController = $this->getMock('Dkd\\CmisService\\Command\\CmisCommandController', array('getQueue'));
+		$commandController = $this->getMock('Dkd\\CmisService\\Command\\CmisCommandController', array('getQueue', 'getObjectFactory'));
 		$queue = $this->getMock('Dkd\\CmisService\\Queue\\SimpleQueue', array('flush'));
 		$queue->expects($this->once())->method('flush');
+		$factory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory', array('getLogger'));
+		$factory->expects($this->once())->method('getLogger')->willReturn($this->getMock(LoggerInterface::class, array('debug')));
 		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
+		$commandController->expects($this->once())->method('getObjectFactory')->will($this->returnValue($factory));
 		$commandController->truncateQueueCommand();
 	}
 
@@ -98,9 +102,15 @@ class CmisCommandControllerTest extends UnitTestCase {
 		$response = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Request\\Response', array('appendContent', 'send'));
 		$response->expects($this->exactly(3))->method('appendContent');
 		$response->expects($this->once())->method('send');
-		$commandController = $this->getAccessibleMock('Dkd\\CmisService\\Command\\CmisCommandController', array('getQueue'));
+		$factory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory', array('getLogger'));
+		$factory->expects($this->once())->method('getLogger')->willReturn($this->getMock(LoggerInterface::class, array('info')));
+		$commandController = $this->getAccessibleMock(
+			'Dkd\\CmisService\\Command\\CmisCommandController',
+			array('getQueue', 'getObjectFactory')
+		);
 		$commandController->_set('response', $response);
 		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
+		$commandController->expects($this->once())->method('getObjectFactory')->will($this->returnValue($factory));
 		$commandController->pickTasksCommand(3);
 	}
 
@@ -115,9 +125,15 @@ class CmisCommandControllerTest extends UnitTestCase {
 		$queue->expects($this->once())->method('count')->will($this->returnValue(2));
 		$response = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Request\\Response', array('setContent', 'send'));
 		$response->expects($this->atLeastOnce())->method('setContent');
-		$commandController = $this->getAccessibleMock('Dkd\\CmisService\\Command\\CmisCommandController', array('getQueue'));
+		$factory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory', array('getLogger'));
+		$factory->expects($this->once())->method('getLogger')->willReturn($this->getMock(LoggerInterface::class, array('debug')));
+		$commandController = $this->getAccessibleMock(
+			'Dkd\\CmisService\\Command\\CmisCommandController',
+			array('getQueue', 'getObjectFactory')
+		);
 		$commandController->_set('response', $response);
 		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
+		$commandController->expects($this->once())->method('getObjectFactory')->will($this->returnValue($factory));
 		$commandController->statusCommand();
 	}
 
@@ -186,12 +202,15 @@ class CmisCommandControllerTest extends UnitTestCase {
 		$queue->expects($this->once())->method('addAll')->will($this->returnValue(TRUE));
 		$response = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Request\\Response', array('setContent', 'send'));
 		$response->expects($this->atLeastOnce())->method('setContent');
+		$factory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory', array('getLogger'));
+		$factory->expects($this->once())->method('getLogger')->willReturn($this->getMock(LoggerInterface::class, array('info')));
 		$commandController = $this->getAccessibleMock(
 			'Dkd\\CmisService\\Command\\CmisCommandController',
-			array('getTableConfigurationAnalyzer', 'getQueue')
+			array('getTableConfigurationAnalyzer', 'getQueue', 'getObjectFactory')
 		);
 		$commandController->_set('response', $response);
 		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
+		$commandController->expects($this->once())->method('getObjectFactory')->will($this->returnValue($factory));
 		$tableConfigurationAnalyzer = $this->getMock(
 			'Dkd\\CmisService\\Analysis\\TableConfigurationAnalyzer',
 			array('getIndexableTableNames')
@@ -226,12 +245,15 @@ class CmisCommandControllerTest extends UnitTestCase {
 		$queue->expects($this->once())->method('addAll')->will($this->returnValue(TRUE));
 		$response = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Request\\Response', array('setContent', 'send'));
 		$response->expects($this->atLeastOnce())->method('setContent');
+		$factory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory', array('getLogger'));
+		$factory->expects($this->once())->method('getLogger')->willReturn($this->getMock(LoggerInterface::class, array('info')));
 		$commandController = $this->getAccessibleMock(
 			'Dkd\\CmisService\\Command\\CmisCommandController',
-			array('getTableConfigurationAnalyzer', 'getQueue', 'createRecordIndexingTask')
+			array('getTableConfigurationAnalyzer', 'getQueue', 'createRecordIndexingTask', 'getObjectFactory')
 		);
 		$commandController->_set('response', $response);
 		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
+		$commandController->expects($this->once())->method('getObjectFactory')->will($this->returnValue($factory));
 		$commandController->expects($this->exactly(4))->method('createRecordIndexingTask');
 		$commandController->generateIndexingTasksCommand('foobar');
 		$GLOBALS['TYPO3_DB'] = $backup;
@@ -263,12 +285,15 @@ class CmisCommandControllerTest extends UnitTestCase {
 		$queue->expects($this->once())->method('addAll')->will($this->returnValue(TRUE));
 		$response = $this->getMock('TYPO3\\CMS\\Extbase\\Mvc\\Request\\Response', array('setContent', 'send'));
 		$response->expects($this->atLeastOnce())->method('setContent');
+		$factory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory', array('getLogger'));
+		$factory->expects($this->once())->method('getLogger')->willReturn($this->getMock(LoggerInterface::class, array('info')));
 		$commandController = $this->getAccessibleMock(
 			'Dkd\\CmisService\\Command\\CmisCommandController',
-			array('getTableConfigurationAnalyzer', 'getQueue', 'createRecordIndexingTask')
+			array('getTableConfigurationAnalyzer', 'getQueue', 'createRecordIndexingTask', 'getObjectFactory')
 		);
 		$commandController->_set('response', $response);
 		$commandController->expects($this->once())->method('getQueue')->will($this->returnValue($queue));
+		$commandController->expects($this->once())->method('getObjectFactory')->will($this->returnValue($factory));
 		$commandController->expects($this->exactly(8))->method('createRecordIndexingTask');
 		$commandController->generateIndexingTasksCommand('foobar,foobaz');
 		$GLOBALS['TYPO3_DB'] = $backup;

@@ -19,6 +19,14 @@ use Dkd\PhpCmis\PropertyIds;
 class IndexExecution extends AbstractCmisExecution implements ExecutionInterface {
 
 	/**
+	 * Contexts passed to Logger implementations when messages
+	 * are dispatched from this class.
+	 *
+	 * @var array
+	 */
+	protected $logContexts = array('cmis_service', 'execution', 'cmis', 'indexing');
+
+	/**
 	 * @param TaskInterface $task
 	 * @return boolean
 	 */

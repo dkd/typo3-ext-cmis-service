@@ -39,6 +39,11 @@ class ObjectFactory {
 	protected static $typoScript = array();
 
 	/**
+	 * @var array
+	 */
+	protected $logContexts = array('cmis_service', 'configuration');
+
+	/**
 	 * Make an instance of $className, if any additional parameters
 	 * are present they will be used as constructor arguments.
 	 *
@@ -96,6 +101,15 @@ class ObjectFactory {
 				$writer,
 				$cache,
 				$setup
+			);
+			$this->getLogger()->debug(
+				sprintf(
+					'Configuration objects initialized. Reader: %s. Writer: %s. Cache: %s',
+					$readerClassName,
+					$writerClassName,
+					$cacheClassName
+				),
+				$this->logContexts
 			);
 		}
 		return self::$configurationManager;

@@ -2,6 +2,7 @@
 namespace Dkd\CmisService\Queue;
 
 use Dkd\CmisService\Cache\VariableFrontendInterface;
+use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Factory\WorkerFactory;
 use Dkd\CmisService\Task\TaskFilterInterface;
 use Dkd\CmisService\Task\TaskInterface;
@@ -51,6 +52,14 @@ class SimpleQueue implements QueueInterface, QueueCachableInterface {
 	const LOCK_ID = 'dkd.cmisservice.queueLock';
 	const MAX_LOCK_WAIT = 120;
 	const CACHE_IDENTITY = 'SimpleQueue';
+
+	/**
+	 * Contexts passed to Logger implementations when messages
+	 * are dispatched from this class.
+	 *
+	 * @var array
+	 */
+	protected $logContexts = array('cmis_service', 'queue', 'SimpleQueue');
 
 	/**
 	 * @var TaskInterface[]
@@ -159,6 +168,8 @@ class SimpleQueue implements QueueInterface, QueueCachableInterface {
 		$this->lock();
 		$this->cache->set(self::CACHE_IDENTITY, $this->queue);
 		$this->release();
+		$this->getObjectFactory()->getLogger()->info(sprintf('Saved %d Task(s)', $this->count()), $this->logContexts
+		);
 	}
 
 	/**
@@ -189,8 +200,10 @@ class SimpleQueue implements QueueInterface, QueueCachableInterface {
 	 * @return void
 	 */
 	public function flush() {
+		$count = $this->count();
 		$this->queue = array();
 		$this->save();
+		$this->getObjectFactory()->getLogger()->info(sprintf('Flushed %d Task(s)', $count), $this->logContexts);
 	}
 
 	/**
@@ -243,6 +256,13 @@ class SimpleQueue implements QueueInterface, QueueCachableInterface {
 	 */
 	protected function isLocked() {
 		return $this->getLocker()->isLocked();
+	}
+
+	/**
+	 * @return ObjectFactory
+	 */
+	protected function getObjectFactory() {
+		return new ObjectFactory();
 	}
 
 }

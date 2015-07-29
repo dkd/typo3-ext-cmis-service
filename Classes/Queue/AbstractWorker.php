@@ -2,6 +2,7 @@
 namespace Dkd\CmisService\Queue;
 
 use Dkd\CmisService\Execution\Result;
+use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Task\TaskInterface;
 
 /**
@@ -13,6 +14,14 @@ use Dkd\CmisService\Task\TaskInterface;
 abstract class AbstractWorker implements WorkerInterface {
 
 	/**
+	 * Contexts passed to Logger implementations when messages
+	 * are dispatched from this class.
+	 *
+	 * @var array
+	 */
+	protected $logContexts = array('cmis_service', 'worker');
+
+	/**
 	 * Execute Task given in argument by internally resolving
 	 * an Execution befitting the Task and then executing
 	 * the Task via this Execution.
@@ -21,16 +30,18 @@ abstract class AbstractWorker implements WorkerInterface {
 	 * @return Result
 	 */
 	public function execute(TaskInterface $task) {
-		$execution = $task->resolveExecutionObject();
 		try {
+			$execution = $task->resolveExecutionObject();
 			$execution->validate($task);
+			$result = $execution->execute($task);
 		} catch (\InvalidArgumentException $error) {
 			// we only catch misconfigured Tasks' errors
 			// here and allow errors raised during execution
 			// to bubble up, by not catching ->execute().
-			return $this->createErrorResult($error);
+			$result = $this->createErrorResult($error);
 		}
-		return $execution->execute($task);
+		$this->getObjectFactory()->getLogger()->log($result->getCode(), $result->getMessage(), $this->logContexts);
+		return $result;
 	}
 
 	/**
@@ -39,7 +50,15 @@ abstract class AbstractWorker implements WorkerInterface {
 	 */
 	protected function createErrorResult(\Exception $error) {
 		$result = new Result($error->getMessage(), Result::ERR, array($error));
+		$result->setError($error);
 		return $result;
+	}
+
+	/**
+	 * @return ObjectFactory
+	 */
+	protected function getObjectFactory() {
+		return new ObjectFactory();
 	}
 
 }

@@ -36,6 +36,14 @@ class CmisCommandController extends CommandController {
 	const ACTION_DOWNLOAD = 'download';
 
 	/**
+	 * Contexts passed to Logger implementations when messages
+	 * are dispatched from this class.
+	 *
+	 * @var array
+	 */
+	protected $logContexts = array('cmis_service', 'CLI');
+
+	/**
 	 * @return void
 	 */
 	public function initializeObject() {
@@ -108,6 +116,7 @@ class CmisCommandController extends CommandController {
 		$yaml = Yaml::dump($data, 99);
 		$this->response->setContent($yaml);
 		$this->response->send();
+		$this->getObjectFactory()->getLogger()->info(sprintf('Dump of %s (id %s) performed', $resource, $id), $this->logContexts);
 	}
 
 	/**
@@ -164,6 +173,7 @@ class CmisCommandController extends CommandController {
 	 */
 	public function truncateQueueCommand() {
 		$this->getQueue()->flush();
+		$this->getObjectFactory()->getLogger()->debug('Queue dump command executed', $this->logContexts);
 	}
 
 	/**
@@ -220,6 +230,7 @@ class CmisCommandController extends CommandController {
 		$message .= sprintf($messageText, $countRelations, 'relation indexing', (1 !== $countRelations ? 's' : ''), $table);
 		$this->response->setContent($message . PHP_EOL);
 		$this->response->send();
+		$this->getObjectFactory()->getLogger()->info(sprintf('%s indexing task(s) created', $queue->count()), $this->logContexts);
 	}
 
 	/**
@@ -260,6 +271,7 @@ class CmisCommandController extends CommandController {
 		$worker = $this->getWorkerFactory()->createWorker();
 		$result = $worker->execute($initializationTask);
 		$this->echoResultToConsole($result);
+		$this->getObjectFactory()->getLogger()->info('Initialization performed', $this->logContexts);
 	}
 
 	/**
@@ -292,6 +304,7 @@ class CmisCommandController extends CommandController {
 			$this->echoResultToConsole($result);
 		}
 		$this->response->send();
+		$this->getObjectFactory()->getLogger()->info(sprintf('Picked %d Worker task(s)', $queue->count()), $this->logContexts);
 	}
 
 	/**
@@ -304,6 +317,7 @@ class CmisCommandController extends CommandController {
 		$count = $queue->count();
 		$message = sprintf('%d job%s currently queued', $count, (1 !== $count ? 's' : ''));
 		$this->response->setContent($message . PHP_EOL);
+		$this->getObjectFactory()->getLogger()->debug(sprintf('Status: %s', $message), $this->logContexts);
 	}
 
 	/**

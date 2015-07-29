@@ -15,6 +15,14 @@ abstract class AbstractExecution implements ExecutionInterface {
 	protected $result;
 
 	/**
+	 * Contexts passed to Logger implementations when messages
+	 * are dispatched from this class.
+	 *
+	 * @var array
+	 */
+	protected $logContexts = array('cmis_service', 'execution');
+
+	/**
 	 * Returns the Result stored in this Execution
 	 * after it has been executed.
 	 *

@@ -89,18 +89,21 @@ class ObjectFactoryTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function getConfigurationManagerCallsExpectedMethodSequenceWithoutWriterAndCache() {
+		$logger = $this->getMock('foo', array('debug'));
 		$factory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory',
 			array(
 				'getConfigurationReaderClassName',
 				'getConfigurationWriterClassName',
 				'getConfigurationReaderCacheClassName',
-				'makeInstance'
+				'makeInstance',
+				'getLogger'
 			)
 		);
 		$factory->expects($this->at(0))->method('getConfigurationReaderClassName')
 			->will($this->returnValue('Dkd\\CmisService\\Tests\\Fixtures\\Configuration\\DummyReader'));
 		$factory->expects($this->at(1))->method('getConfigurationWriterClassName')->will($this->returnValue(NULL));
 		$factory->expects($this->at(2))->method('getConfigurationReaderCacheClassName')->will($this->returnValue(NULL));
+		$factory->expects($this->once())->method('getLogger')->will($this->returnValue($logger));
 		$factory->expects($this->exactly(2))->method('makeInstance');
 		$factory->getConfigurationManager();
 	}
@@ -112,12 +115,14 @@ class ObjectFactoryTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function getConfigurationManagerCallsExpectedMethodSequenceWithWriterAndWithoutCache() {
+		$logger = $this->getMock('foo', array('debug'));
 		$factory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory',
 			array(
 				'getConfigurationReaderClassName',
 				'getConfigurationWriterClassName',
 				'getConfigurationReaderCacheClassName',
-				'makeInstance'
+				'makeInstance',
+				'getLogger'
 			)
 		);
 		$factory->expects($this->at(0))->method('getConfigurationReaderClassName')
@@ -125,6 +130,7 @@ class ObjectFactoryTest extends UnitTestCase {
 		$factory->expects($this->at(1))->method('getConfigurationWriterClassName')
 			->will($this->returnValue('Dkd\\CmisService\\Tests\\Fixtures\\Configuration\\DummyWriter'));
 		$factory->expects($this->at(2))->method('getConfigurationReaderCacheClassName')->will($this->returnValue(NULL));
+		$factory->expects($this->once())->method('getLogger')->will($this->returnValue($logger));
 		$factory->expects($this->exactly(3))->method('makeInstance');
 		$factory->getConfigurationManager();
 	}
@@ -136,12 +142,14 @@ class ObjectFactoryTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function getConfigurationManagerCallsExpectedMethodSequenceWithWriterAndCache() {
+		$logger = $this->getMock('foo', array('debug'));
 		$factory = $this->getMock('Dkd\\CmisService\\Factory\\ObjectFactory',
 			array(
 				'getConfigurationReaderClassName',
 				'getConfigurationWriterClassName',
 				'getConfigurationReaderCacheClassName',
-				'makeInstance'
+				'makeInstance',
+				'getLogger'
 			)
 		);
 		$factory->expects($this->at(0))->method('getConfigurationReaderClassName')
@@ -150,6 +158,7 @@ class ObjectFactoryTest extends UnitTestCase {
 			->will($this->returnValue('Dkd\\CmisService\\Tests\\Fixtures\\Configuration\\DummyWriter'));
 		$factory->expects($this->at(2))->method('getConfigurationReaderCacheClassName')
 			->will($this->returnValue('Dkd\\CmisService\\Tests\\Fixtures\\Configuration\\DummyReader'));
+		$factory->expects($this->once())->method('getLogger')->willReturn($logger);
 		$factory->expects($this->exactly(4))->method('makeInstance');
 		$factory->getConfigurationManager();
 	}

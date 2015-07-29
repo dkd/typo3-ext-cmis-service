@@ -30,6 +30,14 @@ use TYPO3\CMS\Core\Utility\ClassNamingUtility;
 abstract class AbstractCmisExecution extends AbstractExecution {
 
 	/**
+	 * Contexts passed to Logger implementations when messages
+	 * are dispatched from this class.
+	 *
+	 * @var array
+	 */
+	protected $logContexts = array('cmis_service', 'execution', 'cmis');
+
+	/**
 	 * Returns an instance of a CMIS document that is
 	 * related to the record identified by $uid from
 	 * $table. If a CMIS document does not exist in the
@@ -83,7 +91,12 @@ abstract class AbstractCmisExecution extends AbstractExecution {
 		if (0 === count($objects)) {
 			throw new CmisObjectNotFoundException();
 		}
-		return reset($objects);
+		$object = reset($objects);
+		$this->getObjectFactory()->getLogger()->info(
+			sprintf('CMIS Document retrieved, ID: %s', $object->getId()),
+			$this->logContexts
+		);
+		return $object;
 	}
 
 	/**
@@ -172,6 +185,7 @@ abstract class AbstractCmisExecution extends AbstractExecution {
 		} elseif (TRUE === $type instanceof DocumentTypeDefinition) {
 			$objectId = $session->createDocument($properties, $folder);
 		}
+		$this->getObjectFactory()->getLogger()->info(sprintf('New CMIS Document created, ID: %s', $objectId), $this->logContexts);
 		// @TODO: store generic resources for which there is no type, inside else {}
 		return $session->getObject($objectId);
 	}
