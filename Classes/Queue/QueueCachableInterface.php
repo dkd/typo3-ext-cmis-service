@@ -18,4 +18,14 @@ interface QueueCachableInterface {
 	 */
 	public function setCache(VariableFrontendInterface $frontend);
 
+	/**
+	 * @return void
+	 */
+	public function save();
+
+	/**
+	 * @return void
+	 */
+	public function load();
+
 }

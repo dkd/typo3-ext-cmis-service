@@ -31,6 +31,13 @@ interface TaskInterface {
 	public function isQueued();
 
 	/**
+	 * Get parameters associated with this Task.
+	 *
+	 * @return mixed
+	 */
+	public function getParameters();
+
+	/**
 	 * Gets the value of Task parameter $name
 	 *
 	 * @param string $name
@@ -53,6 +60,19 @@ interface TaskInterface {
 	 * @return string
 	 */
 	public function getId();
+
+	/**
+	 * If the resource used by this Task has an identifier,
+	 * for example table records can be identified by `table:uid`,
+	 * CMIS objects can be identified by their UUID, files by
+	 * their filename, etc.
+	 *
+	 * Returning a value here allows checking for duplicate Tasks
+	 * (for example the same Task running on the same record).
+	 *
+	 * @return mixed
+	 */
+	public function getResourceId();
 
 	/**
 	 * Called when Task gets added to Queue

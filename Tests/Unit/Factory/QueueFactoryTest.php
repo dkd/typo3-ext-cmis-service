@@ -63,18 +63,11 @@ class QueueFactoryTest extends UnitTestCase {
 	 * @return void
 	 */
 	public function initializeQueueReturnsValidClassInstance() {
-		$backup = $GLOBALS['TYPO3_DB'];
-		$GLOBALS['TYPO3_DB'] = $this->getMock(
-			'TYPO3\\CMS\\Core\\Database\\DatabaseConnection',
-			array('connectDB', 'fullQuoteStr', 'exec_SELECTcountRows')
-		);
-		$GLOBALS['TYPO3_DB']->expects($this->once())->method('exec_SELECTcountRows')->will($this->returnValue(0));
 		$factory = $this->getAccessibleMock('Dkd\\CmisService\\Factory\\QueueFactory', array('getConfiguredQueueClassName'));
 		$factory->expects($this->once())->method('getConfiguredQueueClassName')
 			->will($this->returnValue(QueueFactory::DEFAULT_QUEUE_CLASS));
 		$instance = $this->callInaccessibleMethod($factory, 'initializeQueue');
 		$this->assertInstanceOf('Dkd\\CmisService\\Queue\\QueueInterface', $instance);
-		$GLOBALS['TYPO3_DB'] = $backup;
 	}
 
 	/**

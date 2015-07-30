@@ -18,4 +18,24 @@ interface TaskFilterInterface {
 	 */
 	public function matches(TaskInterface $task);
 
+	/**
+	 * If the resource used by this Task has an identifier,
+	 * for example table records can be identified by `table:uid`,
+	 * CMIS objects can be identified by their UUID, files by
+	 * their filename, etc.
+	 *
+	 * Returning a value here allows checking for duplicate Tasks
+	 * (for example the same Task running on the same record).
+	 *
+	 * @return mixed
+	 */
+	public function getResourceId();
+
+	/**
+	 * Get parameters associated with this filter.
+	 *
+	 * @return mixed
+	 */
+	public function getParameters();
+
 }

@@ -29,16 +29,6 @@ interface QueueInterface {
 	public function pick();
 
 	/**
-	 * @return void
-	 */
-	public function save();
-
-	/**
-	 * @return void
-	 */
-	public function load();
-
-	/**
 	 * @return integer
 	 */
 	public function count();

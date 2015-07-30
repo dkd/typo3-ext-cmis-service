@@ -51,6 +51,24 @@ abstract class AbstractTask implements TaskInterface {
 	}
 
 	/**
+	 * If the resource used by this Task has an identifier,
+	 * for example table records can be identified by `table:uid`,
+	 * CMIS objects can be identified by their UUID, files by
+	 * their filename, etc.
+	 *
+	 * Returning a value here allows checking for duplicate Tasks
+	 * (for example the same Task running on the same record).
+	 *
+	 * This default implementation always returns NULL and must be
+	 * implemented if a Task operates on an identified resource.
+	 *
+	 * @return mixed
+	 */
+	public function getResourceId() {
+		return NULL;
+	}
+
+	/**
 	 * Returns the unique, automatically generated ID
 	 * of this Task instance.
 	 *
@@ -167,6 +185,20 @@ abstract class AbstractTask implements TaskInterface {
 	 */
 	public function getParameter($name) {
 		return TRUE === isset($this->parameters[$name]) ? $this->parameters[$name] : NULL;
+	}
+
+	/**
+	 * Get parameters associated with this Task. We sort the
+	 * parameters by name so the resulting array always has the
+	 * same order and always appear the same way when serialized,
+	 * debugged, passed between methods, used in vsprintf etc.
+	 *
+	 * @return array
+	 */
+	public function getParameters() {
+		$parameters = $this->parameters;
+		ksort($parameters);
+		return $parameters;
 	}
 
 	/**

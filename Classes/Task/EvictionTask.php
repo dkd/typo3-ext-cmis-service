@@ -37,4 +37,18 @@ class EvictionTask extends AbstractTask implements TaskInterface, TaskFilterInte
 		return ($matchesTable && ($matchesUid || $matchesAllUids));
 	}
 
+	/**
+	 * Returns the `table:uid` format identifying the
+	 * record being evicted; or returns the table name
+	 * only, if the eviction is targeting all records
+	 * from that table.
+	 *
+	 * @return string
+	 */
+	public function getResourceId() {
+		$table = $this->getParameter(self::OPTION_TABLE);
+		$uid = $this->getParameter(self::OPTION_UID);
+		return (empty($uid) ? $table : $table . ':' . $uid);
+	}
+
 }

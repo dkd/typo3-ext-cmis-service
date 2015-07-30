@@ -14,7 +14,7 @@ use Dkd\CmisService\Queue\QueueInterface;
  */
 class QueueFactory {
 
-	const DEFAULT_QUEUE_CLASS = 'Dkd\\CmisService\\Queue\\SimpleQueue';
+	const DEFAULT_QUEUE_CLASS = 'Dkd\\CmisService\\Queue\\DatabaseTableQueue';
 
 	/**
 	 * @var QueueInterface
@@ -44,14 +44,14 @@ class QueueFactory {
 	protected function initializeQueue() {
 		$className = $this->getConfiguredQueueClassName();
 		$objectFactory = new ObjectFactory();
-		$cacheFactory = new CacheFactory();
 		$queueFactory = new QueueFactory();
 		self::$instance = new $className();
 		if (TRUE === self::$instance instanceof QueueCachableInterface) {
+			$cacheFactory = new CacheFactory();
 			$queueCache = $cacheFactory->fetchCache($className::CACHE_IDENTITY);
 			self::$instance->setCache($queueCache);
+			self::$instance->load();
 		}
-		self::$instance->load();
 		return self::$instance;
 	}
 

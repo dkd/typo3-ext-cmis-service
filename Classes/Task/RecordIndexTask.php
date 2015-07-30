@@ -38,4 +38,14 @@ class RecordIndexTask extends AbstractTask implements TaskInterface, TaskFilterI
 		return ($matchesTable && $matchesUid && $matchesFields && $matchesRelations);
 	}
 
+	/**
+	 * Returns the `table:uid` format identifying the
+	 * record being indexed.
+	 *
+	 * @return string
+	 */
+	public function getResourceId() {
+		return $this->getParameter(self::OPTION_TABLE) . ':' . $this->getParameter(self::OPTION_UID);
+	}
+
 }
