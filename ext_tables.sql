@@ -5,3 +5,7 @@ CREATE TABLE `tx_cmisservice_queue` (
   `parameters` text,
   PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE `sys_identity` (
+  `cmis_uuid` tinytext NOT NULL,
+);
