@@ -282,10 +282,11 @@ class CmisCommandController extends CommandController {
 	 *
 	 * For multiple Tasks in one run, use pickTasks()
 	 *
+	 * @param boolean $verbose If TRUE (1) will output additional information about payloads
 	 * @return void
 	 */
-	public function pickTaskCommand() {
-		$this->pickTasksCommand(1);
+	public function pickTaskCommand($verbose = FALSE) {
+		$this->pickTasksCommand(1, $verbose);
 	}
 
 	/**
@@ -295,13 +296,14 @@ class CmisCommandController extends CommandController {
 	 * all of them in a single run.
 	 *
 	 * @param integer $tasks Number of tasks to pick and execute.
+	 * @param boolean $verbose If TRUE (1) will output additional information about payloads
 	 * @return void
 	 */
-	public function pickTasksCommand($tasks = 1) {
+	public function pickTasksCommand($tasks = 1, $verbose = FALSE) {
 		$queue = $this->getQueue();
 		while (0 <= --$tasks && ($task = $queue->pick())) {
 			$result = $task->getWorker()->execute($task);
-			$this->echoResultToConsole($result);
+			$this->echoResultToConsole($result, $verbose);
 		}
 		$this->response->send();
 		$this->getObjectFactory()->getLogger()->info(sprintf('Picked %d Worker task(s)', $queue->count()), $this->logContexts);
@@ -336,12 +338,13 @@ class CmisCommandController extends CommandController {
 
 	/**
 	 * @param Result $result
+	 * @param boolean $verbose
 	 * @return void
 	 */
-	protected function echoResultToConsole(Result $result) {
+	protected function echoResultToConsole(Result $result, $verbose) {
 		$payload = $result->getPayload();
 		$this->response->appendContent($result->getMessage() . PHP_EOL);
-		if (0 < count($payload)) {
+		if (0 < count($payload) && TRUE === $verbose) {
 			$this->response->appendContent(var_export($payload, TRUE) . PHP_EOL);
 		}
 	}
