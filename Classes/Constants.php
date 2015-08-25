@@ -13,6 +13,6 @@ abstract class Constants {
 	const CMIS_PROPERTY_TYPO3UUID = 'dkd:typo3:general:uuid';
 	const CMIS_PROPERTY_TYPO3TABLE = 'dkd:typo3:general:record_table';
 	const CMIS_PROPERTY_TYPO3UID = 'dkd:typo3:general:record_id';
-	const CMIS_PROPERTY_RAWDATA = 'P:dkd:typo3:general:record_data';
+	const CMIS_PROPERTY_RAWDATA = 'dkd:typo3:general:record_data';
 
 }

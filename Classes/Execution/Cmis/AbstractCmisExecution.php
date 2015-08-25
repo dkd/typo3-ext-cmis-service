@@ -16,10 +16,12 @@ use Dkd\PhpCmis\Data\ObjectTypeInterface;
 use Dkd\PhpCmis\DataObjects\DocumentTypeDefinition;
 use Dkd\PhpCmis\DataObjects\FolderTypeDefinition;
 use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
+use Dkd\PhpCmis\Exception\CmisRuntimeException;
 use Dkd\PhpCmis\PropertyIds;
 use Dkd\PhpCmis\SessionInterface;
 use Maroschik\Identity\IdentityMap;
 use TYPO3\CMS\Core\Utility\ClassNamingUtility;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /**
  * Class AbstractCmisExecution
@@ -61,9 +63,8 @@ abstract class AbstractCmisExecution extends AbstractExecution {
 	 */
 	protected function resolveCmisDocumentByTableAndUid($table, $uid) {
 		$session = $this->getCmisObjectFactory()->getSession();
-		$identityMap = $this->getObjectFactory()->getIdentityMap();
-		$uuid = $identityMap->getIdentifierForResourceLocation($table, $uid);
 		try {
+			$uuid = $this->getCmisUuidForLocalRecord($table, $uid);
 			$document = $this->resolveCmisObjectByUuid($session, $uuid);
 		} catch (CmisObjectNotFoundException $error) {
 			$fields = $this->resolveStructuralFieldsForTable($table);
@@ -86,12 +87,7 @@ abstract class AbstractCmisExecution extends AbstractExecution {
 	 * @return CmisObjectInterface
 	 */
 	protected function resolveCmisObjectByUuid(SessionInterface $session, $uuid) {
-		$typeId = $session->getRootFolder()->getBaseType()->getId();
-		$objects = $session->queryObjects($typeId, Constants::CMIS_PROPERTY_TYPO3UUID . '=' . $uuid);
-		if (0 === count($objects)) {
-			throw new CmisObjectNotFoundException();
-		}
-		$object = reset($objects);
+		$object = $session->getObject($session->createObjectId($uuid));
 		$this->getObjectFactory()->getLogger()->info(
 			sprintf('CMIS Document retrieved, ID: %s', $object->getId()),
 			$this->logContexts
@@ -112,11 +108,13 @@ abstract class AbstractCmisExecution extends AbstractExecution {
 	 * @return ObjectTypeInterface
 	 */
 	protected function resolveCmisObjectTypeForTableAndUid($table, $uid) {
-		$session = $this->getCmisObjectFactory()->getSession();
+		$definitionType = Constants::CMIS_DOCUMENT_TYPE_ARBITRARY;
 		if ('pages' === $table) {
-			return $session->getTypeDefinition('cmis:folder');
+			$definitionType = Constants::CMIS_DOCUMENT_TYPE_PAGES;
+		} elseif ('tt_content' === $table) {
+			$definitionType = Constants::CMIS_DOCUMENT_TYPE_CONTENT;
 		}
-		return $session->getTypeDefinition('cmis:document');
+		return $this->getCmisObjectFactory()->getSession()->getTypeDefinition($definitionType);
 	}
 
 	/**
@@ -136,14 +134,8 @@ abstract class AbstractCmisExecution extends AbstractExecution {
 		$values = $this->readDefaultPropertyValuesForTableFromConfiguration($table);
 		$columnDetector = new IndexableColumnDetector();
 		$columns = $columnDetector->getIndexableColumnNamesFromTable($table);
-		$extractionDetector = new ExtractionMethodDetector();
 		$record = $this->loadRecordFromDatabase($table, $uid, $columns);
 		$recordAnalyzer = new RecordAnalyzer($table, $record);
-		foreach ($record as $column => $value) {
-			if (FALSE === array_key_exists($column, $values)) {
-				$values[$column] = $extractionDetector->resolveExtractionForColumn($table, $column)->extract($value);
-			}
-		}
 		$values[PropertyIds::NAME] = $recordAnalyzer->getTitleForRecord();
 		return $values;
 	}
@@ -176,18 +168,59 @@ abstract class AbstractCmisExecution extends AbstractExecution {
 	 */
 	protected function createCmisDocument($uuid, ObjectTypeInterface $type, ObjectIdInterface $folder, $table, $uid) {
 		$session = $this->getCmisObjectFactory()->getSession();
-		$properties = $this->extractPropertiesForTableAndUid($table);
+		$properties = $this->extractPropertiesForTableAndUid($table, $uid);
 		$properties[Constants::CMIS_PROPERTY_TYPO3TABLE] = $table;
-		$properties[Constants::CMIS_PROPERTY_TYPO3UUID] = $uuid;
+		$properties[Constants::CMIS_PROPERTY_TYPO3UUID] = $this->getObjectFactory()
+			->getIdentityMap()->getIdentifierForResourceLocation($table, $uid);
 		$properties[PropertyIds::OBJECT_TYPE_ID] = $type->getId();
+		$properties[PropertyIds::SECONDARY_OBJECT_TYPE_IDS] = array(
+			$this->getCmisObjectFactory()->getSession()->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_MAIN_ASPECT)->getId()
+		);
 		if (TRUE === $type instanceof FolderTypeDefinition) {
 			$objectId = $session->createFolder($properties, $folder);
-		} elseif (TRUE === $type instanceof DocumentTypeDefinition) {
+		} else {
 			$objectId = $session->createDocument($properties, $folder);
 		}
-		$this->getObjectFactory()->getLogger()->info(sprintf('New CMIS Document created, ID: %s', $objectId), $this->logContexts);
+		$this->getObjectFactory()->getLogger()->info(
+			sprintf('New CMIS Object (%s) created, ID: %s', $type->getDisplayName(), $objectId),
+			$this->logContexts
+		);
+		$this->storeCmisUuidLocallyForRecord($table, $uid, $objectId);
 		// @TODO: store generic resources for which there is no type, inside else {}
 		return $session->getObject($objectId);
+	}
+
+	/**
+	 * @param string $table
+	 * @param integer $uid
+	 * @return string|NULL
+	 */
+	protected function getCmisUuidForLocalRecord($table, $uid) {
+		$record = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+			'cmis_uuid',
+			'sys_identity',
+			sprintf("foreign_uid = %d AND foreign_tablename = '%s'", $uid, $table)
+		);
+		if (empty($record['cmis_uuid'])) {
+			throw new CmisObjectNotFoundException('Local UUID not detected, no CMIS document can be loaded');
+		}
+		return $record['cmis_uuid'];
+	}
+
+	/**
+	 * @param string $table
+	 * @param integer $uid
+	 * @param string $objectId
+	 * @return void
+	 */
+	protected function storeCmisUuidLocallyForRecord($table, $uid, $objectId) {
+		$this->getDatabaseConnection()->exec_UPDATEquery(
+			'sys_identity',
+			sprintf("foreign_uid = %d AND foreign_tablename = '%s'", $uid, $table),
+			array(
+				'cmis_uuid' => $objectId
+			)
+		);
 	}
 
 	/**
@@ -214,6 +247,13 @@ abstract class AbstractCmisExecution extends AbstractExecution {
 	 */
 	protected function getCmisObjectFactory() {
 		return new CmisObjectFactory();
+	}
+
+	/**
+	 * @return DatabaseConnection
+	 */
+	protected function getDatabaseConnection() {
+		return $GLOBALS['TYPO3_DB'];
 	}
 
 }

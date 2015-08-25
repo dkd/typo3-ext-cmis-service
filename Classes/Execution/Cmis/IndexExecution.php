@@ -110,10 +110,15 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 	 * @return array
 	 */
 	protected function remapFieldsToDocumentProperties(array $data, RecordAnalyzer $recordAnalyzer) {
+		$record = $recordAnalyzer->getRecord();
 		$cmisPropertyValues = array(
 			PropertyIds::NAME => $recordAnalyzer->getTitleForRecord(),
-			Constants::CMIS_PROPERTY_RAWDATA => $data
+			Constants::CMIS_PROPERTY_RAWDATA => serialize($data)
 		);
+		$parentUid = $record['pid'];
+		if (0 < $parentUid) {
+			$cmisPropertyValues[PropertyIds::PARENT_ID] = $this->resolveCmisDocumentByTableAndUid('pages', $parentUid)->getId();
+		}
 		return $cmisPropertyValues;
 	}
 
