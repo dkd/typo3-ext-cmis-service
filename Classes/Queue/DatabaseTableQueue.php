@@ -45,13 +45,15 @@ class DatabaseTableQueue implements QueueInterface {
 	 * instead, each queue record contains the type of task and the
 	 * parameters it had when originally added to the queue.
 	 *
-	 * @return TaskInterface
+	 * @return TaskInterface|NULL
 	 */
 	public function pick() {
 		$data = $this->performDatabaseQuery(self::QUERY_PICK);
 		if ($data) {
 			// data loaded; delete the queue record immediately.
 			$this->performDatabaseQuery(self::QUERY_DELETE, array($data['uid']));
+		} else {
+			return NULL;
 		}
 		$class = $data['task_class'];
 		if (!is_a($class, 'Dkd\\CmisService\\Task\\TaskInterface', TRUE)) {
