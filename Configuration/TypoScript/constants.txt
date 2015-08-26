@@ -23,6 +23,8 @@ plugin.tx_cmisservice.settings {
                 password =
                 # CMIS Repository ID of repository to use as primary content repository
                 contentRepositoryId = -default-
+                # Optional UUID of folder to use as root for storing CMIS documents on this server. Empty for root level.
+                root =
             }
         }
         server = default

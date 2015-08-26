@@ -15,6 +15,7 @@ class CmisConfiguration extends AbstractConfigurationDefinition implements Confi
 	const USERNAME = 'username';
 	const PASSWORD = 'password';
 	const BINDINGTYPE = 'bindingType';
+	const ROOT_UUID = 'root';
 
 	/**
 	 * @var array

@@ -27,6 +27,7 @@ plugin.tx_cmisservice.settings {
                 username = {$plugin.tx_cmisservice.settings.cmis.servers.default.username}
                 password = {$plugin.tx_cmisservice.settings.cmis.servers.default.password}
                 contentRepositoryId = {$plugin.tx_cmisservice.settings.cmis.servers.default.contentRepositoryId}
+                root = {$plugin.tx_cmisservice.settings.cmis.servers.default.root}
             }
         }
         server = {$plugin.tx_cmisservice.settings.cmis.server}

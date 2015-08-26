@@ -4,6 +4,7 @@ namespace Dkd\CmisService\Execution\Cmis;
 use Dkd\CmisService\Analysis\Detection\ExtractionMethodDetector;
 use Dkd\CmisService\Analysis\Detection\IndexableColumnDetector;
 use Dkd\CmisService\Analysis\RecordAnalyzer;
+use Dkd\CmisService\Configuration\Definitions\CmisConfiguration;
 use Dkd\CmisService\Constants;
 use Dkd\CmisService\Execution\AbstractExecution;
 use Dkd\CmisService\Factory\CmisObjectFactory;
@@ -71,7 +72,13 @@ abstract class AbstractCmisExecution extends AbstractExecution {
 			$record = $this->loadRecordFromDatabase($table, $uid, $fields);
 			$parentPageUid = (integer) $record['pid'];
 			if (0 === $parentPageUid) {
-				$parentFolder = $session->getRootFolder();
+				$configuredRootUuid = $this->getObjectFactory()->getConfiguration()
+					->getCmisConfiguration()->get(CmisConfiguration::ROOT_UUID);
+				if (TRUE === empty($configuredRootUuid)) {
+					$parentFolder = $session->getRootFolder();
+				} else {
+					$parentFolder = $session->getObject($session->createObjectId($configuredRootUuid));
+				}
 			} else {
 				$parentFolder = $this->resolveCmisDocumentByTableAndUid('pages', $parentPageUid);
 			}
@@ -214,11 +221,17 @@ abstract class AbstractCmisExecution extends AbstractExecution {
 	 * @return void
 	 */
 	protected function storeCmisUuidLocallyForRecord($table, $uid, $objectId) {
+		$versionNeedle = strpos($objectId, ';');
+		if (FALSE !== $versionNeedle) {
+			$uuid = substr($objectId, 0, $versionNeedle);
+		} else {
+			$uuid = $objectId;
+		}
 		$this->getDatabaseConnection()->exec_UPDATEquery(
 			'sys_identity',
 			sprintf("foreign_uid = %d AND foreign_tablename = '%s'", $uid, $table),
 			array(
-				'cmis_uuid' => $objectId
+				'cmis_uuid' => $uuid
 			)
 		);
 	}
