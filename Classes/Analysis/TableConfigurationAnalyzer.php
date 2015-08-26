@@ -24,6 +24,19 @@ use Dkd\CmisService\Analysis\Detection\IndexableColumnDetector;
 class TableConfigurationAnalyzer {
 
 	/**
+	 * @var array
+	 */
+	protected static $excludedTableNames = array(
+		'sys_log',
+		'sys_history',
+		'sys_file',
+		'sys_file_metadata',
+		'sys_file_storage',
+		'tx_extensionmanager_domain_model_extension',
+		'tx_extensionmanager_domain_model_repository'
+	);
+
+	/**
 	 * Fast method for returning names-only of tables
 	 * which contain at least one potentially indexed
 	 * field. System configuration of individual fields
@@ -39,6 +52,9 @@ class TableConfigurationAnalyzer {
 		$tables = $this->getAllTableNames();
 		$indexable = array();
 		foreach ($tables as $table) {
+			if (TRUE === in_array($table, self::$excludedTableNames)) {
+				continue;
+			}
 			$fields = $this->getAllFieldNamesOfTable($table);
 			foreach ($fields as $field) {
 				if (TRUE === $columnDetector->isFieldPotentiallyIndexable($table, $field)) {
