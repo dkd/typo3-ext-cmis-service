@@ -52,7 +52,14 @@ abstract class AbstractExecution implements ExecutionInterface {
 	 */
 	protected function loadRecordFromDatabase($table, $uid, array $fields) {
 		$fieldList = implode(',', $fields);
-		return $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fieldList, $table, "uid = '" . $uid . "'");
+		return $this->getDatabaseConnection()->exec_SELECTgetSingleRow($fieldList, $table, "uid = '" . $uid . "'");
+	}
+
+	/**
+	 * @return DatabaseConnection
+	 */
+	protected function getDatabaseConnection() {
+		return $GLOBALS['TYPO3_DB'];
 	}
 
 	/**

@@ -4,6 +4,7 @@ namespace Dkd\CmisService\Queue;
 use Dkd\CmisService\Factory\WorkerFactory;
 use Dkd\CmisService\Task\TaskFilterInterface;
 use Dkd\CmisService\Task\TaskInterface;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /**
  * Class DatabaseTableQueue
@@ -115,14 +116,22 @@ class DatabaseTableQueue implements QueueInterface {
 	 */
 	protected function performDatabaseQuery($query, array $parameters = array()) {
 		$query = vsprintf($query, $parameters);
-		$result = $GLOBALS['TYPO3_DB']->sql_query($query);
+		$result = $this->getDatabaseConnection()->sql_query($query);
 		if ($result ) {
 			if (is_object($result)) {
-				return $GLOBALS['TYPO3_DB']->sql_fetch_assoc($result);
+				return $this->getDatabaseConnection()->sql_fetch_assoc($result);
 			}
 			return $result;
 		}
 		return FALSE;
+	}
+
+	/**
+	 * @return DatabaseConnection
+	 * @codeCoverageIgnore
+	 */
+	protected function getDatabaseConnection() {
+		return $GLOBALS['TYPO3_DB'];
 	}
 
 }

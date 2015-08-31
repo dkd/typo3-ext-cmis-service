@@ -2,7 +2,6 @@
 namespace Dkd\CmisService\Tests\Unit\Command;
 
 use Dkd\CmisService\Command\CmisCommandController;
-use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Tests\Fixtures\Queue\DummyWorker;
 use Dkd\CmisService\Tests\Fixtures\Task\DummyTask;
 use TYPO3\CMS\Core\Core\Bootstrap;

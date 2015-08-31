@@ -1,8 +1,8 @@
 <?php
 namespace Dkd\CmisService\Hook;
 
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Dkd\CmisService\Configuration\ConfigurationManager;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
  * Clear Cache Listener

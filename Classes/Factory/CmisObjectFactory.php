@@ -1,10 +1,9 @@
 <?php
 namespace Dkd\CmisService\Factory;
 
-use Dkd\CmisService\Configuration\Definitions\CmisConfiguration;
 use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
-use Dkd\PhpCmis\SessionInterface;
 use Dkd\PhpCmis\SessionFactory;
+use Dkd\PhpCmis\SessionInterface;
 
 /**
  * Class CmisObjectFactory
