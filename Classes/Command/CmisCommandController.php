@@ -15,7 +15,6 @@ use Dkd\CmisService\Task\TaskInterface;
 use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
 use Dkd\PhpCmis\Data\DocumentInterface;
 use Dkd\PhpCmis\Data\FolderInterface;
-use Dkd\PhpCmis\PropertyIds;
 use Symfony\Component\Yaml\Yaml;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use TYPO3\CMS\Frontend\Page\PageRepository;
@@ -263,14 +262,15 @@ class CmisCommandController extends CommandController {
 	 * This CLI command circumvents the Queue and directly
 	 * executes the InitializationTask.
 	 *
+	 * @param boolean $verbose If TRUE (1) will output additional information about payloads
 	 * @return void
 	 */
-	public function initializeCommand() {
+	public function initializeCommand($verbose = FALSE) {
 		$taskFactory = $this->getTaskFactory();
 		$initializationTask = $taskFactory->createInitializationTask();
 		$worker = $this->getWorkerFactory()->createWorker();
 		$result = $worker->execute($initializationTask);
-		$this->echoResultToConsole($result);
+		$this->echoResultToConsole($result, $verbose);
 		$this->getObjectFactory()->getLogger()->info('Initialization performed', $this->logContexts);
 	}
 
