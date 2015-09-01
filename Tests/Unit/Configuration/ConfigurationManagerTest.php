@@ -42,6 +42,33 @@ class ConfigurationManagerTest extends UnitTestCase {
 	}
 
 	/**
+	 * @param array $values
+	 * @param string $path
+	 * @param mixed $expected
+	 * @dataProvider getGlobalConfigurationTestValues
+	 * @return void
+	 */
+	public function testGetGlobalConfiguration(array $values, $path, $expected) {
+		$dummyReader = new DummyReader();
+		$manager = new ConfigurationManager($dummyReader, NULL, NULL, $values);
+		$this->assertEquals($expected, $manager->getGlobalConfiguration($path));
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getGlobalConfigurationTestValues() {
+		return array(
+			array(array(), NULL, array()),
+			array(array('test' => 'foobar'), 'test', 'foobar'),
+			array(array('test' => array('test2' => 'foobar')), 'test.test2', 'foobar'),
+			array(array('test' => array('test2' => 'foobar')), 'test.notfound', NULL),
+			array(array('test' => array('test1' => 'baz', 'test2' => 'foobar')), array('test.notfound', 'test.test2'), 'foobar'),
+			array(array('test' => array('test1' => 'baz', 'test2' => 'foobar')), array('test.test1', 'test.notfound'), 'baz'),
+		);
+	}
+
+	/**
 	 * Unit test
 	 *
 	 * @test

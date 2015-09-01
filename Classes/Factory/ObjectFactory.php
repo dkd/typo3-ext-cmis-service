@@ -4,7 +4,6 @@ namespace Dkd\CmisService\Factory;
 use Dkd\CmisService\Configuration\ConfigurationManager;
 use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
 use Dkd\CmisService\Resolving\UUIDResolver;
-use Maroschik\Identity\IdentityMap;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -64,6 +63,7 @@ class ObjectFactory {
 	 *
 	 * @param string $className
 	 * @return mixed
+	 * @codeCoverageIgnore // untestable due to object manager
 	 */
 	public function makeInstance($className) {
 		/** @var ObjectManagerInterface $manager */
@@ -125,13 +125,6 @@ class ObjectFactory {
 			self::$logger = $this->makeInstance('TYPO3\\CMS\\Core\\Log\\LogManager')->getLogger(self::LOGGER_NAME);
 		}
 		return self::$logger;
-	}
-
-	/**
-	 * @return IdentityMap
-	 */
-	public function getIdentityMap() {
-		return new IdentityMap();
 	}
 
 	/**

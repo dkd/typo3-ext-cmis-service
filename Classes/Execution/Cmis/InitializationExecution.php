@@ -3,13 +3,10 @@ namespace Dkd\CmisService\Execution\Cmis;
 
 use Dkd\CmisService\CmisApi;
 use Dkd\CmisService\Constants;
-use Dkd\CmisService\Execution\Cmis\AbstractCmisExecution;
 use Dkd\CmisService\Execution\ExecutionInterface;
 use Dkd\CmisService\Execution\Result;
-use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Task\InitializationTask;
 use Dkd\CmisService\Task\TaskInterface;
-use Dkd\PhpCmis\Exception\CmisContentAlreadyExistsException;
 use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
 
 /**
@@ -29,9 +26,9 @@ class InitializationExecution extends AbstractCmisExecution implements Execution
 	 * @var array
 	 */
 	protected $requiredCustomTypes = array(
-		Constants::CMIS_PROPERTY_TYPO3UUID,
-		Constants::CMIS_PROPERTY_TYPO3TABLE,
-		Constants::CMIS_PROPERTY_TYPO3UID,
+		Constants::CMIS_DOCUMENT_TYPE_ARBITRARY,
+		Constants::CMIS_DOCUMENT_TYPE_PAGES,
+		Constants::CMIS_DOCUMENT_TYPE_CONTENT
 	);
 
 	/**
@@ -52,7 +49,12 @@ class InitializationExecution extends AbstractCmisExecution implements Execution
 	}
 
 	/**
-	 * Evict a document from the index.
+	 * Initialize the CMIS integrations:
+	 *
+	 * - Verify that the current CMIS server can
+	 *   operate our special TYPO3 objects.
+	 * - Initialize the CMIS storage by creating
+	 *   a special "Site" folder to use as root.
 	 *
 	 * @param InitializationTask $task
 	 * @return Result
@@ -62,6 +64,7 @@ class InitializationExecution extends AbstractCmisExecution implements Execution
 		$this->result = $this->createResultObject();
 		try {
 			$this->validatePresenceOfCustomCmisTypes($this->requiredCustomTypes);
+			$this->createCmisSitesForFirstDomainOfAllRootPages();
 			$this->result->setMessage('CMIS Repository initialized!');
 		} catch (\InvalidArgumentException $error) {
 			$this->result->setCode(Result::ERR);
@@ -72,6 +75,29 @@ class InitializationExecution extends AbstractCmisExecution implements Execution
 	}
 
 	/**
+	 * Uses the shared execution logic to ensure
+	 * that every recorded domain has a Site folder
+	 * in CMIS - by simply attempting to resolve
+	 * each one. The ad-hoc folder creation logic
+	 * then takes care of the rest.
+	 *
+	 * @return void
+	 */
+	protected function createCmisSitesForFirstDomainOfAllRootPages() {
+		$pagesWithDomainRecords = $this->getDatabaseConnection()->exec_SELECTgetRows(
+			'pid', 'sys_domain', 'hidden = 0', 'pid', 'sorting ASC'
+		);
+		$pageUids = array_map('reset', $pagesWithDomainRecords);
+		foreach ($pageUids as $pageUid) {
+			$this->getCmisService()->resolveCmisSiteFolderByPageUid($pageUid);
+		}
+	}
+
+	/**
+	 * Verifies that all required types exist in the
+	 * CMIS server, including those types added via
+	 * the custom TYPO3 CMIS model.
+	 *
 	 * @param array $typeIds
 	 * @throws CmisObjectNotFoundException
 	 */
@@ -80,13 +106,6 @@ class InitializationExecution extends AbstractCmisExecution implements Execution
 		foreach ($typeIds as $typeId) {
 			$session->getTypeDefinition($typeId);
 		}
-	}
-
-	/**
-	 * @return ObjectFactory
-	 */
-	protected function getObjectFactory() {
-		return new ObjectFactory();
 	}
 
 }

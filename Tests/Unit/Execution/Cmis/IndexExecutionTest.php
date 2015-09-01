@@ -49,13 +49,23 @@ class IndexExecutionTest extends UnitTestCase {
 	 */
 	public function executeCreatesResultObjectAndStoresAsProperty() {
 		$result = new Result();
+		$cmisService = $this->getMock('Dkd\\CmisService\\Service\\CmisService', array(
+			'resolveObjectByTableAndUid'
+		));
 		$instance = $this->getMock(
 			'Dkd\\CmisService\\Execution\\Cmis\\IndexExecution',
-			array('createResultObject', 'loadRecordFromDatabase', 'performTextExtraction', 'resolveCmisDocumentByTableAndUid')
+			array(
+				'createResultObject',
+				'loadRecordFromDatabase',
+				'performTextExtraction',
+				'getCmisService'
+			)
 		);
+
 		$document = $this->getMock('Dkd\\PhpCmis\\DataObjects\\Document', array(), array(), '', FALSE);
 		$instance->expects($this->once())->method('createResultObject')->will($this->returnValue($result));
-		$instance->expects($this->once())->method('resolveCmisDocumentByTableAndUid')->will($this->returnValue($document));
+		$instance->expects($this->atLeastOnce())->method('getCmisService')->willReturn($cmisService);
+		$cmisService->expects($this->atLeastOnce())->method('resolveObjectByTableAndUid')->will($this->returnValue($document));
 		$task = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask', array('getParameter'));
 		$task->expects($this->at(0))->method('getParameter')
 			->with(RecordIndexTask::OPTION_FIELDS)

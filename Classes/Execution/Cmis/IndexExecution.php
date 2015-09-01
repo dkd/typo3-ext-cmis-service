@@ -59,7 +59,7 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 		}
 		$recordAnalyzer = new RecordAnalyzer($table, $record);
 		$cmisPropertyValues = $this->remapFieldsToDocumentProperties($data, $recordAnalyzer);
-		$document = $this->resolveCmisDocumentByTableAndUid($table, $uid);
+		$document = $this->getCmisService()->resolveObjectByTableAndUid($table, $uid);
 		$document->updateProperties($cmisPropertyValues);
 		if (TRUE === (boolean) $task->getParameter(RecordIndexTask::OPTION_RELATIONS)) {
 			// The Task was configured to also index the relations from
@@ -117,7 +117,8 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 		);
 		$parentUid = $record['pid'];
 		if (0 < $parentUid) {
-			$cmisPropertyValues[PropertyIds::PARENT_ID] = $this->resolveCmisDocumentByTableAndUid('pages', $parentUid)->getId();
+			$cmisPropertyValues[PropertyIds::PARENT_ID] = $this->getCmisService()
+				->resolveObjectByTableAndUid('pages', $parentUid)->getId();
 		}
 		return $cmisPropertyValues;
 	}

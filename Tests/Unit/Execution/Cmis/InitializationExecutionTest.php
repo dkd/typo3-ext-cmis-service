@@ -50,9 +50,10 @@ class InitializationExecutionTest extends UnitTestCase {
 		$task = new DummyTask();
 		$execution = $this->getMock(
 			'Dkd\\CmisService\\Execution\\Cmis\\InitializationExecution',
-			array('validatePresenceOfCustomCmisTypes')
+			array('validatePresenceOfCustomCmisTypes', 'createCmisSitesForFirstDomainOfAllRootPages')
 		);
 		$execution->expects($this->once())->method('validatePresenceOfCustomCmisTypes');
+		$execution->expects($this->once())->method('createCmisSitesForFirstDomainOfAllRootPages');
 		$result = $execution->execute($task);
 		$this->assertInstanceOf('Dkd\\CmisService\\Execution\\Result', $result);
 	}
