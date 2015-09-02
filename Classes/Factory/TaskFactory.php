@@ -20,10 +20,10 @@ class TaskFactory {
 	 */
 	public function createRecordIndexingTask($table, $uid, $fields = NULL, $includeRelations = FALSE) {
 		$task = new RecordIndexTask();
-		$task->setParameter(RecordIndexTask::OPTION_TABLE, $table);
-		$task->setParameter(RecordIndexTask::OPTION_UID, $uid);
-		$task->setParameter(RecordIndexTask::OPTION_FIELDS, $fields);
-		$task->setParameter(RecordIndexTask::OPTION_RELATIONS, $includeRelations);
+		$task->setParameter(RecordIndexTask::OPTION_TABLE, (string) $table);
+		$task->setParameter(RecordIndexTask::OPTION_UID, (integer) $uid);
+		$task->setParameter(RecordIndexTask::OPTION_FIELDS, (array) $fields);
+		$task->setParameter(RecordIndexTask::OPTION_RELATIONS, (boolean) $includeRelations);
 		return $task;
 	}
 
@@ -36,8 +36,8 @@ class TaskFactory {
 	 */
 	public function createEvictionTask($table, $uid = NULL) {
 		$task = new EvictionTask();
-		$task->setParameter(EvictionTask::OPTION_TABLE, $table);
-		$task->setParameter(EvictionTask::OPTION_UID, $uid);
+		$task->setParameter(EvictionTask::OPTION_TABLE, (string) $table);
+		$task->setParameter(EvictionTask::OPTION_UID, (integer) $uid);
 		return $task;
 	}
 
