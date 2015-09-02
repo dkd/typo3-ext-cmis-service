@@ -33,11 +33,21 @@ class CmisServiceTest extends UnitTestCase {
 	 */
 	public function testResolveCmisDocumentByTableAndUidCatchesDocumentNotFoundExceptionsAndCreatesDocument() {
 		$exception = new CmisObjectNotFoundException();
-		$document = $this->getMock('Dkd\\PhpCmis\\DataObjects\\Document', array(), array(), '', FALSE);
+		$document = $this->getMock('Dkd\\PhpCmis\\DataObjects\\Document', array('dummy'), array(), '', FALSE);
 		$uuid = 'abc';
-		$folder = $this->getMock('Dkd\\PhpCmis\\DataObjects\\Folder', array(), array(), '', FALSE);
-		$session = $this->getMock('Dkd\\PhpCmis\\Session', array('getRootFolder'), array(), '', FALSE);
+		$folder = $this->getMock('Dkd\\PhpCmis\\DataObjects\\Folder', array('getChildren'), array(), '', FALSE);
+		$folder->expects($this->atLeastOnce())->method('getChildren')->willReturn(array());
+		$type = $this->getMock('Dkd\\PhpCmis\\DataObjects\\TypeDefinition', array('getId'));
+		$type->expects($this->any())->method('getId')->willReturn('id');
+		$session = $this->getMock(
+			'Dkd\\PhpCmis\\Session',
+			array('getRootFolder', 'getTypeDefinition', 'createFolder', 'getObject'),
+			array(), '', FALSE
+		);
+		$session->expects($this->once())->method('createFolder')->willReturn($folder);
+		$session->expects($this->atLeastOnce())->method('getTypeDefinition')->willReturn($type);
 		$session->expects($this->once())->method('getRootFolder')->willReturn($folder);
+		$session->expects($this->atLeastOnce())->method('getObject')->willReturn($folder);
 		$instance = $this->getCmisServiceMock(
 			array(
 				'createCmisObject',

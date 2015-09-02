@@ -14,6 +14,7 @@ use Dkd\PhpCmis\DataObjects\FolderTypeDefinition;
 use Dkd\PhpCmis\Definitions\TypeDefinitionInterface;
 use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
 use Dkd\PhpCmis\PropertyIds;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /**
  * CMIS Service
@@ -32,6 +33,19 @@ class CmisService implements SingletonInterface {
 	protected $logContexts = array('cmis_service', 'service', 'cmis');
 
 	/**
+	 * @param string $table
+	 * @param integer $uid
+	 * @return array|NULL
+	 */
+	protected function getIdentityStorageRecord($table, $uid) {
+		return $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+			'cmis_uuid',
+			'sys_identity',
+			sprintf("foreign_uid = %d AND foreign_tablename = '%s'", $uid, $table)
+		);
+	}
+
+	/**
 	 * Get the CMIS-generated UUID for a local record,
 	 * pulled from local storage. Save UUIDs using the
 	 * storeUuidLocallyForRecord() method.
@@ -41,11 +55,7 @@ class CmisService implements SingletonInterface {
 	 * @return string|NULL
 	 */
 	public function getUuidForLocalRecord($table, $uid) {
-		$record = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
-			'cmis_uuid',
-			'sys_identity',
-			sprintf("foreign_uid = %d AND foreign_tablename = '%s'", $uid, $table)
-		);
+		$record = $this->getIdentityStorageRecord($table, $uid);
 		if (empty($record['cmis_uuid'])) {
 			throw new CmisObjectNotFoundException('Local UUID not detected, no CMIS document can be loaded');
 		}
@@ -68,13 +78,25 @@ class CmisService implements SingletonInterface {
 		} else {
 			$uuid = $objectId;
 		}
-		$this->getDatabaseConnection()->exec_UPDATEquery(
-			'sys_identity',
-			sprintf("foreign_uid = %d AND foreign_tablename = '%s'", $uid, $table),
-			array(
-				'cmis_uuid' => $uuid
-			)
-		);
+		$record = $this->getIdentityStorageRecord($table, $uid);
+		if ($record) {
+			$this->getDatabaseConnection()->exec_UPDATEquery(
+				'sys_identity',
+				sprintf("foreign_uid = %d AND foreign_tablename = '%s'", $uid, $table),
+				array(
+					'cmis_uuid' => $uuid
+				)
+			);
+		} else {
+			$this->getDatabaseConnection()->exec_INSERTquery(
+				'sys_identity',
+				array(
+					'cmis_uuid' => $uuid,
+					'foreign_uid' => $uid,
+					'foreign_tablename' => $table
+				)
+			);
+		}
 	}
 
 	/**
@@ -234,20 +256,50 @@ class CmisService implements SingletonInterface {
 				$parentFolder = $this->resolveCmisSitesParentFolder();
 			} elseif (NULL !== $domainRecord) {
 				// Domain record detected; has priority. Store CMIS object in Site folder.
-				$parentFolder = $this->resolveCmisSiteFolderByPageUid($uid);
+				$parentFolder = $this->resolveCmisSiteFolderByPageUid($parentPageUid);
 			} elseif (0 < $parentPageUid) {
-				// Standard page without domain and with parent; store under parent page.
+				// Standard record without domain and with parent; store under parent page.
 				$parentFolder = $this->resolveObjectByTableAndUid('pages', $parentPageUid);
 			} elseif (FALSE === empty($configuredRootUuid)) {
 				// Page UID is zero; page has no domain; a top point is configured. Use it.
 				$parentFolder = $session->getObject($session->createObjectId($configuredRootUuid));
 			} else {
-				// Page UID is zero; page has no domain; no top poin is configured. Use root.
-				$parentFolder = $session->getRootFolder();
+				// Page UID is zero; page has no domain; no top point is configured. Resolve
+				// hostname or IP and use as site folder.
+				$hostname = $this->resolveHostname();
+				$sitesParentFolder = $this->resolveCmisSitesParentFolder();
+				$parentFolder = NULL;
+				foreach ($sitesParentFolder->getChildren() as $site) {
+					if ($site->getName() === $hostname) {
+						$parentFolder = $site;
+						break;
+					}
+				}
+				if (NULL === $parentFolder) {
+					$createdFolder = $session->createFolder(array(
+						PropertyIds::NAME => $hostname,
+						PropertyIds::DESCRIPTION => 'Global records from page UID zero on host ' . $hostname,
+						PropertyIds::OBJECT_TYPE_ID => Constants::CMIS_DOCUMENT_TYPE_SITE,
+						PropertyIds::SECONDARY_OBJECT_TYPE_IDS => array(
+							$session->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_MAIN_ASPECT)->getId(),
+							$session->getTypeDefinition('P:cm:titled')->getId(),
+							$session->getTypeDefinition('P:cm:ownable')->getId(),
+							$session->getTypeDefinition('P:sys:undeletable')->getId()
+						)
+					), $sitesParentFolder);
+					$parentFolder = $session->getObject($createdFolder);
+				}
 			}
 			$document = $this->createCmisObject($parentFolder, $table, $uid);
 		}
 		return $document;
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function resolveHostname() {
+		return trim(shell_exec('hostname'));
 	}
 
 	/**
@@ -373,6 +425,22 @@ class CmisService implements SingletonInterface {
 	public function createCmisObject(FolderInterface $folder, $table, $uid, array $properties = NULL) {
 		if (NULL === $properties) {
 			$properties = $this->resolvePropertiesForTableAndUid($table, $uid);
+		}
+
+		foreach ($folder->getChildren() as $child) {
+			if ($child->getName() === $properties[PropertyIds::NAME]) {
+				$objectId = $child->getId();
+				$this->storeUuidLocallyForRecord($table, $uid, $objectId);
+				$this->getObjectFactory()->getLogger()->info(
+					sprintf(
+						'Existing CMIS Object (%s) used instead of creating new, ID: %s',
+						$type,
+						$objectId
+					),
+					$this->logContexts
+				);
+				return $child;
+			}
 		}
 
 		$session = $this->getCmisObjectFactory()->getSession();
