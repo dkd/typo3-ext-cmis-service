@@ -5,6 +5,7 @@ use Dkd\CmisService\Analysis\Detection\ExtractionMethodDetector;
 use Dkd\CmisService\Analysis\RecordAnalyzer;
 use Dkd\CmisService\Analysis\TableConfigurationAnalyzer;
 use Dkd\CmisService\Constants;
+use Dkd\CmisService\Execution\Exception;
 use Dkd\CmisService\Execution\ExecutionInterface;
 use Dkd\CmisService\Execution\Result;
 use Dkd\CmisService\Factory\ObjectFactory;
@@ -44,6 +45,7 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 	 *
 	 * @param RecordIndexTask $task
 	 * @return Result
+	 * @throws Exception
 	 */
 	public function execute(TaskInterface $task) {
 		$objectFactory = new ObjectFactory();
@@ -53,6 +55,16 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 		$table = $task->getParameter(RecordIndexTask::OPTION_TABLE);
 		$uid = $task->getParameter(RecordIndexTask::OPTION_UID);
 		$record = $this->loadRecordFromDatabase($table, $uid, $fields);
+		if (NULL === $record) {
+			throw new Exception(
+				sprintf(
+					'Record %d from table %s not loaded. Record removed or invalid fields requested? (fields requested: %s)',
+					$uid,
+					$table,
+					implode(', ', $fields)
+				)
+			);
+		}
 		$data = array();
 		foreach ($fields as $fieldName) {
 			$data[$fieldName] = $this->performTextExtraction($table, $uid, $fieldName, $record);

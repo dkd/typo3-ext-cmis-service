@@ -47,6 +47,41 @@ class IndexExecutionTest extends UnitTestCase {
 	 * @test
 	 * @return void
 	 */
+	public function executeThrowsExecutionExceptionIfRecordNotLoaded() {
+		$result = new Result();
+		$instance = $this->getMock(
+			'Dkd\\CmisService\\Execution\\Cmis\\IndexExecution',
+			array(
+				'createResultObject',
+				'loadRecordFromDatabase'
+			)
+		);
+
+		$instance->expects($this->once())->method('createResultObject')->will($this->returnValue($result));
+
+		$task = $this->getMock('Dkd\\CmisService\\Tests\\Fixtures\\Task\\DummyTask', array('getParameter'));
+		$task->expects($this->at(0))->method('getParameter')
+			->with(RecordIndexTask::OPTION_FIELDS)
+			->will($this->returnValue(array('uid', 'pid')));
+		$task->expects($this->at(1))->method('getParameter')
+			->with(RecordIndexTask::OPTION_TABLE)
+			->will($this->returnValue('tt_content'));
+		$task->expects($this->at(2))->method('getParameter')
+			->with(RecordIndexTask::OPTION_UID)
+			->will($this->returnValue(123));
+		$instance->expects($this->once())->method('loadRecordFromDatabase')
+			->with('tt_content', 123, array('uid', 'pid'))
+			->will($this->returnValue(NULL));
+		$this->setExpectedException('Dkd\\CmisService\\Execution\\Exception');
+		$instance->execute($task);
+	}
+
+	/**
+	 * Unit test
+	 *
+	 * @test
+	 * @return void
+	 */
 	public function executeCreatesResultObjectAndStoresAsProperty() {
 		$result = new Result();
 		$cmisService = $this->getMock('Dkd\\CmisService\\Service\\CmisService', array(
