@@ -1,6 +1,8 @@
 <?php
 namespace Dkd\CmisService\Execution;
 
+use Dkd\CmisService\Error\DatabaseCallException;
+use Dkd\CmisService\Error\RecordNotFoundException;
 use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Task\TaskInterface;
 
@@ -48,11 +50,20 @@ abstract class AbstractExecution implements ExecutionInterface {
 	 * @param string $table
 	 * @param integer $uid
 	 * @param array $fields
-	 * @return array|FALSE
+	 * @return array
+	 * @throws RecordNotFoundException
+	 * @throws DatabaseCallException
 	 */
 	protected function loadRecordFromDatabase($table, $uid, array $fields) {
 		$fieldList = implode(',', $fields);
-		return $this->getDatabaseConnection()->exec_SELECTgetSingleRow($fieldList, $table, "uid = '" . $uid . "'");
+		$database = $this->getDatabaseConnection();
+		$result = $database->exec_SELECTgetSingleRow($fieldList, $table, "uid = '" . $uid . "'");
+		if (NULL === $result) {
+			throw new DatabaseCallException($database->sql_error(), 1442925435);
+		} elseif (FALSE === $result) {
+			throw new RecordNotFoundException(sprintf('Record %d from table %s could not be loaded', $uid, $table), 1442925436);
+		}
+		return $result;
 	}
 
 	/**

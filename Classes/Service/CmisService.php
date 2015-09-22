@@ -8,6 +8,8 @@ use Dkd\CmisService\Constants;
 use Dkd\CmisService\Factory\CmisObjectFactory;
 use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\SingletonInterface;
+use Dkd\CmisService\Error\RecordNotFoundException;
+use Dkd\CmisService\Error\DatabaseCallException;
 use Dkd\PhpCmis\Data\FolderInterface;
 use Dkd\PhpCmis\DataObjects\DocumentTypeDefinition;
 use Dkd\PhpCmis\DataObjects\FolderTypeDefinition;
@@ -182,11 +184,11 @@ class CmisService implements SingletonInterface {
 	 * @return array
 	 */
 	public function resolvePropertiesForTableAndUid($table, $uid) {
-		$properties = $this->readDefaultPropertyValuesForTableFromConfiguration($table);
 		$columnDetector = new IndexableColumnDetector();
 		$columns = $columnDetector->getIndexableColumnNamesFromTable($table);
 		$record = $this->loadRecordFromDatabase($table, $uid, $columns);
 		$recordAnalyzer = new RecordAnalyzer($table, $record);
+		$properties = $this->readDefaultPropertyValuesForTableFromConfiguration($table);
 		$properties[PropertyIds::NAME] = $recordAnalyzer->getTitleForRecord();
 		$properties[Constants::CMIS_PROPERTY_TYPO3TABLE] = $table;
 		$properties[Constants::CMIS_PROPERTY_TYPO3UID] = (integer) $uid;
@@ -498,16 +500,29 @@ class CmisService implements SingletonInterface {
 
 	/**
 	 * Wrapper function to load a single database record,
-	 * identified by $uid.
+	 * identified by $uid. Throws a CmisService-specific
+	 * Exception if the record could not be loaded - this
+	 * method is only used to load existing records and
+	 * a failure indicates a failure in table name, uid
+	 * or field names.
 	 *
 	 * @param string $table
 	 * @param integer $uid
 	 * @param array $fields
-	 * @return array|FALSE
+	 * @return array
+	 * @throws RecordNotFoundException
+	 * @throws DatabaseCallException
 	 */
 	protected function loadRecordFromDatabase($table, $uid, array $fields) {
 		$fieldList = implode(',', $fields);
-		return $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow($fieldList, $table, "uid = '" . $uid . "'");
+		$database = $this->getDatabaseConnection();
+		$result = $database->exec_SELECTgetSingleRow($fieldList, $table, "uid = '" . $uid . "'");
+		if (NULL === $result) {
+			throw new DatabaseCallException($database->sql_error(), 1442925222);
+		} elseif (FALSE === $result) {
+			throw new RecordNotFoundException(sprintf('Record %d from table %s could not be loaded', $uid, $table), 1442925279);
+		}
+		return $result;
 	}
 
 	/**

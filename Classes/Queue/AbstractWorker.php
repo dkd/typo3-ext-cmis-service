@@ -1,6 +1,8 @@
 <?php
 namespace Dkd\CmisService\Queue;
 
+use Dkd\CmisService\CmisServiceException;
+use Dkd\CmisService\Error\RecordNotFoundException;
 use Dkd\CmisService\Execution\Result;
 use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Task\TaskInterface;
@@ -38,6 +40,10 @@ abstract class AbstractWorker implements WorkerInterface {
 			// we only catch misconfigured Tasks' errors
 			// here and allow errors raised during execution
 			// to bubble up, by not catching ->execute().
+			$result = $this->createErrorResult($error);
+		} catch (RecordNotFoundException $error) {
+			$result = new Result($error . '; skipping silently');
+		} catch (CmisServiceException $error) {
 			$result = $this->createErrorResult($error);
 		}
 		$this->getObjectFactory()->getLogger()->log($result->getCode(), $result->getMessage(), $this->logContexts);
