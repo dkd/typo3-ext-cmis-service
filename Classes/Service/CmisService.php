@@ -10,12 +10,14 @@ use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\SingletonInterface;
 use Dkd\CmisService\Error\RecordNotFoundException;
 use Dkd\CmisService\Error\DatabaseCallException;
+use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
 use Dkd\PhpCmis\Data\FolderInterface;
 use Dkd\PhpCmis\DataObjects\DocumentTypeDefinition;
 use Dkd\PhpCmis\DataObjects\FolderTypeDefinition;
 use Dkd\PhpCmis\Definitions\TypeDefinitionInterface;
 use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
 use Dkd\PhpCmis\PropertyIds;
+use Dkd\PhpCmis\SessionInterface;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /**
@@ -189,6 +191,7 @@ class CmisService implements SingletonInterface {
 		$record = $this->loadRecordFromDatabase($table, $uid, $columns);
 		$recordAnalyzer = new RecordAnalyzer($table, $record);
 		$properties = $this->readDefaultPropertyValuesForTableFromConfiguration($table);
+		$properties[PropertyIds::OBJECT_TYPE_ID] = $this->resolvePrimaryObjectTypeForTableAndUid($table, $uid)->getId();
 		$properties[PropertyIds::NAME] = $recordAnalyzer->getTitleForRecord();
 		$properties[Constants::CMIS_PROPERTY_TYPO3TABLE] = $table;
 		$properties[Constants::CMIS_PROPERTY_TYPO3UID] = (integer) $uid;
@@ -268,33 +271,45 @@ class CmisService implements SingletonInterface {
 			} else {
 				// Page UID is zero; page has no domain; no top point is configured. Resolve
 				// hostname or IP and use as site folder.
-				$hostname = $this->resolveHostname();
-				$sitesParentFolder = $this->resolveCmisSitesParentFolder();
-				$parentFolder = NULL;
-				foreach ($sitesParentFolder->getChildren() as $site) {
-					if ($site->getName() === $hostname) {
-						$parentFolder = $site;
-						break;
-					}
-				}
-				if (NULL === $parentFolder) {
-					$createdFolder = $session->createFolder(array(
-						PropertyIds::NAME => $hostname,
-						PropertyIds::DESCRIPTION => 'Global records from page UID zero on host ' . $hostname,
-						PropertyIds::OBJECT_TYPE_ID => Constants::CMIS_DOCUMENT_TYPE_SITE,
-						PropertyIds::SECONDARY_OBJECT_TYPE_IDS => array(
-							$session->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_MAIN_ASPECT)->getId(),
-							$session->getTypeDefinition('P:cm:titled')->getId(),
-							$session->getTypeDefinition('P:cm:ownable')->getId(),
-							$session->getTypeDefinition('P:sys:undeletable')->getId()
-						)
-					), $sitesParentFolder);
-					$parentFolder = $session->getObject($createdFolder);
-				}
+				$parentFolder = $this->getAndAutoCreateDefaultSiteFolder();
 			}
 			$document = $this->createCmisObject($parentFolder, $table, $uid);
 		}
 		return $document;
+	}
+
+	/**
+	 * Gets, and creates if missing, a default Site
+	 * folder based on the hostname of the current host.
+	 *
+	 * @return CmisObjectInterface|NULL
+	 */
+	protected function getAndAutoCreateDefaultSiteFolder() {
+		$session = $this->getCmisObjectFactory()->getSession();
+		$hostname = $this->resolveHostname();
+		$sitesParentFolder = $this->resolveCmisSitesParentFolder();
+		$parentFolder = NULL;
+		foreach ($sitesParentFolder->getChildren() as $site) {
+			if ($site->getName() === $hostname) {
+				$parentFolder = $site;
+				break;
+			}
+		}
+		if (NULL === $parentFolder) {
+			$createdFolder = $session->createFolder(array(
+				PropertyIds::NAME => $hostname,
+				PropertyIds::DESCRIPTION => 'Global records from page UID zero on host ' . $hostname,
+				PropertyIds::OBJECT_TYPE_ID => Constants::CMIS_DOCUMENT_TYPE_SITE,
+				PropertyIds::SECONDARY_OBJECT_TYPE_IDS => array(
+					$session->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_MAIN_ASPECT)->getId(),
+					$session->getTypeDefinition('P:cm:titled')->getId(),
+					$session->getTypeDefinition('P:cm:ownable')->getId(),
+					$session->getTypeDefinition('P:sys:undeletable')->getId()
+				)
+			), $sitesParentFolder);
+			$parentFolder = $session->getObject($createdFolder);
+		}
+		return $parentFolder;
 	}
 
 	/**
@@ -361,17 +376,20 @@ class CmisService implements SingletonInterface {
 	 * @return FolderInterface
 	 */
 	public function resolveCmisSiteFolderByPageUid($pageUid) {
-		$searchPageUid = $pageUid;
-		$domainRecord = $this->resolvePrimaryDomainRecordForPageUid($searchPageUid);
-		while (NULL === $domainRecord && $searchPageUid > 0) {
-			$searchPageUid = (integer) reset(
-				$this->getDatabaseConnection()->exec_SELECTgetSingleRow('pid', 'pages', "uid = '" . $searchPageUid . "'")
-			);
-			$domainRecord = $this->resolvePrimaryDomainRecordForPageUid($searchPageUid);
+		if (0 === (integer) $pageUid) {
+			return $this->getAndAutoCreateDefaultSiteFolder();
 		}
+		$searchPageUid = $pageUid;
+		$domainRecord = NULL;
 		try {
+			while (NULL === $domainRecord && $searchPageUid > 0) {
+				$domainRecord = $this->resolvePrimaryDomainRecordForPageUid($searchPageUid);
+				$searchPageUid = (integer) reset($this->loadRecordFromDatabase('pages', $searchPageUid, array('pid')));
+			}
 			$uuid = $this->getUuidForLocalRecord('sys_domain', $domainRecord['uid']);
 			$folder = $this->resolveObjectByUuid($uuid);
+		} catch (RecordNotFoundException $error) {
+			$folder = $this->getAndAutoCreateDefaultSiteFolder();
 		} catch (CmisObjectNotFoundException $error) {
 			$parent = $this->resolveCmisSitesParentFolder();
 			$folder = $this->createCmisObject($parent, 'sys_domain', $domainRecord['uid']);
