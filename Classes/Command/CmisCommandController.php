@@ -220,15 +220,18 @@ class CmisCommandController extends CommandController {
 			}
 		}
 		$tasks = array_merge($indexingTasks, $relationIndexingTasks);
+		$tableNames = implode(', ', $tables);
 		$queue = $this->getQueue();
 		$queue->addAll($tasks);
+		$tablesSuffix = 1 !== count($tables) ? 's' : '';
 		$countTasks = count($indexingTasks);
+		$tasksSuffix = 1 !== $countTasks ? 's' : '';
 		$countRelations = count($relationIndexingTasks);
-		$messageText = 'Added %d %s task%s for table %s.';
-		$message = sprintf($messageText, $countTasks, 'indexing', (1 !== $countTasks ? 's' : ''), $table) . PHP_EOL;
-		$message .= sprintf($messageText, $countRelations, 'relation indexing', (1 !== $countRelations ? 's' : ''), $table);
+		$relationsSuffix = 1 !== $countRelations ? 's' : '';
+		$messageText = 'Added %d %s task%s for table%s %s.';
+		$message = sprintf($messageText, $countTasks, 'indexing', $tasksSuffix, $tablesSuffix, $tableNames) . PHP_EOL;
+		$message .= sprintf($messageText, $countRelations, 'relation indexing', $relationsSuffix, $tablesSuffix, $tableNames);
 		$this->response->setContent($message . PHP_EOL);
-		$this->response->send();
 		$this->getObjectFactory()->getLogger()->info(sprintf('%s indexing task(s) created', $queue->count()), $this->logContexts);
 	}
 
