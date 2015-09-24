@@ -10,11 +10,39 @@ plugin.tx_cmisservice.settings {
     # for possible attributes to use when manually defining rules
     # for a table.
     tables {
+        sys_domain {
+            enabled = {$plugin.tx_cmisservice.settings.tables.sys_domain.enabled}
+            primaryType = F:dkd:typo3:sys_domain
+            secondaryTypes {
+                0 = P:cm:titled
+                1 = P:cm:localizable
+                2 = P:cm:undeletable
+            }
+        }
+        sys_category {
+            enabled = {$plugin.tx_cmisservice.settings.tables.sys_category.enabled}
+            primaryType = I:cm:category
+            secondaryTypes {
+                0 = P:cm:titled
+            }
+        }
         tt_content {
             enabled = {$plugin.tx_cmisservice.settings.tables.tt_content.enabled}
+            primaryType = D:dkd:typo3:tt_content
+            secondaryTypes {
+                0 = P:cm:titled
+                1 = P:cm:localizable
+                2 = P:cm:ownable
+            }
         }
         pages {
             enabled = {$plugin.tx_cmisservice.settings.tables.pages.enabled}
+            primaryType = F:dkd:typo3:pages
+            secondaryTypes {
+                0 = P:cm:titled
+                1 = P:cm:localizable
+                2 = P:cm:ownable
+            }
         }
     }
 

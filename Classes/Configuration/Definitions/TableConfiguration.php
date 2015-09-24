@@ -39,4 +39,28 @@ class TableConfiguration extends AbstractConfigurationDefinition implements Conf
 		return (array) $this->get($table . '.defaults');
 	}
 
+	/**
+	 * @param string $table
+	 * @return string
+	 */
+	public function getSinglePrimaryType($table) {
+		return (string) $this->get($table . '.primaryType');
+	}
+
+	/**
+	 * @param string $table
+	 * @return array
+	 */
+	public function getSingleSecondaryTypes($table) {
+		return (array) $this->get($table . '.secondaryTypes');
+	}
+
+	/**
+	 * @param string $table
+	 * @return array
+	 */
+	public function getSingleTableMapping($table) {
+		return (array) $this->get($table . '.mapping');
+	}
+
 }

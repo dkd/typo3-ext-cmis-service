@@ -1,6 +1,14 @@
 [global]
 plugin.tx_cmisservice.settings {
     tables {
+        sys_domain {
+            # Enable domain/site indexing to CMIS? Must be ON or indexing of any record not in page UID zero will be disabled.
+            enabled = 1
+        }
+        sys_category {
+            # Enable category indexing to CMIS? Must be ON or all category referencing will be disabled
+            enabled = 1
+        }
         tt_content {
             # Enable content indexing to CMIS?
             enabled = 1

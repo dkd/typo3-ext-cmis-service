@@ -5,5 +5,9 @@ plugin.tx_cmisservice.settings {
             # Enable indexing of EXT:news news-items?
             enabled = 1
         }
+        tx_news_domain_model_tag {
+            # Enable indexing of EXT:news tag records?
+            enabled = 1
+        }
     }
 }
