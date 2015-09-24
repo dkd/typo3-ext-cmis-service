@@ -66,3 +66,5 @@ plugin.tx_cmisservice.settings {
     }
 
 }
+
+module.tx_cmisservice.settings < plugin.tx_cmisservice.settings
