@@ -114,17 +114,19 @@ class CmisService implements SingletonInterface {
 	 * @return TypeDefinitionInterface
 	 */
 	public function resolvePrimaryObjectTypeForTableAndUid($table, $uid) {
-		$session = $this->getCmisObjectFactory()->getSession();
-		if ('pages' === $table) {
-			$type = $session->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_PAGES);
-		} elseif ('tt_content' === $table) {
-			$type = $session->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_CONTENT);
-		} elseif ('sys_domain' === $table) {
-			$type = $session->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_SITE);
-		} else {
-			$type = $session->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_ARBITRARY);
+		$typeId = $this->getObjectFactory()->getConfiguration()->getTableConfiguration()->getSinglePrimaryType($table);
+		if (TRUE === empty($typeId)) {
+			if ('pages' === $table) {
+				$typeId = Constants::CMIS_DOCUMENT_TYPE_PAGES;
+			} elseif ('tt_content' === $table) {
+				$typeId = Constants::CMIS_DOCUMENT_TYPE_CONTENT;
+			} elseif ('sys_domain' === $table) {
+				$typeId = Constants::CMIS_DOCUMENT_TYPE_SITE;
+			} else {
+				$typeId = Constants::CMIS_DOCUMENT_TYPE_ARBITRARY;
+			}
 		}
-		return $type;
+		return $this->getCmisObjectFactory()->getSession()->getTypeDefinition($typeId);
 	}
 
 	/**
@@ -136,39 +138,13 @@ class CmisService implements SingletonInterface {
 	 * types depending on the record's type designation.
 	 *
 	 * @param string $table
-	 * @param integer $uid
+	 * @param integer $uid Currently unused; planned usage: read type from record property, lookup types by record type
 	 * @return array
 	 */
 	public function resolveSecondaryObjectTypesForTableAndUid($table, $uid) {
 		$session = $this->getCmisObjectFactory()->getSession();
-		if ('pages' === $table) {
-			$types = array(
-				$session->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_MAIN_ASPECT)->getId(),
-				$session->getTypeDefinition('P:cm:titled')->getId(),
-				$session->getTypeDefinition('P:cm:localizable')->getId(),
-				$session->getTypeDefinition('P:cm:ownable')->getId()
-			);
-		} elseif ('tt_content' === $table) {
-			$types = array(
-				$session->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_MAIN_ASPECT)->getId(),
-				$session->getTypeDefinition('P:cm:titled')->getId(),
-				$session->getTypeDefinition('P:cm:localizable')->getId(),
-				$session->getTypeDefinition('P:cm:ownable')->getId()
-			);
-		} elseif ('sys_domain' === $table) {
-			$types = array(
-				$session->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_MAIN_ASPECT)->getId(),
-				$session->getTypeDefinition('P:cm:titled')->getId(),
-				$session->getTypeDefinition('P:cm:ownable')->getId(),
-				$session->getTypeDefinition('P:sys:undeletable')->getId()
-			);
-		} else {
-			$types = array(
-				$session->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_MAIN_ASPECT)->getId(),
-				$session->getTypeDefinition('P:cm:titled')->getId(),
-				$session->getTypeDefinition('P:cm:ownable')->getId()
-			);
-		}
+		$types = $this->getObjectFactory()->getConfiguration()->getTableConfiguration()->getSingleSecondaryTypes($table);
+		array_unshift($types, Constants::CMIS_DOCUMENT_TYPE_MAIN_ASPECT);
 		return $types;
 	}
 
