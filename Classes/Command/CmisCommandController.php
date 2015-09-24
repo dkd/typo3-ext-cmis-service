@@ -212,11 +212,14 @@ class CmisCommandController extends CommandController {
 	protected function createAndAddIndexingTasks($tables) {
 		$indexingTasks = array();
 		$relationIndexingTasks = array();
+		$objectFactory = $this->getObjectFactory();
 		foreach ($tables as $table) {
-			$records = $this->getAllEnabledRecordsFromTable($table);
-			foreach ($records as $record) {
-				$indexingTasks[] = $this->createRecordIndexingTask($table, $record);
-				$relationIndexingTasks[] = $this->createRecordIndexingTask($table, $record, TRUE);
+			if ($objectFactory->getConfiguration()->getTableConfiguration()->isTableEnabled($table)) {
+				$records = $this->getAllEnabledRecordsFromTable($table);
+				foreach ($records as $record) {
+					$indexingTasks[] = $this->createRecordIndexingTask($table, $record);
+					$relationIndexingTasks[] = $this->createRecordIndexingTask($table, $record, TRUE);
+				}
 			}
 		}
 		$tasks = array_merge($indexingTasks, $relationIndexingTasks);
@@ -232,7 +235,7 @@ class CmisCommandController extends CommandController {
 		$message = sprintf($messageText, $countTasks, 'indexing', $tasksSuffix, $tablesSuffix, $tableNames) . PHP_EOL;
 		$message .= sprintf($messageText, $countRelations, 'relation indexing', $relationsSuffix, $tablesSuffix, $tableNames);
 		$this->response->setContent($message . PHP_EOL);
-		$this->getObjectFactory()->getLogger()->info(sprintf('%s indexing task(s) created', $queue->count()), $this->logContexts);
+		$objectFactory->getLogger()->info(sprintf('%s indexing task(s) created', $queue->count()), $this->logContexts);
 	}
 
 	/**

@@ -25,6 +25,14 @@ class TableConfiguration extends AbstractConfigurationDefinition implements Conf
 
 	/**
 	 * @param string $table
+	 * @return boolean
+	 */
+	public function isTableEnabled($table) {
+		return (boolean) $this->get($table . '.enabled');
+	}
+
+	/**
+	 * @param string $table
 	 * @return array
 	 */
 	public function getSingleTableConfiguration($table) {

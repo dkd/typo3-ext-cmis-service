@@ -2,6 +2,7 @@
 namespace Dkd\CmisService\Analysis;
 
 use Dkd\CmisService\Analysis\Detection\IndexableColumnDetector;
+use Dkd\CmisService\Factory\ObjectFactory;
 
 /**
  * Table Configuration Analyzer
@@ -53,6 +54,8 @@ class TableConfigurationAnalyzer {
 		$indexable = array();
 		foreach ($tables as $table) {
 			if (TRUE === in_array($table, self::$excludedTableNames)) {
+				continue;
+			} elseif (FALSE === $this->getObjectFactory()->getConfiguration()->getTableConfiguration()->isTableEnabled($table)) {
 				continue;
 			}
 			$fields = $this->getAllFieldNamesOfTable($table);
@@ -188,6 +191,13 @@ class TableConfigurationAnalyzer {
 	public function getUploadFolderForField($table, $field) {
 		$configuration = $this->getConfigurationForField($table, $field);
 		return TRUE === isset($configuration['uploadfolder']) ? $configuration['uploadfolder'] : NULL;
+	}
+
+	/**
+	 * @return ObjectFactory
+	 */
+	protected function getObjectFactory() {
+		return new ObjectFactory();
 	}
 
 }
