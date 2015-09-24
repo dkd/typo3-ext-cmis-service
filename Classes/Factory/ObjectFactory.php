@@ -4,6 +4,7 @@ namespace Dkd\CmisService\Factory;
 use Dkd\CmisService\Configuration\ConfigurationManager;
 use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
 use Dkd\CmisService\Resolving\UUIDResolver;
+use Dkd\CmisService\Service\CmisService;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
@@ -41,6 +42,13 @@ class ObjectFactory {
 	 * @var array
 	 */
 	protected $logContexts = array('cmis_service', 'configuration');
+
+	/**
+	 * @return static
+	 */
+	public function getInstance() {
+		return new static();
+	}
 
 	/**
 	 * Make an instance of $className, if any additional parameters
@@ -153,6 +161,13 @@ class ObjectFactory {
 	public function getConfiguration() {
 		$configuration = $this->getConfigurationManager()->getMasterConfiguration();
 		return $configuration;
+	}
+
+	/**
+	 * @return CmisService
+	 */
+	public function getCmisService() {
+		return $this->makeInstance('Dkd\\CmisService\\Service\\CmisService');
 	}
 
 	/**

@@ -51,7 +51,6 @@
         }
     ],
     "require-dev": {
-        "typo3/identity": "*",
         "typo3/cms": ">=6.2.11",
         "dkd/php-cmis": "dev-master",
         "squizlabs/php_codesniffer": "1.*",

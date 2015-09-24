@@ -44,7 +44,7 @@ class CmisService implements SingletonInterface {
 	protected function getIdentityStorageRecord($table, $uid) {
 		return $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
 			'cmis_uuid',
-			'sys_identity',
+			'tx_cmisservice_identity',
 			sprintf("foreign_uid = %d AND foreign_tablename = '%s'", $uid, $table)
 		);
 	}
@@ -85,7 +85,7 @@ class CmisService implements SingletonInterface {
 		$record = $this->getIdentityStorageRecord($table, $uid);
 		if ($record) {
 			$this->getDatabaseConnection()->exec_UPDATEquery(
-				'sys_identity',
+				'tx_cmisservice_identity',
 				sprintf("foreign_uid = %d AND foreign_tablename = '%s'", $uid, $table),
 				array(
 					'cmis_uuid' => $uuid
@@ -93,7 +93,7 @@ class CmisService implements SingletonInterface {
 			);
 		} else {
 			$this->getDatabaseConnection()->exec_INSERTquery(
-				'sys_identity',
+				'tx_cmisservice_identity',
 				array(
 					'cmis_uuid' => $uuid,
 					'foreign_uid' => $uid,
