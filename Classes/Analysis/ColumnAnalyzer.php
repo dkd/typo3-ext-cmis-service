@@ -40,6 +40,13 @@ class ColumnAnalyzer {
 	}
 
 	/**
+	 * @return array
+	 */
+	public function getConfigurationArray() {
+		return $this->configurationArray;
+	}
+
+	/**
 	 * Returns TRUE if the field is a database relation
 	 *
 	 * @return boolean

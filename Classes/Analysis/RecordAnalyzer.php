@@ -2,6 +2,8 @@
 namespace Dkd\CmisService\Analysis;
 
 use Dkd\CmisService\Analysis\Detection\IndexableColumnDetector;
+use Dkd\CmisService\Analysis\Detection\RelationData;
+use Dkd\CmisService\Factory\ObjectFactory;
 
 /**
  * Record Analyzer
@@ -61,6 +63,59 @@ class RecordAnalyzer {
 	}
 
 	/**
+	 * @param string $fieldName
+	 * @return RelationData
+	 */
+	public function getRelationDataForColumn($fieldName) {
+		$columnAnalyzer = $this->getColumnAnalyzer($fieldName);
+		$configuration = $columnAnalyzer->getConfigurationArray();
+		$targetTable = $configuration['config']['foreign_table'];
+		$sourceUid = (integer) $this->record['uid'];
+		$relatedUids = array();
+		$targetFields = array();
+
+		if ($columnAnalyzer->isFieldMultipleDatabaseRelation()) {
+			$bindingTable = $configuration['config']['MM'];
+			// @TODO: resolve related records while respecting MM configuration; seek core API
+			$relatedRecords = array();
+			$targetFields = $configuration['config']['MM_match_fields'];
+		} elseif ($columnAnalyzer->isFieldSimpleMultiValued()) {
+			// @TODO: resolve related records diretly from target table while respecting `foreign_table_*` configuration.
+			$relatedRecords = array();
+			$targetFields = array($configuration['config']['foreign_table_field'] => $sourceUid);
+		} elseif ($columnAnalyzer->isFieldSingleDatabaseRelation()) {
+			$relatedRecords = array(
+				$this->loadRecordFromTable($targetTable, $this->record[$fieldName])
+			);
+		}
+
+		foreach ($relatedRecords as $relatedRecord) {
+			$relatedUid = (integer) $relatedRecord['uid'];
+			if (NULL === $relatedRecord) {
+				$this->getObjectFactory()->getLogger()->info(
+					sprintf(
+						'Detected dead reference from %s%d to %s:%d; skipped',
+						$this->table,
+						$sourceUid,
+						$targetTable,
+						$relatedUid
+					)
+				);
+				continue;
+			}
+			$relatedUids[] = $relatedUid;
+		}
+
+		$relation = new RelationData();
+		$relation->setTargetTable($targetTable);
+		$relation->setTargetFields($targetFields);
+		$relation->setSourceTable($this->table);
+		$relation->setSourceUid($sourceUid);
+
+		return $relation;
+	}
+
+	/**
 	 * Gets an always-filled title for the record being
 	 * analysed. If no title can be resolved based on the
 	 * record's columns and TCA configuration for label,
@@ -77,6 +132,30 @@ class RecordAnalyzer {
 			}
 		}
 		return $this->table . ':' . $this->record['uid'];
+	}
+
+	/**
+	 * @param string $fieldName
+	 * @return ColumnAnalyzer
+	 */
+	protected function getColumnAnalyzer($fieldName) {
+		return new ColumnAnalyzer($GLOBALS['TCA'][$this->table]['columns'][$fieldName]);
+	}
+
+	/**
+	 * @param string $table
+	 * @param integer $uid
+	 * @return array|NULL
+	 */
+	protected function loadRecordFromTable($table, $uid) {
+		return $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow('*', $table, "uid = '" . $uid . "'") OR NULL;
+	}
+
+	/**
+	 * @return ObjectFactory
+	 */
+	protected function getObjectFactory() {
+		return new ObjectFactory();
 	}
 
 }

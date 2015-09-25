@@ -12,6 +12,7 @@ use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Task\RecordIndexTask;
 use Dkd\CmisService\Task\TaskInterface;
 use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
+use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
 use Dkd\PhpCmis\PropertyIds;
 
 /**
@@ -98,11 +99,43 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 	 */
 	protected function synchronizeRelationships(CmisObjectInterface $document, RecordAnalyzer $recordAnalyzer, array $data) {
 		$tableConfigurationAnalyzer = new TableConfigurationAnalyzer();
+		$objectFactory = $this->getObjectFactory();
 		$table = $recordAnalyzer->getTable();
+		$logger = $objectFactory->getLogger();
 		foreach ($recordAnalyzer->getIndexableColumnNames() as $fieldName) {
 			$columnAnalyzer = $tableConfigurationAnalyzer->getColumnAnalyzerForField($table, $fieldName);
 			if ($columnAnalyzer->isFieldDatabaseRelation()) {
-				// @TODO: extract target relation UUID(s) based on target TCA table/uid
+				$relationData = $recordAnalyzer->getRelationDataForColumn($fieldName);
+				$targetUids = $relationData->getTargetUids();
+				$targetTable = $relationData->getTargetTable();
+				if ($objectFactory->getConfiguration()->getTableConfiguration()->isTableEnabled($targetTable)) {
+					$logger->warning(
+						sprintf(
+							'Table %s is not configured for indexing; this relation cannot be indexed!',
+							$table
+						)
+					);
+					continue;
+				}
+				$session = $this->getCmisObjectFactory()->getSession();
+				foreach ($targetUids as $targetUid) {
+					try {
+						$cmisObjectId = $objectFactory->getCmisService()->getUuidForLocalRecord($table, $targetUid);
+						$foreignObject = $session->getObject($session->createObjectId($cmisObjectId));
+						$session->createRelationship(array(
+							PropertyIds::SOURCE_ID => $document->getId(),
+							PropertyIds::TARGET_ID => $foreignObject->getId()
+						));
+					} catch (CmisObjectNotFoundException $error) {
+						$logger->info(
+							sprintf(
+								'Record %d from table %s is not yet indexed by CMIS',
+								$targetUid,
+								$targetTable
+							)
+						);
+					}
+				}
 			} elseif ($columnAnalyzer->isFieldLegacyFileReference()) {
 				// @TODO: detect the already "imported" legacy file placed in CMIS
 				// Extracted by LegacyFileReferenceExtractor which executed during the
@@ -123,16 +156,21 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 	 */
 	protected function remapFieldsToDocumentProperties(array $data, RecordAnalyzer $recordAnalyzer) {
 		$record = $recordAnalyzer->getRecord();
-		$cmisPropertyValues = array(
+		$table = $recordAnalyzer->getTable();
+		$values = array(
 			PropertyIds::NAME => $recordAnalyzer->getTitleForRecord(),
 			Constants::CMIS_PROPERTY_RAWDATA => serialize($data)
 		);
 		$parentUid = $record['pid'];
 		if (0 < $parentUid) {
-			$cmisPropertyValues[PropertyIds::PARENT_ID] = $this->getCmisService()
+			$values[PropertyIds::PARENT_ID] = $this->getCmisService()
 				->resolveObjectByTableAndUid('pages', $parentUid)->getId();
 		}
-		return $cmisPropertyValues;
+		$propertyMap = $this->getObjectFactory()->getConfiguration()->getTableConfiguration()->getSingleTableMapping($table);
+		foreach ($propertyMap as $recordProperty => $cmisPropertyId) {
+			$values[$cmisPropertyId] = $this->performTextExtraction($table, $record['uid'], $recordProperty, $record);
+		}
+		return $values;
 	}
 
 	/**
