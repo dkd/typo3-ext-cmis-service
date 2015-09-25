@@ -16,7 +16,7 @@ plugin.tx_cmisservice.settings {
             secondaryTypes {
                 0 = P:cm:titled
                 1 = P:cm:localizable
-                2 = P:cm:undeletable
+                2 = P:sys:undeletable
             }
         }
         sys_category {
