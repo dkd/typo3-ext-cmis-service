@@ -16,7 +16,6 @@ plugin.tx_cmisservice.settings {
                 4 = P:cm:syndication
                 5 = P:cm:referencing
                 6 = P:cm:taggable
-                7 = D:ia:calendarEvent
             }
             mapping {
                 description = cmis:description
