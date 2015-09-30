@@ -238,7 +238,7 @@ class CmisService implements SingletonInterface {
 				$parentFolder = $this->resolveCmisSitesParentFolder();
 			} elseif (NULL !== $domainRecord) {
 				// Domain record detected; has priority. Store CMIS object in Site folder.
-				$parentFolder = $this->resolveCmisSiteFolderByPageUid($parentPageUid);
+				$parentFolder = $this->resolveCmisSiteFolderByPageUid($domainRecord['pid']);
 			} elseif (0 < $parentPageUid) {
 				// Standard record without domain and with parent; store under parent page.
 				$parentFolder = $this->resolveObjectByTableAndUid('pages', $parentPageUid);
@@ -308,6 +308,7 @@ class CmisService implements SingletonInterface {
 			'uid, domainName, pid',
 			'sys_domain',
 			"pid = '" . $pageUid . "'",
+			'',
 			'sorting ASC'
 		);
 		return (TRUE === empty($record) ? NULL : $record);
@@ -353,16 +354,16 @@ class CmisService implements SingletonInterface {
 	 * @return FolderInterface
 	 */
 	public function resolveCmisSiteFolderByPageUid($pageUid) {
-		if (0 === (integer) $pageUid) {
-			return $this->getAndAutoCreateDefaultSiteFolder();
-		}
 		$searchPageUid = $pageUid;
 		$domainRecord = NULL;
+		while (NULL === $domainRecord && $searchPageUid > 0) {
+			$domainRecord = $this->resolvePrimaryDomainRecordForPageUid($searchPageUid);
+			$searchPageUid = (integer) reset($this->loadRecordFromDatabase('pages', $searchPageUid, array('pid')));
+		}
+		if (NULL === $domainRecord) {
+			return $this->getAndAutoCreateDefaultSiteFolder();
+		}
 		try {
-			while (NULL === $domainRecord && $searchPageUid > 0) {
-				$domainRecord = $this->resolvePrimaryDomainRecordForPageUid($searchPageUid);
-				$searchPageUid = (integer) reset($this->loadRecordFromDatabase('pages', $searchPageUid, array('pid')));
-			}
 			$uuid = $this->getUuidForLocalRecord('sys_domain', $domainRecord['uid']);
 			$folder = $this->resolveObjectByUuid($uuid);
 		} catch (RecordNotFoundException $error) {
