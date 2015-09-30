@@ -2,6 +2,7 @@
 namespace Dkd\CmisService\Task;
 
 use Dkd\CmisService\Factory\ExecutionFactory;
+use Dkd\CmisService\Execution\ExecutionInterface;
 
 /**
  * Class InitializationTask
@@ -12,7 +13,7 @@ class InitializationTask extends AbstractTask implements TaskInterface, TaskFilt
 	 * Returns an Execution object for indexing the
 	 * record as configured by Task's options.
 	 *
-	 * @return ExcecutionInterface
+	 * @return ExecutionInterface
 	 */
 	public function resolveExecutionObject() {
 		$executionFactory = new ExecutionFactory();
