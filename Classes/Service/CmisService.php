@@ -4,6 +4,7 @@ namespace Dkd\CmisService\Service;
 use Dkd\CmisService\Analysis\Detection\IndexableColumnDetector;
 use Dkd\CmisService\Analysis\RecordAnalyzer;
 use Dkd\CmisService\Configuration\Definitions\CmisConfiguration;
+use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
 use Dkd\CmisService\Constants;
 use Dkd\CmisService\Factory\CmisObjectFactory;
 use Dkd\CmisService\Factory\ObjectFactory;
@@ -457,6 +458,18 @@ class CmisService implements SingletonInterface {
 		);
 		$this->storeUuidLocallyForRecord($table, $uid, $objectId);
 		return $session->getObject($objectId);
+	}
+
+	/**
+	 * Gets the default or a named CMIS session. Wrapper
+	 * with public access for easy use of CMIS session in
+	 * classes implementing CmisService.
+	 *
+	 * @param string $serverName
+	 * @return SessionInterface
+	 */
+	public function getCmisSession($serverName = MasterConfiguration::CMIS_DEFAULT_SERVER) {
+		return $this->getCmisObjectFactory()->getSession($serverName);
 	}
 
 	/**
