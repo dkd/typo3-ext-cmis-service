@@ -167,9 +167,11 @@ class CmisService implements SingletonInterface {
 		$columns = $columnDetector->getIndexableColumnNamesFromTable($table);
 		$record = $this->loadRecordFromDatabase($table, $uid, $columns);
 		$recordAnalyzer = new RecordAnalyzer($table, $record);
+		$title = $recordAnalyzer->getTitleForRecord();
 		$properties = $this->readDefaultPropertyValuesForTableFromConfiguration($table);
 		$properties[PropertyIds::OBJECT_TYPE_ID] = $this->resolvePrimaryObjectTypeForTableAndUid($table, $uid)->getId();
-		$properties[PropertyIds::NAME] = $recordAnalyzer->getTitleForRecord();
+		$properties[Constants::CMIS_PROPERTY_FULLTITLE] = $title;
+		$properties[PropertyIds::NAME] = $this->sanitizeTitle($title, $table . '-' . $uid);
 		$properties[Constants::CMIS_PROPERTY_TYPO3TABLE] = $table;
 		$properties[Constants::CMIS_PROPERTY_TYPO3UID] = (integer) $uid;
 		$properties[PropertyIds::SECONDARY_OBJECT_TYPE_IDS] = $this->resolveSecondaryObjectTypesForTableAndUid($table, $uid);
@@ -471,6 +473,24 @@ class CmisService implements SingletonInterface {
 	 */
 	public function getCmisSession($serverName = MasterConfiguration::CMIS_DEFAULT_SERVER) {
 		return $this->getCmisObjectFactory()->getSession($serverName);
+	}
+
+	/**
+	 * @param string $title
+	 * @param string $default
+	 * @return string
+	 */
+	public function sanitizeTitle($title, $default) {
+		$title = strip_tags($title);
+		$title = iconv('UTF-8', 'ASCII//IGNORE//TRANSLIT', $title);
+		$title = trim($title);
+		$title = preg_replace('/[^a-z0-9\\s_\\-]+/i', '', $title);
+		if (strlen($title) > 255) {
+			$title = substr($title, 0, 252);
+		} elseif (empty($title)) {
+			$title = $default;
+		}
+		return $title;
 	}
 
 	/**

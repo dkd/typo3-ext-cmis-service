@@ -157,6 +157,7 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 	protected function remapFieldsToDocumentProperties(array $data, RecordAnalyzer $recordAnalyzer) {
 		$record = $recordAnalyzer->getRecord();
 		$table = $recordAnalyzer->getTable();
+		$uid = $record['uid'];
 		$values = array(
 			PropertyIds::NAME => $recordAnalyzer->getTitleForRecord(),
 			Constants::CMIS_PROPERTY_RAWDATA => serialize($data)
@@ -168,8 +169,10 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 		}
 		$propertyMap = $this->getObjectFactory()->getConfiguration()->getTableConfiguration()->getSingleTableMapping($table);
 		foreach ($propertyMap as $recordProperty => $cmisPropertyId) {
-			$values[$cmisPropertyId] = $this->performTextExtraction($table, $record['uid'], $recordProperty, $record);
+			$values[$cmisPropertyId] = $this->performTextExtraction($table, $uid, $recordProperty, $record);
 		}
+		$values[Constants::CMIS_PROPERTY_FULLTITLE] = $values[PropertyIds::NAME];
+		$values[PropertyIds::NAME] = $this->getCmisService()->sanitizeTitle($values[PropertyIds::NAME], $table . '-' . $uid);
 		return $values;
 	}
 
