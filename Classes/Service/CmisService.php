@@ -382,7 +382,7 @@ class CmisService implements SingletonInterface {
 	 *
 	 * @return FolderInterface
 	 */
-	protected function resolveCmisSitesParentFolder() {
+	public function resolveCmisSitesParentFolder() {
 		$session = $this->getCmisObjectFactory()->getSession();
 		$root = $session->getRootFolder();
 		foreach ($root->getChildren() as $child) {
