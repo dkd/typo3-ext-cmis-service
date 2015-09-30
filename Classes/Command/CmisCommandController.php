@@ -190,7 +190,7 @@ class CmisCommandController extends CommandController {
 	 * @return void
 	 */
 	public function generateIndexingTasksCommand($table = NULL) {
-		if (NULL === $table) {
+		if (TRUE === empty($table)) {
 			$tableAnalyzer = $this->getTableConfigurationAnalyzer();
 			$tables = $tableAnalyzer->getIndexableTableNames();
 		} elseif (FALSE !== strpos($table, ',')) {
