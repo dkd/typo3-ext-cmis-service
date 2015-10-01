@@ -46,7 +46,7 @@ class ObjectFactory {
 	/**
 	 * @return static
 	 */
-	public function getInstance() {
+	public static function getInstance() {
 		return new static();
 	}
 
