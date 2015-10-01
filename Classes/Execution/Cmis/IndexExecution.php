@@ -53,6 +53,7 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 		/** @var RecordIndexTask $task */
 		$this->result = $this->createResultObject();
 		$fields = (array) $task->getParameter(RecordIndexTask::OPTION_FIELDS);
+		$fields[] = 'uid';
 		$table = $task->getParameter(RecordIndexTask::OPTION_TABLE);
 		$uid = $task->getParameter(RecordIndexTask::OPTION_UID);
 		$record = $this->loadRecordFromDatabase($table, $uid, $fields);
@@ -108,7 +109,7 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 				$relationData = $recordAnalyzer->getRelationDataForColumn($fieldName);
 				$targetUids = $relationData->getTargetUids();
 				$targetTable = $relationData->getTargetTable();
-				if ($objectFactory->getConfiguration()->getTableConfiguration()->isTableEnabled($targetTable)) {
+				if (FALSE === $objectFactory->getConfiguration()->getTableConfiguration()->isTableEnabled($targetTable)) {
 					$logger->warning(
 						sprintf(
 							'Table %s is not configured for indexing; this relation cannot be indexed!',
@@ -124,7 +125,8 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 						$foreignObject = $session->getObject($session->createObjectId($cmisObjectId));
 						$session->createRelationship(array(
 							PropertyIds::SOURCE_ID => $document->getId(),
-							PropertyIds::TARGET_ID => $foreignObject->getId()
+							PropertyIds::TARGET_ID => $foreignObject->getId(),
+							PropertyIds::OBJECT_TYPE_ID => 'cm:references'
 						));
 					} catch (CmisObjectNotFoundException $error) {
 						$logger->info(

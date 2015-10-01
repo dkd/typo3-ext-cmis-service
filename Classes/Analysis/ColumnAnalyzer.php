@@ -192,7 +192,7 @@ class ColumnAnalyzer {
 	 */
 	protected function isFieldLimitedToSingleValue(array $configuration) {
 		$maxItems = TRUE === isset($configuration['maxitems']) ? (integer) $configuration['maxitems'] : 0;
-		$size = TRUE === isset($configuration['size']) ? (integer) $configuration['size'] : 0;
+		$size = TRUE === isset($configuration['size']) ? (integer) $configuration['size'] : 1;
 		return (1 === $maxItems || 1 === $size);
 	}
 

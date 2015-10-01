@@ -2,11 +2,11 @@
 plugin.tx_cmisservice.settings {
     tables {
         tx_news_domain_model_tag {
-            enabled = {$plugin.tx_cmisservice.settings.table.tx_news_domain_model_tag.enabled}
+            enabled = {$plugin.tx_cmisservice.settings.tables.tx_news_domain_model_tag.enabled}
             primaryType = D:dkd:typo3:arbitrary
         }
         tx_news_domain_model_news {
-            enabled = {$plugin.tx_cmisservice.settings.table.tx_news_domain_model_news.enabled}
+            enabled = {$plugin.tx_cmisservice.settings.tables.tx_news_domain_model_news.enabled}
             primaryType = D:dkd:typo3:arbitrary
             secondaryTypes {
                 0 = P:cm:titled

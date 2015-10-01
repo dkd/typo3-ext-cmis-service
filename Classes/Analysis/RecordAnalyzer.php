@@ -4,6 +4,7 @@ namespace Dkd\CmisService\Analysis;
 use Dkd\CmisService\Analysis\Detection\IndexableColumnDetector;
 use Dkd\CmisService\Analysis\Detection\RelationData;
 use Dkd\CmisService\Factory\ObjectFactory;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /**
  * Record Analyzer
@@ -76,12 +77,28 @@ class RecordAnalyzer {
 
 		if ($columnAnalyzer->isFieldMultipleDatabaseRelation()) {
 			$bindingTable = $configuration['config']['MM'];
-			// @TODO: resolve related records while respecting MM configuration; seek core API
-			$relatedRecords = array();
-			$targetFields = $configuration['config']['MM_match_fields'];
+			if (FALSE === empty($bindingTable)) {
+				$targetFields = $configuration['config']['MM_match_fields'];
+				$relatedRecords = $this->getDatabaseConnection()->exec_SELECTgetRows(
+					'target.*',
+					$bindingTable . ' mm, ' . $targetTable . ' target',
+					'mm.uid_foreign = ' . $sourceUid . ' AND target.uid = mm.uid_local'
+				);
+			} elseif (FALSE === empty($this->record[$fieldName])) {
+				$relatedRecords = $this->getDatabaseConnection()->exec_SELECTgetRows(
+					'*',
+					$targetTable,
+					'uid IN (' . $this->record[$fieldName] . ')'
+				);
+			} else {
+				$relatedRecords = array();
+			}
 		} elseif ($columnAnalyzer->isFieldSimpleMultiValued()) {
-			// @TODO: resolve related records diretly from target table while respecting `foreign_table_*` configuration.
-			$relatedRecords = array();
+			$relatedRecords = $this->getDatabaseConnection()->exec_SELECTgetRows(
+				'*',
+				$configuration['config']['foreign_table'],
+				$configuration['config']['foreign_table_field'] . ' = ' . (string) $sourceUid
+			);
 			$targetFields = array($configuration['config']['foreign_table_field'] => $sourceUid);
 		} elseif ($columnAnalyzer->isFieldSingleDatabaseRelation()) {
 			$relatedRecords = array(
@@ -109,6 +126,8 @@ class RecordAnalyzer {
 		$relation = new RelationData();
 		$relation->setTargetTable($targetTable);
 		$relation->setTargetFields($targetFields);
+		$relation->setTargetUids($relatedUids);
+		$relation->setSourceField($fieldName);
 		$relation->setSourceTable($this->table);
 		$relation->setSourceUid($sourceUid);
 
@@ -148,7 +167,14 @@ class RecordAnalyzer {
 	 * @return array|NULL
 	 */
 	protected function loadRecordFromTable($table, $uid) {
-		return $GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow('*', $table, "uid = '" . $uid . "'") OR NULL;
+		return $this->getDatabaseConnection()->exec_SELECTgetSingleRow('*', $table, "uid = '" . $uid . "'") OR NULL;
+	}
+
+	/**
+	 * @return DatabaseConnection
+	 */
+	protected function getDatabaseConnection() {
+		return $GLOBALS['TYPO3_DB'];
 	}
 
 	/**
