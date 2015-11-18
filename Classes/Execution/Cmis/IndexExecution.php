@@ -83,10 +83,38 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 			// manner; both creating and removing relationships as needed.
 			$this->synchronizeRelationships($document, $recordAnalyzer, $data);
 		}
+		$this->affixAuthor($document, $recordAnalyzer);
 		$this->result->setCode(Result::OK);
 		$this->result->setMessage('Indexed record ' . $uid . ' from ' . $table);
 		$this->result->setPayload($data);
 		return $this->result;
+	}
+
+	/**
+	 * Affixes (sets if missing) the also indexed backend user record
+	 * that owns this document. Does not allow changing the existing
+	 * author (returns TRUE without action).
+	 *
+	 * @param CmisObjectInterface $document
+	 * @param RecordAnalyzer $recordAnalyzer
+	 * @return boolean TRUE if an author was affixed or already exists, FALSE otherwise
+	 */
+	protected function affixAuthor(CmisObjectInterface $document, RecordAnalyzer $recordAnalyzer) {
+		$currentAuthor = $document->getProperty(PropertyIds::CREATED_BY);
+		if (NULL !== $currentAuthor) {
+			return TRUE;
+		}
+		$authorUserUid = $recordAnalyzer->getAuthorUidFromRecord();
+		if (NULL !== $authorUserUid) {
+			$authorUserObject = $this->getCmisService()->resolveObjectByTableAndUid('be_users', $authorUserUid);
+			if (NULL !== $authorUserObject) {
+				$document->updateProperties(array(
+					PropertyIds::CREATED_BY => $authorUserObject->getName()
+				));
+				return TRUE;
+			}
+		}
+		return FALSE;
 	}
 
 	/**
@@ -113,7 +141,7 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 					$logger->warning(
 						sprintf(
 							'Table %s is not configured for indexing; this relation cannot be indexed!',
-							$table
+							$targetTable
 						)
 					);
 					continue;
@@ -175,6 +203,8 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 		}
 		$values[Constants::CMIS_PROPERTY_FULLTITLE] = $values[PropertyIds::NAME];
 		$values[PropertyIds::NAME] = $this->getCmisService()->sanitizeTitle($values[PropertyIds::NAME], $table . '-' . $uid);
+		$values[PropertyIds::LAST_MODIFICATION_DATE] = $recordAnalyzer->getLastModifiedDateTime();
+		$values[PropertyIds::CREATION_DATE] = $recordAnalyzer->getCreationDateTime();
 		return $values;
 	}
 
@@ -194,6 +224,16 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 	 */
 	protected function getExtractionMethodDetector() {
 		return new ExtractionMethodDetector();
+	}
+
+	/**
+	 * @return integer|NULL
+	 */
+	protected function getCurrentBackendUserUid() {
+		if (TRUE === isset($GLOBALS['BE_USER']) && !empty($GLOBALS['BE_USER']->user['uid'])) {
+			return $GLOBALS['BE_USER']->user['uid'];
+		}
+		return NULL;
 	}
 
 }

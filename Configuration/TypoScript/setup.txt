@@ -10,6 +10,13 @@ plugin.tx_cmisservice.settings {
     # for possible attributes to use when manually defining rules
     # for a table.
     tables {
+        be_users {
+            enabled = {$plugin.tx_cmisservice.settings.tables.be_users.enabled}
+            primaryType = I:dkd:typo3:be_users
+            mapping {
+                username = P:usr:username
+            }
+        }
         sys_domain {
             enabled = {$plugin.tx_cmisservice.settings.tables.sys_domain.enabled}
             primaryType = F:dkd:typo3:sys_domain
@@ -17,6 +24,9 @@ plugin.tx_cmisservice.settings {
                 0 = P:cm:titled
                 1 = P:cm:localizable
                 2 = P:sys:undeletable
+            }
+            mapping {
+                domainName = P:cm:title
             }
         }
         sys_category {

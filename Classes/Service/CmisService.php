@@ -12,6 +12,7 @@ use Dkd\CmisService\SingletonInterface;
 use Dkd\CmisService\Error\RecordNotFoundException;
 use Dkd\CmisService\Error\DatabaseCallException;
 use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
+use Dkd\PhpCmis\Data\DocumentInterface;
 use Dkd\PhpCmis\Data\FolderInterface;
 use Dkd\PhpCmis\DataObjects\DocumentTypeDefinition;
 use Dkd\PhpCmis\DataObjects\FolderTypeDefinition;
@@ -110,22 +111,23 @@ class CmisService implements SingletonInterface {
 	 * to allow switching the returned type based on the
 	 * selected record's type designation.
 	 *
+	 * Throws a \RuntimeException if the table has no
+	 * primary type configured in TypoScript.
+	 *
 	 * @param string $table
 	 * @param string $uid
 	 * @return TypeDefinitionInterface
+	 * @throws \RuntimeException
 	 */
 	public function resolvePrimaryObjectTypeForTableAndUid($table, $uid) {
 		$typeId = $this->getObjectFactory()->getConfiguration()->getTableConfiguration()->getSinglePrimaryType($table);
 		if (TRUE === empty($typeId)) {
-			if ('pages' === $table) {
-				$typeId = Constants::CMIS_DOCUMENT_TYPE_PAGES;
-			} elseif ('tt_content' === $table) {
-				$typeId = Constants::CMIS_DOCUMENT_TYPE_CONTENT;
-			} elseif ('sys_domain' === $table) {
-				$typeId = Constants::CMIS_DOCUMENT_TYPE_SITE;
-			} else {
-				$typeId = Constants::CMIS_DOCUMENT_TYPE_ARBITRARY;
-			}
+			throw new \RuntimeException(
+				sprintf(
+					'Table "%s" does not appear to be configured with a primary CMIS type, please check your settings',
+					$table
+				)
+			);
 		}
 		return $this->getCmisObjectFactory()->getSession()->getTypeDefinition($typeId);
 	}
@@ -175,11 +177,6 @@ class CmisService implements SingletonInterface {
 		$properties[Constants::CMIS_PROPERTY_TYPO3TABLE] = $table;
 		$properties[Constants::CMIS_PROPERTY_TYPO3UID] = (integer) $uid;
 		$properties[PropertyIds::SECONDARY_OBJECT_TYPE_IDS] = $this->resolveSecondaryObjectTypesForTableAndUid($table, $uid);
-		if ('sys_domain' === $table) {
-			$properties['cm:title'] = $properties[PropertyIds::NAME];
-			//TODO: discuss inclusion of a configurable "TYPO3 site preset" in Alfresco repository;
-			//$properties['st:sitePreset'] = 'typo3-site';
-		}
 		return $properties;
 	}
 
@@ -456,7 +453,7 @@ class CmisService implements SingletonInterface {
 		}
 
 		$this->getObjectFactory()->getLogger()->info(
-			sprintf('New CMIS Object (%s) created, ID: %s', $type, $objectId),
+			sprintf('New CMIS Object (%s) created, ID: %s', $primaryType->getId(), $objectId),
 			$this->logContexts
 		);
 		$this->storeUuidLocallyForRecord($table, $uid, $objectId);

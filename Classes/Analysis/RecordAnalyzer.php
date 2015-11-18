@@ -64,6 +64,20 @@ class RecordAnalyzer {
 	}
 
 	/**
+	 * Returns the UID of the be_user record that owns
+	 * this record - returns NULL if no user owns the
+	 * record or the record cannot be owned by users.
+	 *
+	 * @return integer|NULL
+	 */
+	public function getAuthorUidFromRecord() {
+		if (TRUE === isset($this->record['cruser_id']) && $this->record['cruser_id'] > 0) {
+			return (integer) $this->record['cruser_id'];
+		}
+		return NULL;
+	}
+
+	/**
 	 * @param string $fieldName
 	 * @return RelationData
 	 */
@@ -151,6 +165,20 @@ class RecordAnalyzer {
 			}
 		}
 		return $this->table . ':' . $this->record['uid'];
+	}
+
+	/**
+	 * @return \DateTime
+	 */
+	public function getLastModifiedDateTime() {
+		\DateTime::createFromFormat('U', $this->record['tstamp']);
+	}
+
+	/**
+	 * @return \DateTime
+	 */
+	public function getCreationDateTime() {
+		\DateTime::createFromFormat('U', $this->record['crtime']);
 	}
 
 	/**

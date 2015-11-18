@@ -1,6 +1,10 @@
 [global]
 plugin.tx_cmisservice.settings {
     tables {
+        be_users {
+            # Enable backend user indexing to CMIS? Must be ON to allow assigning author and last updated by properties in CMIS.
+            enabled = 1
+        }
         sys_domain {
             # Enable domain/site indexing to CMIS? Must be ON or indexing of any record not in page UID zero will be disabled.
             enabled = 1
