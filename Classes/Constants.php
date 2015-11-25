@@ -8,7 +8,7 @@ abstract class Constants {
 
 	const CMIS_DOCUMENT_TYPE_SITES = 'F:st:sites';
 	const CMIS_DOCUMENT_TYPE_SITE = 'F:dkd:typo3:sys_domain';
-	const CMIS_DOCUMENT_TYPE_BACKEND_USER = 'I:dkd:typo3:sys_domain';
+	const CMIS_DOCUMENT_TYPE_BACKEND_USER = 'I:dkd:typo3:be_users';
 	const CMIS_DOCUMENT_TYPE_MAIN_ASPECT = 'P:dkd:typo3:aspect:general';
 	const CMIS_DOCUMENT_TYPE_ARBITRARY = 'D:dkd:typo3:arbitrary';
 	const CMIS_DOCUMENT_TYPE_PAGES = 'F:dkd:typo3:pages';

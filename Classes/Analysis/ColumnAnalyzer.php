@@ -54,9 +54,13 @@ class ColumnAnalyzer {
 	public function isFieldDatabaseRelation() {
 		$configuration = $this->configurationArray['config'];
 		$isSelectOrGroup = $this->isFieldMultiValue($configuration);
-		$hasTableOption = $this->hasTableOption($configuration);
-		$internalType = $this->getInternalType($configuration);
-		return ($isSelectOrGroup && $hasTableOption && (NULL === $internalType || self::GROUPFIELDTYPE_DB === $internalType));
+		if ($this->getFieldType() === self::FIELDTYPE_GROUP) {
+			$internalType = $this->getInternalType($configuration);
+			$hasTableOption = (self::GROUPFIELDTYPE_DB === $internalType);
+		} else {
+			$hasTableOption = $this->hasTableOption($configuration);
+		}
+		return ($isSelectOrGroup && $hasTableOption);
 	}
 
 	/**
@@ -116,7 +120,7 @@ class ColumnAnalyzer {
 		$internalType = $this->getInternalType($configuration);
 		$lacksTableOption = FALSE === $this->hasTableOption($configuration);
 		$isFileOrDbField = in_array($internalType, array(self::GROUPFIELDTYPE_DB, self::GROUPFIELDTYPE_FILE));
-		return ($isSelectOrGroup && (FALSE === $isFileOrDbField && TRUE === $lacksTableOption));
+		return (($isSelectOrGroup && $lacksTableOption) || TRUE === $isFileOrDbField);
 	}
 
 	/**
@@ -183,7 +187,11 @@ class ColumnAnalyzer {
 	 * @return boolean
 	 */
 	protected function hasTableOption(array $configuration) {
-		return (TRUE === isset($configuration['table']) || TRUE === isset($configuration['foreign_table']));
+		return (
+			TRUE === isset($configuration['table'])
+			|| TRUE === isset($configuration['foreign_table'])
+			|| TRUE === isset($configuration['MM'])
+		);
 	}
 
 	/**
@@ -201,7 +209,7 @@ class ColumnAnalyzer {
 	 * @return boolean
 	 */
 	protected function isFieldMultiValue(array $configuration) {
-		$fieldType = $this->getFieldType($configurationArray);
+		$fieldType = $this->getFieldType();
 		return in_array($fieldType, array(self::FIELDTYPE_SELECT, self::FIELDTYPE_GROUP, self::FIELDTYPE_INLINE));
 	}
 

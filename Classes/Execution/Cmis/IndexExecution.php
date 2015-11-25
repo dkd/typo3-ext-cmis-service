@@ -136,26 +136,42 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 			if ($columnAnalyzer->isFieldDatabaseRelation()) {
 				$relationData = $recordAnalyzer->getRelationDataForColumn($fieldName);
 				$targetUids = $relationData->getTargetUids();
-				$targetTable = $relationData->getTargetTable();
-				if (FALSE === $objectFactory->getConfiguration()->getTableConfiguration()->isTableEnabled($targetTable)) {
-					$logger->warning(
-						sprintf(
-							'Table %s is not configured for indexing; this relation cannot be indexed!',
-							$targetTable
-						)
-					);
-					continue;
-				}
+				$configuredTargetTable = $relationData->getTargetTable();
 				$session = $this->getCmisObjectFactory()->getSession();
 				foreach ($targetUids as $targetUid) {
 					try {
+						if (FALSE !== strpos($targetUid, '_')) {
+							$parts = explode('_', $targetUid);
+							$targetUid = (integer) array_pop($parts);
+							$targetTable = implode('_', $parts);
+						} else {
+							$targetTable = $configuredTargetTable;
+						}
+						if (FALSE === $objectFactory->getConfiguration()->getTableConfiguration()->isTableEnabled($targetTable)) {
+							$logger->warning(
+								sprintf(
+									'Table %s is not configured for indexing; this relation cannot be indexed!',
+									$targetTable
+								)
+							);
+							continue;
+						}
 						$cmisObjectId = $objectFactory->getCmisService()->getUuidForLocalRecord($table, $targetUid);
 						$foreignObject = $session->getObject($session->createObjectId($cmisObjectId));
-						$session->createRelationship(array(
+						$relation = $session->createRelationship(array(
+							PropertyIds::NAME => 'Relation',
 							PropertyIds::SOURCE_ID => $document->getId(),
 							PropertyIds::TARGET_ID => $foreignObject->getId(),
-							PropertyIds::OBJECT_TYPE_ID => 'cm:references'
+							PropertyIds::OBJECT_TYPE_ID => 'R:cm:references'
 						));
+						$logger->info(
+							sprintf(
+								'Relationship (%s) created between %s and %s',
+								'cm:reference',
+								$document->getId(),
+								$foreignObject->getId()
+							)
+						);
 					} catch (CmisObjectNotFoundException $error) {
 						$logger->info(
 							sprintf(

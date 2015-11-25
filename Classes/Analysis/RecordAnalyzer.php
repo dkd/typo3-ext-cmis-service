@@ -84,7 +84,11 @@ class RecordAnalyzer {
 	public function getRelationDataForColumn($fieldName) {
 		$columnAnalyzer = $this->getColumnAnalyzer($fieldName);
 		$configuration = $columnAnalyzer->getConfigurationArray();
-		$targetTable = $configuration['config']['foreign_table'];
+		if ($columnAnalyzer->getFieldType() === ColumnAnalyzer::FIELDTYPE_GROUP) {
+			$targetTable = $configuration['config']['allowed'];
+		} else {
+			$targetTable = $configuration['config']['foreign_table'];
+		}
 		$sourceUid = (integer) $this->record['uid'];
 		$relatedUids = array();
 		$targetFields = array();
@@ -96,14 +100,21 @@ class RecordAnalyzer {
 				$relatedRecords = $this->getDatabaseConnection()->exec_SELECTgetRows(
 					'target.*',
 					$bindingTable . ' mm, ' . $targetTable . ' target',
-					'mm.uid_foreign = ' . $sourceUid . ' AND target.uid = mm.uid_local'
+					'mm.uid_local = ' . $sourceUid . ' AND target.uid = mm.uid_foreign'
 				);
 			} elseif (FALSE === empty($this->record[$fieldName])) {
-				$relatedRecords = $this->getDatabaseConnection()->exec_SELECTgetRows(
-					'*',
-					$targetTable,
-					'uid IN (' . $this->record[$fieldName] . ')'
-				);
+				if (FALSE === strpos($targetTable, ',')) {
+					$relatedRecords = $this->getDatabaseConnection()->exec_SELECTgetRows(
+						'*',
+						$targetTable,
+						'uid IN (' . $this->record[$fieldName] . ')'
+					);
+				} else {
+					$relatedRecords = array();
+					foreach (explode(',', $this->record[$fieldName]) as $identity) {
+						$relatedRecords[] = array('uid' => $identity);
+					}
+				}
 			} else {
 				$relatedRecords = array();
 			}
@@ -121,7 +132,13 @@ class RecordAnalyzer {
 		}
 
 		foreach ($relatedRecords as $relatedRecord) {
-			$relatedUid = (integer) $relatedRecord['uid'];
+			if (TRUE === empty($relatedRecord['uid'])) {
+				continue;
+			} elseif (is_numeric($relatedRecord['uid'])) {
+				$relatedUid = (integer) $relatedRecord['uid'];
+			} else {
+				$relatedUid = $relatedRecord['uid'];
+			}
 			if (NULL === $relatedRecord) {
 				$this->getObjectFactory()->getLogger()->info(
 					sprintf(
@@ -136,6 +153,8 @@ class RecordAnalyzer {
 			}
 			$relatedUids[] = $relatedUid;
 		}
+
+		$relatedUids = array_diff($relatedUids, array(0));
 
 		$relation = new RelationData();
 		$relation->setTargetTable($targetTable);
