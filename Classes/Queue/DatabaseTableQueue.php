@@ -17,7 +17,7 @@ class DatabaseTableQueue implements QueueInterface {
 	const QUERY_ADD = 'INSERT INTO tx_cmisservice_queue SET task_class = \'%s\', parameters = \'%s\', resource_identifier = \'%s\'';
 	const QUERY_PICK = 'SELECT * FROM tx_cmisservice_queue ORDER BY uid ASC LIMIT 0,1';
 	const QUERY_DELETE = 'DELETE FROM tx_cmisservice_queue WHERE uid = %d';
-	const QUERY_COUNT = 'SELECT uid FROM tx_cmisservice_queue';
+	const QUERY_COUNT = 'SELECT COUNT(uid) as count FROM tx_cmisservice_queue';
 
 	/**
 	 * @param TaskInterface[] $task
@@ -79,7 +79,7 @@ class DatabaseTableQueue implements QueueInterface {
 	 * @return integer
 	 */
 	public function count() {
-		return count($this->performDatabaseQuery(self::QUERY_COUNT));
+		return (integer) reset($this->performDatabaseQuery(self::QUERY_COUNT));
 	}
 
 	/**

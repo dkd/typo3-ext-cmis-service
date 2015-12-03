@@ -281,7 +281,7 @@ class CmisCommandController extends CommandController {
 	}
 
 	/**
-	 * Pick and execute one (1) Task from the Queue
+	 * Pick and execute one (1) Task
 	 *
 	 * Picks the next-in-line Task from the Queue and runs
 	 * it, then exits.
@@ -296,7 +296,7 @@ class CmisCommandController extends CommandController {
 	}
 
 	/**
-	 * Pick and execute one or more tasks from the Queue
+	 * Pick and execute one or more Tasks
 	 *
 	 * Pick the number of Tasks indicated in $tasks and run
 	 * all of them in a single run.
