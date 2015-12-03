@@ -9,6 +9,10 @@ plugin.tx_cmisservice.settings {
             # Enable domain/site indexing to CMIS? Must be ON or indexing of any record not in page UID zero will be disabled.
             enabled = 1
         }
+        sys_file {
+            # Enable FAL indexing - note that extension cmis_fal allows CMIS to be used directly as FAL storage but this flag must be enabled for those CMIS files to become indexed when your records reference files.
+            enabled = 1
+        }
         sys_category {
             # Enable category indexing to CMIS? Must be ON or all category referencing will be disabled
             enabled = 1

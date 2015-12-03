@@ -36,6 +36,13 @@ plugin.tx_cmisservice.settings {
                 0 = P:cm:titled
             }
         }
+        sys_file {
+            enabled = {$plugin.tx_cmisservice.settings.tables.sys_file.enabled}
+            primaryType = D:dkd:typo3:sys_file
+            secondaryTypes {
+                0 = P:cm:titled
+            }
+        }
         tt_content {
             enabled = {$plugin.tx_cmisservice.settings.tables.tt_content.enabled}
             primaryType = D:dkd:typo3:tt_content
