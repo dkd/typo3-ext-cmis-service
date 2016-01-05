@@ -6,3 +6,4 @@ typo3_src
 typo3_conf
 typo3temp
 uploads
+composer.lock

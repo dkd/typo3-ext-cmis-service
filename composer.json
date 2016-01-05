@@ -12,7 +12,6 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Maroschik\\Identity\\": "vendor/typo3/identity/Classes/",
             "Dkd\\CmisService\\Tests\\": "Tests/"
         }
     },
@@ -24,18 +23,6 @@
         {
             "url": "https://github.com/dkd/php-cmis-client.git",
             "type": "git"
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "typo3/identity",
-                "version": "0.3.0",
-                "source": {
-                    "url": "https://git.typo3.org/TYPO3CMS/Extensions/Identity.git",
-                    "type": "git",
-                    "reference": "refs/heads/master"
-                }
-            }
         }
     ],
     "authors": [
@@ -50,9 +37,11 @@
             "role": "Developer"
         }
     ],
+    "require": {
+        "typo3/cms": "^7.6",
+        "dkd/php-cmis": "dev-master"
+    },
     "require-dev": {
-        "typo3/cms": ">=6.2.11",
-        "dkd/php-cmis": "dev-master",
         "squizlabs/php_codesniffer": "1.*",
         "phpunit/phpunit": "4.2.*",
         "mikey179/vfsStream": "~1.3.0",
