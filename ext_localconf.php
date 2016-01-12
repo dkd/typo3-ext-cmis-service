@@ -12,7 +12,3 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['move
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearCachePostProc'][]
 	= 'Dkd\\CmisService\\Hook\\ClearCacheListener->clearCacheCommand';
 
-if (!defined('TYPO3_COMPOSER_AUTOLOAD') || (boolean) constant('TYPO3_COMPOSER_AUTOLOAD') === FALSE) {
-	require_once PATH_site . '/Packages/Libraries/autoload.php';
-}
-
