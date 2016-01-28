@@ -260,7 +260,7 @@ class CmisService implements SingletonInterface {
 	 *
 	 * @return CmisObjectInterface|NULL
 	 */
-	protected function getAndAutoCreateDefaultSiteFolder() {
+    public function getAndAutoCreateDefaultSiteFolder() {
 		$session = $this->getCmisObjectFactory()->getSession();
 		$hostname = $this->resolveHostname();
 		$sitesParentFolder = $this->resolveCmisSitesParentFolder();
