@@ -16,6 +16,7 @@ use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
 use Dkd\PhpCmis\Data\DocumentInterface;
 use Dkd\PhpCmis\Data\FolderInterface;
 use Symfony\Component\Yaml\Yaml;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 use TYPO3\CMS\Frontend\Page\PageRepository;
 
@@ -176,6 +177,23 @@ class CmisCommandController extends CommandController {
 	}
 
 	/**
+	 * Truncate Identity Storage
+	 *
+	 * Used when the local index associating records'
+	 * table and UID to a CMIS UUID needs to be flushed,
+	 * which it does when changing or recreating the
+	 * CMIS storage. In other words this command should be
+	 * executed whenever CMIS UUIDs have changed.
+	 *
+	 * Executes "TRUNCATE TABLE tx_cmisservice_identity".
+	 *
+	 * @return void
+	 */
+	public function truncateIdentityStorageCommand() {
+		$this->getDatabaseConnection()->exec_TRUNCATEquery('tx_cmisservice_identity');
+	}
+
+	/**
 	 * Generate Indexing Tasks
 	 *
 	 * Generates indexing Tasks for all monitored content.
@@ -272,6 +290,7 @@ class CmisCommandController extends CommandController {
 	 * @return void
 	 */
 	public function initializeCommand($verbose = FALSE) {
+		$this->getDatabaseConnection()->exec_TRUNCATEquery('tx_cmisservice_identity');
 		$taskFactory = $this->getTaskFactory();
 		$initializationTask = $taskFactory->createInitializationTask();
 		$worker = $this->getWorkerFactory()->createWorker();
@@ -448,4 +467,10 @@ class CmisCommandController extends CommandController {
 		return $this->getQueueFactory()->fetchQueue();
 	}
 
+	/**
+	 * @return DatabaseConnection
+	 */
+	protected function getDatabaseConnection() {
+		return $GLOBALS['TYPO3_DB'];
+	}
 }

@@ -260,7 +260,7 @@ class CmisService implements SingletonInterface {
 	 *
 	 * @return CmisObjectInterface|NULL
 	 */
-    public function getAndAutoCreateDefaultSiteFolder() {
+	public function getAndAutoCreateDefaultSiteFolder() {
 		$session = $this->getCmisObjectFactory()->getSession();
 		$hostname = $this->resolveHostname();
 		$sitesParentFolder = $this->resolveCmisSitesParentFolder();
@@ -276,12 +276,7 @@ class CmisService implements SingletonInterface {
 				PropertyIds::NAME => $hostname,
 				PropertyIds::DESCRIPTION => 'Global records from page UID zero on host ' . $hostname,
 				PropertyIds::OBJECT_TYPE_ID => Constants::CMIS_DOCUMENT_TYPE_SITE,
-				PropertyIds::SECONDARY_OBJECT_TYPE_IDS => array(
-					$session->getTypeDefinition(Constants::CMIS_DOCUMENT_TYPE_MAIN_ASPECT)->getId(),
-					$session->getTypeDefinition('P:cm:titled')->getId(),
-					$session->getTypeDefinition('P:cm:ownable')->getId(),
-					$session->getTypeDefinition('P:sys:undeletable')->getId()
-				)
+				PropertyIds::SECONDARY_OBJECT_TYPE_IDS => $this->resolveSecondaryObjectTypesForTableAndUid('sys_domain', 0)
 			), $sitesParentFolder);
 			$parentFolder = $session->getObject($createdFolder);
 		}
@@ -292,7 +287,7 @@ class CmisService implements SingletonInterface {
 	 * @return string
 	 */
 	protected function resolveHostname() {
-		return trim(shell_exec('hostname'));
+		return !empty($GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename']) ? $GLOBALS['TYPO3_CONF_VARS']['SYS']['sitename'] : trim(shell_exec('hostname'));
 	}
 
 	/**
@@ -368,8 +363,7 @@ class CmisService implements SingletonInterface {
 		} catch (RecordNotFoundException $error) {
 			$folder = $this->getAndAutoCreateDefaultSiteFolder();
 		} catch (CmisObjectNotFoundException $error) {
-			$parent = $this->resolveCmisSitesParentFolder();
-			$folder = $this->createCmisObject($parent, 'sys_domain', $domainRecord['uid']);
+			$folder = $this->getAndAutoCreateDefaultSiteFolder();
 		}
 		return $folder;
 	}

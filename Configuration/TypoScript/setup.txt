@@ -21,12 +21,11 @@ plugin.tx_cmisservice.settings {
             enabled = {$plugin.tx_cmisservice.settings.tables.sys_domain.enabled}
             primaryType = F:dkd:typo3:sys_domain
             secondaryTypes {
-                0 = P:cm:titled
-                1 = P:cm:localizable
-                2 = P:sys:undeletable
+                0 = P:cm:localizable
+                1 = P:sys:undeletable
             }
             mapping {
-                domainName = P:cm:title
+                domainName = cmis:name
             }
         }
         sys_category {
