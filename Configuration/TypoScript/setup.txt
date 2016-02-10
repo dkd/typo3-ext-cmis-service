@@ -34,6 +34,9 @@ plugin.tx_cmisservice.settings {
             secondaryTypes {
                 0 = P:cm:titled
             }
+            mapping {
+                title = cm:title
+            }
         }
         sys_file {
             enabled = {$plugin.tx_cmisservice.settings.tables.sys_file.enabled}
@@ -58,6 +61,9 @@ plugin.tx_cmisservice.settings {
                 0 = P:cm:titled
                 1 = P:cm:localizable
                 2 = P:cm:ownable
+            }
+            mapping {
+                title = cm:title
             }
         }
     }
