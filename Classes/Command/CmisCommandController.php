@@ -290,7 +290,6 @@ class CmisCommandController extends CommandController {
 	 * @return void
 	 */
 	public function initializeCommand($verbose = FALSE) {
-		$this->getDatabaseConnection()->exec_TRUNCATEquery('tx_cmisservice_identity');
 		$taskFactory = $this->getTaskFactory();
 		$initializationTask = $taskFactory->createInitializationTask();
 		$worker = $this->getWorkerFactory()->createWorker();

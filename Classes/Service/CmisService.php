@@ -6,6 +6,7 @@ use Dkd\CmisService\Analysis\RecordAnalyzer;
 use Dkd\CmisService\Configuration\Definitions\CmisConfiguration;
 use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
 use Dkd\CmisService\Constants;
+use Dkd\CmisService\Execution\Exception;
 use Dkd\CmisService\Factory\CmisObjectFactory;
 use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\SingletonInterface;
@@ -20,6 +21,7 @@ use Dkd\PhpCmis\Definitions\TypeDefinitionInterface;
 use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
 use Dkd\PhpCmis\PropertyIds;
 use Dkd\PhpCmis\SessionInterface;
+use GuzzleHttp\Stream\Stream;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /**
@@ -452,6 +454,87 @@ class CmisService implements SingletonInterface {
 		);
 		$this->storeUuidLocallyForRecord($table, $uid, $objectId);
 		return $session->getObject($objectId);
+	}
+
+	/**
+	 * Uploads a (new or existing) model schema to the
+	 * CMIS repository and activates it, causing the
+	 * repository to load all definitions from the schema.
+	 *
+	 * Can be executed multiple times without problems
+	 * but will obviously replace the schema with the version
+	 * you provide as argument, always.
+	 *
+	 * Note that your uploaded model files are identified by
+	 * base name only, meaning that uploading multiple files
+	 * named for example "mymodel.xml" will override that
+	 * model every time also if the file comes from different
+	 * folders on the local file system.
+	 *
+	 * @param string $modelDefinitionPathAndFilename
+	 * @return DocumentInterface
+	 */
+	public function uploadModelDefinition($modelDefinitionPathAndFilename) {
+		if (!file_exists($modelDefinitionPathAndFilename)) {
+			throw new Exception(
+				sprintf(
+					'Model definition file "%s" does not exist - please provide a valid path',
+					$modelDefinitionPathAndFilename
+				)
+			);
+		}
+		$session = $this->getCmisSession();
+		/** @var FolderInterface $dictionaryModelFolder */
+		$dictionaryModelFolder = $session->getObjectByPath('/Data Dictionary/Models');
+		$modelDefinitionBaseName = pathinfo($modelDefinitionPathAndFilename, PATHINFO_BASENAME);
+		/** @var DocumentInterface|NULL $modelDefinitionObject */
+		$modelDefinitionObject = NULL;
+		foreach ($dictionaryModelFolder->getChildren() as $existingModelDefinitionObject) {
+			if ($existingModelDefinitionObject->getName() === $modelDefinitionBaseName) {
+				$modelDefinitionObject = $existingModelDefinitionObject;
+				break;
+			}
+		}
+		$contentStream = Stream::factory(fopen($modelDefinitionPathAndFilename, 'r'));
+		if ($modelDefinitionObject) {
+			$modelDefinitionObjectId = $modelDefinitionObject->setContentStream($contentStream, TRUE);
+		} else {
+			$modelDefinitionObjectId = $session->createDocument(
+				array(
+					PropertyIds::OBJECT_TYPE_ID => Constants::CMIS_DOCUMENT_TYPE_MODEL,
+					PropertyIds::NAME => $modelDefinitionBaseName,
+					Constants::CMIS_PROPERTY_MODELDESCRIPTION => 'Imported TYPO3 model definition',
+					Constants::CMIS_PROPERTY_MODELACTIVE => TRUE
+				),
+				$dictionaryModelFolder,
+				$contentStream
+			);
+		}
+		return $session->getObject($modelDefinitionObjectId);
+	}
+
+	/**
+	 * Activate a model definition definition in repository.
+	 *
+	 * @param CmisObjectInterface $model
+	 * @return CmisObjectInterface
+	 */
+	public function activateModelDefinition(CmisObjectInterface $model) {
+		return $model->updateProperties(array(
+			Constants::CMIS_PROPERTY_MODELACTIVE => TRUE
+		));
+	}
+
+	/**
+	 * Deactivate a model definition document in repository.
+	 *
+	 * @param CmisObjectInterface $model
+	 * @return CmisObjectInterface
+	 */
+	public function deactivateModelDefinition(CmisObjectInterface $model) {
+		return $model->updateProperties(array(
+			Constants::CMIS_PROPERTY_MODELACTIVE => FALSE
+		));
 	}
 
 	/**

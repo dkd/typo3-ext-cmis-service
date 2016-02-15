@@ -8,6 +8,8 @@ use Dkd\CmisService\Execution\Result;
 use Dkd\CmisService\Task\InitializationTask;
 use Dkd\CmisService\Task\TaskInterface;
 use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
+use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 
 /**
  * Class InitializationExecution
@@ -60,18 +62,54 @@ class InitializationExecution extends AbstractCmisExecution implements Execution
 	 * @return Result
 	 */
 	public function execute(TaskInterface $task) {
-		/** @var EvictionTask $task */
+		/** @var InitializationTask $task */
 		$this->result = $this->createResultObject();
 		try {
+			$this->flushIdentityCache();
+			$uploadedModelDefinition = $this->uploadModelDefinition($task);
 			$this->validatePresenceOfCustomCmisTypes($this->requiredCustomTypes);
 			$this->createCmisSitesForFirstDomainOfAllRootPages();
-			$this->result->setMessage('CMIS Repository initialized!');
+			$this->result->setMessage(
+				sprintf(
+					'CMIS Repository initialized! Model definition "%s" uploaded with UUID "%s"',
+					$uploadedModelDefinition->getName(),
+					$uploadedModelDefinition->getId()
+				)
+			);
 		} catch (\InvalidArgumentException $error) {
 			$this->result->setCode(Result::ERR);
 			$this->result->setError($error);
 			$this->result->setMessage($error->getMessage());
 		}
 		return $this->result;
+	}
+
+	/**
+	 * @param TaskInterface $task
+	 * @return CmisObjectInterface
+	 */
+	protected function uploadModelDefinition(TaskInterface $task) {
+		$modelDefinitionPathAndFilename = $task->getParameter(InitializationTask::OPTION_MODELPATHANDFILENAME);
+		if (!$modelDefinitionPathAndFilename) {
+			$modelDefinitionPathAndFilename = ExtensionManagementUtility::extPath('cmis_service', 'Configuration/CmisModel/typo3model.xml');
+		}
+		$cmisService = $this->getCmisService();
+		$modelObject = $cmisService->uploadModelDefinition($modelDefinitionPathAndFilename);
+		#var_dump($modelObject->)
+		#var_dump($modelObject->getProperties()['cm:modelActive']->getValues());
+		#var_dump($modelObject->getProperties()['cm:modelDescription']->getValues());
+		$modelObject = $cmisService->activateModelDefinition($modelObject);
+		var_dump($modelObject->getProperties()['cm:modelActive']);
+		var_dump($modelObject->getProperties()['cm:modelActive']->getValues());
+		var_dump($modelObject->getProperties()['cm:modelDescription']->getValues());
+		return $modelObject;
+	}
+
+	/**
+	 * @return void
+	 */
+	protected function flushIdentityCache() {
+		$this->getDatabaseConnection()->exec_TRUNCATEquery('tx_cmisservice_identity');
 	}
 
 	/**

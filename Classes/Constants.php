@@ -6,6 +6,7 @@ namespace Dkd\CmisService;
  */
 abstract class Constants {
 
+	const CMIS_DOCUMENT_TYPE_MODEL = 'D:cm:dictionaryModel';
 	const CMIS_DOCUMENT_TYPE_SITES = 'F:st:sites';
 	const CMIS_DOCUMENT_TYPE_SITE = 'F:dkd:typo3:sys_domain';
 	const CMIS_DOCUMENT_TYPE_BACKEND_USER = 'I:dkd:typo3:be_users';
@@ -18,5 +19,7 @@ abstract class Constants {
 	const CMIS_PROPERTY_TYPO3TABLE = 'dkd:typo3:general:record_table';
 	const CMIS_PROPERTY_TYPO3UID = 'dkd:typo3:general:record_id';
 	const CMIS_PROPERTY_RAWDATA = 'dkd:typo3:general:record_data';
+	const CMIS_PROPERTY_MODELACTIVE = 'cm:modelActive';
+	const CMIS_PROPERTY_MODELDESCRIPTION = 'cm:modelDescription';
 
 }

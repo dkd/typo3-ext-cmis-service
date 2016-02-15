@@ -9,6 +9,8 @@ use Dkd\CmisService\Execution\ExecutionInterface;
  */
 class InitializationTask extends AbstractTask implements TaskInterface, TaskFilterInterface {
 
+	const OPTION_MODELPATHANDFILENAME = 'modelPathAndFilename';
+
 	/**
 	 * Returns an Execution object for indexing the
 	 * record as configured by Task's options.

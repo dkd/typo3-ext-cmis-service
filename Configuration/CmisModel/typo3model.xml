@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Definition of new Model -->
+<!-- The important part here is the name - Note: the use of the my: namespace
+     which is defined further on in the document -->
+<model xmlns="http://www.alfresco.org/model/dictionary/1.0" name="dkd:typo3">
+  <!-- Optional meta-data about the model -->
+  <description>TYPO3 Type</description>
+  <author>dkd Internet Service GmbH - Sascha Egerer, Mr. Wonderful</author>
+  <version>1.0</version>
+  <!-- Imports are required to allow references to definitions in other models -->
+  <imports>
+      <!-- Import Alfresco Dictionary Definitions -->
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <!-- Import Alfresco Content Domain Model Definitions -->
+      <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+      <!-- Import Alfresco User Domain Model Definitions -->
+      <import uri="http://www.alfresco.org/model/user/1.0" prefix="usr"/>
+  </imports>
+  <!-- Introduction of new namespaces defined by this model -->
+  <!-- NOTE: The following namespace my.new.model should be changed to reflect your own namespace -->
+  <namespaces>
+      <namespace uri="http://www.dkd.de/model/content/cmis/1.0" prefix="dkd"/>
+  </namespaces>
+  <types>
+      <!--  Enterprise-wide generic document type -->
+      <type name="dkd:typo3:sys_domain">
+          <title>TYPO3 Site</title>
+          <!-- Note: domains treated as pseudo-folders; not records! -->
+          <parent>cm:folder</parent>
+          <mandatory-aspects>
+              <aspect>dkd:typo3:aspect:general</aspect>
+          </mandatory-aspects>
+      </type>
+      <type name="dkd:typo3:be_users">
+          <title>TYPO3 Backend User</title>
+          <parent>usr:user</parent>
+          <mandatory-aspects>
+              <aspect>dkd:typo3:aspect:general</aspect>
+          </mandatory-aspects>
+      </type>
+      <type name="dkd:typo3:pages">
+          <title>TYPO3 Page</title>
+          <parent>cm:folder</parent>
+          <properties>
+              <property name="dkd:typo3:pages:doktype">
+                  <type>d:int</type>
+                  <mandatory>true</mandatory>
+                  <multiple>false</multiple>
+              </property>
+          </properties>
+          <associations>
+              <association name="dkd:typo3:pages:shortcut_to">
+                  <title>Shortcut to page</title>
+                  <source>
+                      <mandatory>false</mandatory>
+                      <many>true</many>
+                  </source>
+                  <target>
+                      <class>dkd:typo3:pages</class>
+                      <mandatory>false</mandatory>
+                      <many>false</many>
+                  </target>
+              </association>
+          </associations>
+          <mandatory-aspects>
+              <aspect>dkd:typo3:aspect:general</aspect>
+          </mandatory-aspects>
+      </type>
+      <type name="dkd:typo3:sys_file">
+          <title>TYPO3 File Record</title>
+          <parent>cm:content</parent>
+          <mandatory-aspects>
+              <aspect>dkd:typo3:aspect:general</aspect>
+          </mandatory-aspects>
+      </type>
+      <type name="dkd:typo3:tt_content">
+          <title>TYPO3 Content</title>
+          <parent>cm:content</parent>
+          <properties>
+              <property name="dkd:typo3:tt_content:CType">
+                  <type>d:text</type>
+                  <mandatory>true</mandatory>
+                  <multiple>false</multiple>
+              </property>
+              <property name="dkd:typo3:tt_content:colPos">
+                  <type>d:int</type>
+                  <mandatory>true</mandatory>
+                  <multiple>false</multiple>
+              </property>
+              <property name="dkd:typo3:tt_content:header_layout">
+                  <type>d:text</type>
+                  <mandatory>false</mandatory>
+                  <multiple>false</multiple>
+              </property>
+              <property name="dkd:typo3:tt_content:bodytext">
+                  <type>d:text</type>
+                  <mandatory>false</mandatory>
+                  <multiple>false</multiple>
+              </property>
+              <property name="dkd:typo3:tt_content:subHeader">
+                  <type>d:text</type>
+                  <mandatory>false</mandatory>
+                  <multiple>false</multiple>
+              </property>
+              <property name="dkd:typo3:tt_content:layout">
+                  <type>d:int</type>
+                  <mandatory>false</mandatory>
+                  <multiple>false</multiple>
+              </property>
+              <property name="dkd:typo3:tt_content:sectionindex">
+                  <type>d:boolean</type>
+                  <mandatory>false</mandatory>
+                  <multiple>false</multiple>
+                  <default>false</default>
+              </property>
+              <property name="dkd:typo3:tt_content:rte_enabled">
+                  <type>d:boolean</type>
+                  <mandatory>false</mandatory>
+                  <multiple>false</multiple>
+                  <default>false</default>
+              </property>
+          </properties>
+          <mandatory-aspects>
+              <aspect>dkd:typo3:aspect:general</aspect>
+          </mandatory-aspects>
+      </type>
+      <type name="dkd:typo3:arbitrary">
+          <title>TYPO3 Typeless/arbitrary Record</title>
+          <parent>cm:content</parent>
+          <mandatory-aspects>
+              <aspect>dkd:typo3:aspect:general</aspect>
+          </mandatory-aspects>
+      </type>
+  </types>
+  <aspects>
+      <aspect name="dkd:typo3:aspect:general">
+          <title>TYPO3 base attributes</title>
+          <properties>
+              <property name="dkd:typo3:general:record_table">
+                  <type>d:text</type>
+                  <multiple>false</multiple>
+              </property>
+              <property name="dkd:typo3:general:record_id">
+                  <type>d:int</type>
+                  <multiple>false</multiple>
+              </property>
+              <property name="dkd:typo3:general:record_data">
+                  <type>d:text</type>
+                  <multiple>false</multiple>
+              </property>
+              <property name="dkd:typo3:general:fullTitle">
+                  <type>d:text</type>
+                  <multiple>false</multiple>
+              </property>
+          </properties>
+          <associations>
+              <association name="dkd:typo3:relation:references_file">
+                  <title>References file</title>
+                  <source>
+                      <mandatory>false</mandatory>
+                      <many>true</many>
+                  </source>
+                  <target>
+                      <class>dkd:typo3:sys_file</class>
+                      <mandatory>false</mandatory>
+                      <many>false</many>
+                  </target>
+              </association>
+          </associations>
+      </aspect>
+  </aspects>
+</model>

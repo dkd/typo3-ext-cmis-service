@@ -22,7 +22,6 @@ plugin.tx_cmisservice.settings {
             primaryType = F:dkd:typo3:sys_domain
             secondaryTypes {
                 0 = P:cm:localizable
-                1 = P:sys:undeletable
             }
             mapping {
                 domainName = cmis:name
