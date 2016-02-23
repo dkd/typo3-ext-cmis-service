@@ -95,13 +95,7 @@ class InitializationExecution extends AbstractCmisExecution implements Execution
 		}
 		$cmisService = $this->getCmisService();
 		$modelObject = $cmisService->uploadModelDefinition($modelDefinitionPathAndFilename);
-		#var_dump($modelObject->)
-		#var_dump($modelObject->getProperties()['cm:modelActive']->getValues());
-		#var_dump($modelObject->getProperties()['cm:modelDescription']->getValues());
 		$modelObject = $cmisService->activateModelDefinition($modelObject);
-		var_dump($modelObject->getProperties()['cm:modelActive']);
-		var_dump($modelObject->getProperties()['cm:modelActive']->getValues());
-		var_dump($modelObject->getProperties()['cm:modelDescription']->getValues());
 		return $modelObject;
 	}
 

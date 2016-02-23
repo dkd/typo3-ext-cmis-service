@@ -299,7 +299,7 @@ class CmisService implements SingletonInterface {
 	 * @param integer $pageUid
 	 * @return array|NULL
 	 */
-	protected function resolvePrimaryDomainRecordForPageUid($pageUid) {
+	public function resolvePrimaryDomainRecordForPageUid($pageUid) {
 		$record = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
 			'uid, domainName, pid',
 			'sys_domain',
@@ -502,9 +502,13 @@ class CmisService implements SingletonInterface {
 			$modelDefinitionObjectId = $session->createDocument(
 				array(
 					PropertyIds::OBJECT_TYPE_ID => Constants::CMIS_DOCUMENT_TYPE_MODEL,
+					PropertyIds::SECONDARY_OBJECT_TYPE_IDS => array(
+						'P:cm:titled',
+						'P:cm:author',
+						'P:sys:localized'
+					),
 					PropertyIds::NAME => $modelDefinitionBaseName,
 					Constants::CMIS_PROPERTY_MODELDESCRIPTION => 'Imported TYPO3 model definition',
-					Constants::CMIS_PROPERTY_MODELACTIVE => TRUE
 				),
 				$dictionaryModelFolder,
 				$contentStream

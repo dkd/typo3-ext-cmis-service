@@ -1,5 +1,23 @@
 [global]
 
+# page type with endpoint to render pages/content as basic HTML with minimal metadata
+cmisContentBodyRenderer = PAGE
+cmisContentBodyRenderer {
+    typeNum = 41683
+    headerData >
+    config {
+        disableAllHeaderCode = 1
+        debug = 0
+    }
+    10 = USER
+    10 {
+        userFunc = TYPO3\CMS\Extbase\Core\Bootstrap->run
+        extensionName = CmisService
+        vendorName = Dkd
+        pluginName = Renderer
+    }
+}
+
 # TypoScript settings for extension cmis_service
 plugin.tx_cmisservice.settings {
 
@@ -14,7 +32,7 @@ plugin.tx_cmisservice.settings {
             enabled = {$plugin.tx_cmisservice.settings.tables.be_users.enabled}
             primaryType = I:dkd:typo3:be_users
             mapping {
-                username = P:usr:username
+                username = usr:username
             }
         }
         sys_domain {

@@ -4,6 +4,7 @@ namespace Dkd\CmisService\Analysis;
 use Dkd\CmisService\Analysis\Detection\IndexableColumnDetector;
 use Dkd\CmisService\Analysis\Detection\RelationData;
 use Dkd\CmisService\Factory\ObjectFactory;
+use Dkd\PhpCmis\Exception\CmisRuntimeException;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /**
@@ -82,6 +83,15 @@ class RecordAnalyzer {
 	 * @return RelationData
 	 */
 	public function getRelationDataForColumn($fieldName) {
+		if (empty($fieldName)) {
+			throw new CmisRuntimeException(
+				sprintf(
+					'Field name passed to RecordAnalyzer::getRelationDataForColumn was empty - your TCA may be invalid or ' .
+					'incomplete, lacking a target field for a relation column. Table name: %s',
+					$this->getTable()
+				)
+			);
+		}
 		$columnAnalyzer = $this->getColumnAnalyzer($fieldName);
 		$configuration = $columnAnalyzer->getConfigurationArray();
 		if ($columnAnalyzer->getFieldType() === ColumnAnalyzer::FIELDTYPE_GROUP) {
@@ -119,10 +129,24 @@ class RecordAnalyzer {
 				$relatedRecords = array();
 			}
 		} elseif ($columnAnalyzer->isFieldSimpleMultiValued()) {
+			if (empty($targetTable)) {
+				throw new CmisRuntimeException(
+					sprintf(
+						'Table field "%s:%s" is a relation, but the foreign_table parameter is empty',
+						$targetTable,
+						$fieldName
+					)
+				);
+			}
+			if (!empty($configuration['config']['foreign_table_field'])) {
+				$targetField = $configuration['config']['foreign_table_field'];
+			} else {
+				$targetField = 'uid';
+			}
 			$relatedRecords = $this->getDatabaseConnection()->exec_SELECTgetRows(
 				'*',
-				$configuration['config']['foreign_table'],
-				$configuration['config']['foreign_table_field'] . ' = ' . (string) $sourceUid
+				$targetTable,
+				$targetField . ' = ' . (string) $sourceUid
 			);
 			$targetFields = array($configuration['config']['foreign_table_field'] => $sourceUid);
 		} elseif ($columnAnalyzer->isFieldSingleDatabaseRelation()) {

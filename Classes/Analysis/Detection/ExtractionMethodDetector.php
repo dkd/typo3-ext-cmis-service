@@ -3,6 +3,7 @@ namespace Dkd\CmisService\Analysis\Detection;
 
 use Dkd\CmisService\Analysis\ColumnAnalyzer;
 use Dkd\CmisService\Analysis\TableConfigurationAnalyzer;
+use Dkd\CmisService\Extraction\BodyContentStreamExtraction;
 use Dkd\CmisService\Extraction\ExtractionInterface;
 
 /**
@@ -19,6 +20,16 @@ class ExtractionMethodDetector extends AbstractDetector implements DetectorInter
 	const METHOD_LEGACYFILE = 'LegacyFileReference';
 	const METHOD_BOOLEAN = 'Boolean';
 	const DEFAULT_METHOD = self::METHOD_PASSTHROUGH;
+
+	/**
+	 * Returns a content stream extractor which makes
+	 * stream wrappers from input strings.
+	 *
+	 * @return BodyContentStreamExtraction
+	 */
+	public function resolveBodyContentStreamExtractor() {
+		return new BodyContentStreamExtraction();
+	}
 
 	/**
 	 * Returns an instance of an ExtractionInterface

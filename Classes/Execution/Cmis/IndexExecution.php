@@ -9,9 +9,12 @@ use Dkd\CmisService\Execution\Exception;
 use Dkd\CmisService\Execution\ExecutionInterface;
 use Dkd\CmisService\Execution\Result;
 use Dkd\CmisService\Factory\ObjectFactory;
+use Dkd\CmisService\Service\RenderingService;
 use Dkd\CmisService\Task\RecordIndexTask;
 use Dkd\CmisService\Task\TaskInterface;
 use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
+use Dkd\PhpCmis\Data\DocumentInterface;
+use Dkd\PhpCmis\Data\FolderInterface;
 use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
 use Dkd\PhpCmis\PropertyIds;
 
@@ -21,12 +24,25 @@ use Dkd\PhpCmis\PropertyIds;
 class IndexExecution extends AbstractCmisExecution implements ExecutionInterface {
 
 	/**
+	 * @var RenderingService
+	 */
+	protected $renderingService;
+
+	/**
 	 * Contexts passed to Logger implementations when messages
 	 * are dispatched from this class.
 	 *
 	 * @var array
 	 */
 	protected $logContexts = array('cmis_service', 'execution', 'cmis', 'indexing');
+
+	/**
+	 * @param RenderingService $renderingService
+	 * @return void
+	 */
+	public function injectRenderingService(RenderingService $renderingService) {
+		$this->renderingService = $renderingService;
+	}
 
 	/**
 	 * @param TaskInterface $task
@@ -53,7 +69,6 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 		/** @var RecordIndexTask $task */
 		$this->result = $this->createResultObject();
 		$fields = (array) $task->getParameter(RecordIndexTask::OPTION_FIELDS);
-		$fields[] = 'uid';
 		$table = $task->getParameter(RecordIndexTask::OPTION_TABLE);
 		$uid = $task->getParameter(RecordIndexTask::OPTION_UID);
 		$record = $this->loadRecordFromDatabase($table, $uid, $fields);
@@ -84,10 +99,27 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 			$this->synchronizeRelationships($document, $recordAnalyzer, $data);
 		}
 		$this->affixAuthor($document, $recordAnalyzer);
+		$this->affixContentStream($document, $recordAnalyzer);
 		$this->result->setCode(Result::OK);
 		$this->result->setMessage('Indexed record ' . $uid . ' from ' . $table);
 		$this->result->setPayload($data);
 		return $this->result;
+	}
+
+	/**
+	 * @param CmisObjectInterface $document
+	 * @param RecordAnalyzer $recordAnalyzer
+	 * @return void
+	 */
+	protected function affixContentStream(CmisObjectInterface $document, RecordAnalyzer $recordAnalyzer) {
+		if ($document instanceof DocumentInterface) {
+			$renderedBody = $this->renderingService->renderRecord(
+				$recordAnalyzer->getTable(),
+				$recordAnalyzer->getRecord()
+			);
+			$stream = $this->getExtractionMethodDetector()->resolveBodyContentStreamExtractor()->extract($renderedBody);
+			$document->setContentStream($stream, TRUE);
+		}
 	}
 
 	/**
@@ -208,11 +240,13 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 			PropertyIds::NAME => $recordAnalyzer->getTitleForRecord(),
 			Constants::CMIS_PROPERTY_RAWDATA => serialize($data)
 		);
+		/*
 		$parentUid = $record['pid'];
 		if (0 < $parentUid) {
 			$values[PropertyIds::PARENT_ID] = $this->getCmisService()
 				->resolveObjectByTableAndUid('pages', $parentUid)->getId();
 		}
+		*/
 		$propertyMap = $this->getObjectFactory()->getConfiguration()->getTableConfiguration()->getSingleTableMapping($table);
 		foreach ($propertyMap as $recordProperty => $cmisPropertyId) {
 			$values[$cmisPropertyId] = $this->performTextExtraction($table, $uid, $recordProperty, $record);

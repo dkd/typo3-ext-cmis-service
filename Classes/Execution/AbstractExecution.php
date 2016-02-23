@@ -55,7 +55,13 @@ abstract class AbstractExecution implements ExecutionInterface {
 	 * @throws DatabaseCallException
 	 */
 	protected function loadRecordFromDatabase($table, $uid, array $fields) {
-		$fieldList = TRUE === empty($fields) ? '*' : implode(',', $fields);
+		if (empty($fields)) {
+			$fieldList = '*';
+		} else {
+			$fields[] = 'uid';
+			$fields[] = 'pid';
+			$fieldList = implode(',', $fields);
+		}
 		$database = $this->getDatabaseConnection();
 		$result = $database->exec_SELECTgetSingleRow($fieldList, $table, "uid = '" . $uid . "'");
 		if (NULL === $result) {
