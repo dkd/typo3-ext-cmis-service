@@ -4,6 +4,7 @@ namespace Dkd\CmisService\Service;
 use Dkd\CmisService\Constants;
 use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\SingletonInterface;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /**
  * Class RenderingService
@@ -67,6 +68,13 @@ class RenderingService implements SingletonInterface {
 	 * @return string
 	 */
 	protected function renderRecordWithFunction($table, array $record) {
+		if ($table === 'sys_file') {
+			$filePath = PATH_site . $record['identifier'];
+			if (file_exists($filePath)) {
+				return file_get_contents($filePath);
+			}
+			return sprintf('File not found: %s. Identifier: %s', $filePath, $record['identifier']);
+		}
 		return 'Rendered record ' . $record['uid'] . ' from table ' . $table;
 	}
 
@@ -83,12 +91,12 @@ class RenderingService implements SingletonInterface {
 		$parentPageUid = $pageUid;
 		while ($domain === NULL && $parentPageUid > 0) {
 			$domain = $this->getObjectFactory()->getCmisService()->resolvePrimaryDomainRecordForPageUid($parentPageUid);
-			$parentPageUid = reset($GLOBALS['TYPO3_DB']->exec_SELECTgetSingleRow('pid', 'pages', "uid = '" . $parentPageUid . "'"));
+			$parentPageUid = reset($this->getDatabaseConnection()->exec_SELECTgetSingleRow('pid', 'pages', "uid = '" . $parentPageUid . "'"));
 		}
-		$content = file_get_contents('http://' . $domain['domainName'] . '/' . $uri);
+		$content = @file_get_contents('http://' . $domain['domainName'] . '/' . $uri);
 		if (empty($content)) {
 			// retry on localhost
-			$content = file_get_contents('http://localhost/' . $uri);
+			$content = @file_get_contents('http://localhost/' . $uri);
 		}
 		return $content;
 	}
@@ -100,4 +108,10 @@ class RenderingService implements SingletonInterface {
 		return new ObjectFactory();
 	}
 
+	/**
+	 * @return DatabaseConnection
+	 */
+	protected function getDatabaseConnection() {
+		return $GLOBALS['TYPO3_DB'];
+	}
 }

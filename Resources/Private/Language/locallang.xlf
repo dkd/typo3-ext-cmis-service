@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<xliff version="1.0">
+    <file source-language="en" datatype="plaintext" original="messages"
+          product-name="cmis_service" date="2016-02-23T13:11:32+01:00">
+        <header/>
+        <body>
+            <trans-unit id="mlang_tabs_tab" xml:space="preserve">
+                <source>CMIS Manager</source>
+            </trans-unit>
+            <trans-unit id="mlang_labels_tablabel" xml:space="preserve">
+                <source>CMIS Manager</source>
+            </trans-unit>
+            <trans-unit id="mlang_labels_tabdescr" xml:space="preserve">
+                <source>Interaction with CMIS service</source>
+            </trans-unit>
+            <trans-unit id="view.index" xml:space="preserve">
+                <source>Queue status/actions</source>
+            </trans-unit>
+            <trans-unit id="view.repositories" xml:space="preserve">
+                <source>Repositories</source>
+            </trans-unit>
+            <trans-unit id="view.tables" xml:space="preserve">
+                <source>Monitored tables</source>
+            </trans-unit>
+            <trans-unit id="none" xml:space="preserve">
+                <source>None</source>
+            </trans-unit>
+            <trans-unit id="setting" xml:space="preserve">
+                <source>Setting</source>
+            </trans-unit>
+            <trans-unit id="value" xml:space="preserve">
+                <source>Value</source>
+            </trans-unit>
+            <trans-unit id="headers.queue" xml:space="preserve">
+                <source>Queue</source>
+            </trans-unit>
+            <trans-unit id="headers.repositories" xml:space="preserve">
+                <source>Repositories/info</source>
+            </trans-unit>
+            <trans-unit id="headers.tables" xml:space="preserve">
+                <source>Monitored tables</source>
+            </trans-unit>
+            <trans-unit id="headers.actions" xml:space="preserve">
+                <source>Actions</source>
+            </trans-unit>
+            <trans-unit id="actions.nothingQueued" xml:space="preserve">
+                <source>No actions to perform</source>
+            </trans-unit>
+            <trans-unit id="actions.executeTask" xml:space="preserve">
+                <source>Execute task</source>
+            </trans-unit>
+            <trans-unit id="actions.executeTasks" xml:space="preserve">
+                <source>Execute %d tasks</source>
+            </trans-unit>
+            <trans-unit id="actions.refreshStatus" xml:space="preserve">
+                <source>Refresh status</source>
+            </trans-unit>
+            <trans-unit id="actions.generate" xml:space="preserve">
+                <source>Generate...</source>
+            </trans-unit>
+            <trans-unit id="actions.generate.indexingTasks" xml:space="preserve">
+                <source>Tasks for %s</source>
+            </trans-unit>
+            <trans-unit id="actions.truncate" xml:space="preserve">
+                <source>Truncate...</source>
+            </trans-unit>
+            <trans-unit id="actions.truncate.queued" xml:space="preserve">
+                <source>Queued tasks</source>
+            </trans-unit>
+            <trans-unit id="actions.truncate.identities" xml:space="preserve">
+                <source>Identities</source>
+            </trans-unit>
+            <trans-unit id="progressbar.legend.indexed" xml:space="preserve">
+                <source>Indexed</source>
+            </trans-unit>
+            <trans-unit id="progressbar.legend.queued" xml:space="preserve">
+                <source>Queued</source>
+            </trans-unit>
+            <trans-unit id="progressbar.legend.remaining" xml:space="preserve">
+                <source>Not yet processed</source>
+            </trans-unit>
+            <trans-unit id="tables.enabled" xml:space="preserve">
+                <source>Enabled?</source>
+            </trans-unit>
+            <trans-unit id="tables.primaryType" xml:space="preserve">
+                <source>Primary CMIS type</source>
+            </trans-unit>
+            <trans-unit id="tables.secondaryTypes" xml:space="preserve">
+                <source>Secondary CMIS type(s)</source>
+            </trans-unit>
+            <trans-unit id="tables.propertyMapping" xml:space="preserve">
+                <source>Property mapping</source>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

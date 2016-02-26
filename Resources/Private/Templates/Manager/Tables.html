@@ -1,0 +1,106 @@
+{namespace cmis=Dkd\CmisService\ViewHelpers}
+
+<f:layout name="Backend" />
+
+<f:section name="Buttons">
+	<!-- buttons -->
+</f:section>
+
+<f:section name="Main">
+
+	<div class="row">
+
+		<div class="col-xs-12">
+			<h3>
+				<f:translate key="headers.tables" />
+			</h3>
+			{f:render(section: 'TableConfiguration', arguments: {table: table, tableName: tableName})
+			-> f:for(each: monitored, as: 'table', key: 'tableName')}
+		</div>
+
+	</div>
+
+</f:section>
+
+<f:section name="TableConfiguration">
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th colspan="2">
+					{tableName}
+				</th>
+			</tr>
+			<tr>
+				<th class="col-xs-4">
+					<f:translate key="setting" />
+				</th>
+				<th>
+					<f:translate key="value" />
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+		<tr class="{f:if(condition: table.enabled, then: 'success', else: 'danger')}">
+			<td>
+				<f:translate key="tables.enabled" />
+			</td>
+			<td><f:if condition="{table.enabled}" then="YES" else="NO" /></td>
+		</tr>
+		<tr>
+			<td>
+				<f:translate key="tables.primaryType" />
+			</td>
+			<td>{table.primaryType}</td>
+		</tr>
+		<tr>
+			<td>
+				<f:translate key="tables.secondaryTypes" />
+			</td>
+			<td>
+				<f:if condition="{table.secondaryTypes -> f:count()}">
+					<f:else>
+						<f:translate key="none" />
+					</f:else>
+					<f:then>
+						<ol class="list-unstyled">
+							<f:for each="{table.secondaryTypes}" as="secondaryType">
+								<li>{secondaryType}</li>
+							</f:for>
+						</ol>
+					</f:then>
+				</f:if>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<f:translate key="tables.propertyMapping" />
+			</td>
+			<td>
+				<f:if condition="{table.mapping -> f:count()}">
+					<f:else>
+						<f:translate key="none" />
+					</f:else>
+					<f:then>
+						<table class="table table-condensed table-no-borders">
+							<thead>
+							<tr>
+								<th class="col-xs-6">TYPO3</th>
+								<th>CMIS</th>
+							</tr>
+							</thead>
+							<tbody>
+							<f:for each="{table.mapping}" as="destination" key="source">
+								<tr>
+									<td>{source}</td>
+									<td>{destination}</td>
+								</tr>
+							</f:for>
+							</tbody>
+						</table>
+					</f:then>
+				</f:if>
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</f:section>

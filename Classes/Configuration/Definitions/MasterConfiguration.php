@@ -164,6 +164,13 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getActiveConfigurationName() {
+		return $this->activeCmisServerConfigurationName;
+	}
+
+	/**
 	 * Get the ConfigurationDefinition describing Stanbol integration
 	 *
 	 * @return StanbolConfiguration

@@ -1,0 +1,42 @@
+<f:layout name="Backend" />
+
+{namespace cmis=Dkd\CmisService\ViewHelpers}
+<f:be.container pageTitle="Content Dashboard" enableClickMenu="false" includeCssFiles="{cmis:stylesheets()}">
+	<cmis:Javascript />
+	<div class="typo3-fullDoc">
+		<div id="typo3-docheader">
+			<div class="typo3-docheader-functions">
+				<f:be.menus.actionMenu>
+					<f:be.menus.actionMenuItem
+							label="{f:translate(key: 'view.index')}"
+							controller="Manager" action="index" />
+					<f:be.menus.actionMenuItem
+							label="{f:translate(key: 'view.repositories')}"
+							controller="Manager" action="repositories" />
+					<f:be.menus.actionMenuItem
+							label="{f:translate(key: 'view.tables')}"
+							controller="Manager" action="tables" />
+				</f:be.menus.actionMenu>
+			</div>
+			<div class="typo3-docheader-buttons">
+				<div class="left">
+					<div class="buttongroup">
+						<f:render section="Buttons" />
+					</div>
+				</div>
+				<div class="right">
+					<div class="buttongroup">
+						<f:be.buttons.shortcut />
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="typo3-docbody">
+			<div id="typo3-inner-docbody">
+				<div class="container contentdashboard-container">
+					<f:render section="Main" />
+				</div>
+			</div>
+		</div>
+	</div>
+</f:be.container>

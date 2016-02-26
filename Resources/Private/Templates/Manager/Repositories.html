@@ -1,0 +1,43 @@
+{namespace cmis=Dkd\CmisService\ViewHelpers}
+
+<f:layout name="Backend" />
+
+<f:section name="Buttons">
+	<!-- buttons -->
+</f:section>
+
+<f:section name="Main">
+
+	<div class="row">
+
+		<div class="col-xs-12">
+			<h3>
+				<f:translate key="headers.repositories" />
+			</h3>
+			{f:render(section: 'ServerStatus', arguments: {server: server, statuses: servers.status, serverName: serverName})
+			-> f:for(each: servers.configurations, as: 'server', key: 'serverName')}
+		</div>
+
+	</div>
+
+</f:section>
+
+<f:section name="ServerStatus">
+	<div class="alert alert-{f:if(condition: '{cmis:variable(name: \'statuses.{serverName}.code\')}', then: 'danger', else: 'success')}">
+		{cmis:variable(name: 'statuses.{serverName}.message') -> f:format.raw()}
+	</div>
+	<div class="alert alert-info">
+		<span class="fa fa-globe"></span>
+		<a href="{server.definitions.url}" target="_blank" class="">
+			{server.definitions.url}
+		</a>
+	</div>
+	<table class="table table-condensed table-striped">
+		<f:for each="{server.definitions}" as="value" key="key">
+			<tr>
+				<td>{key}</td>
+				<td>{value}</td>
+			</tr>
+		</f:for>
+	</table>
+</f:section>

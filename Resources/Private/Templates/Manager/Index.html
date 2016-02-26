@@ -1,0 +1,134 @@
+{namespace cmis=Dkd\CmisService\ViewHelpers}
+
+<f:layout name="Backend" />
+
+<f:section name="Buttons">
+	<!-- buttons -->
+</f:section>
+
+<f:section name="Main">
+
+	<f:flashMessages renderMode="div" />
+
+	<div class="row">
+
+		<div class="col-xs-12">
+			<h3>
+				<f:translate key="headers.queue" />
+			</h3>
+			<div class="progress" style="height: 3.5em;">
+				<div class="progress-bar progress-bar-striped progress-bar-success" role="progressbar" aria-valuenow="{status.percent.indexed}"
+				     aria-valuemin="0" aria-valuemax="100" style="height: 3.5em; padding-top: 1em; width: {status.percent.indexed}%;">
+					{status.percent.indexed}%
+				</div>
+				<div class="progress-bar progress-bar-striped progress-bar-warning" role="progressbar" aria-valuenow="{status.percent.queued}"
+				     aria-valuemin="0" aria-valuemax="100" style="height: 3.5em; padding-top: 1em; width: {status.percent.queued}%;">
+					{status.percent.queued}%
+				</div>
+				<div class="progress-bar progress-bar-striped progress-bar-danger" role="progressbar" aria-valuenow="{status.percent.remaining}"
+				     aria-valuemin="0" aria-valuemax="100" style="height: 3.5em; padding-top: 1em; width: {status.percent.remaining}%;">
+					{status.percent.remaining}%
+				</div>
+			</div>
+			<div class="pull-right clearfix">
+				<span class="label label-success"><f:translate key="progressbar.legend.indexed" /></span>
+				<span class="label label-warning"><f:translate key="progressbar.legend.queued" /></span>
+				<span class="label label-danger"><f:translate key="progressbar.legend.remaining" /></span>
+			</div>
+		</div>
+
+	</div>
+	<div class="row">
+
+		<div class="col-xs-12">
+
+			<!-- Task related actions -->
+			<h3>
+				<f:translate key="headers.actions" />
+			</h3>
+			<f:if condition="{status.queued}">
+				<f:else>
+					<span class="btn btn-default disabled">
+						<f:translate key="actions.nothingQueued" />
+					</span>
+				</f:else>
+				<f:then>
+					<div class="btn-group">
+						<f:link.action action="pickTask" class="btn btn-primary">
+							<f:translate key="actions.executeTask" />
+						</f:link.action>
+						<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li>
+								<f:link.action action="pickTasks" arguments="{tasks: 5}">
+									<f:translate key="actions.executeTasks" arguments="{0: 5}" />
+								</f:link.action>
+							</li>
+							<li>
+								<f:link.action action="pickTasks" arguments="{tasks: 25}">
+									<f:translate key="actions.executeTasks" arguments="{0: 25}" />
+								</f:link.action>
+							</li>
+							<li>
+								<f:link.action action="pickTasks" arguments="{tasks: 50}">
+									<f:translate key="actions.executeTasks" arguments="{0: 50}" />
+								</f:link.action>
+							</li>
+							<li>
+								<f:link.action action="pickTasks" arguments="{tasks: 100}">
+									<f:translate key="actions.executeTasks" arguments="{0: 100}" />
+								</f:link.action>
+							</li>
+						</ul>
+					</div>
+				</f:then>
+			</f:if>
+
+			<!-- Standard actions which can be performed by clicking buttons -->
+			<f:link.action action="refreshStatus" class="btn btn-info">
+				<span class="fa fa-refresh"></span>
+				<f:translate key="actions.refreshStatus" />
+			</f:link.action>
+
+			<div class="btn-group">
+				<button class="btn btn-danger dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<f:translate key="actions.truncate" /> <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<li>
+						<f:link.action action="truncateQueue">
+							<span class="fa fa-trash-o"></span>
+							<f:translate key="actions.truncate.queued" /> ({status.queued})
+						</f:link.action>
+					</li>
+					<li>
+						<f:link.action action="truncateIdentities">
+							<span class="fa fa-trash-o"></span>
+							<f:translate key="actions.truncate.identities" /> ({status.identities})
+						</f:link.action>
+					</li>
+				</ul>
+			</div>
+
+			<div class="btn-group">
+				<button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<f:translate key="actions.generate" /> <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu">
+					<f:for each="{tables}" as="tableRecords" key="tableName">
+						<li>
+							<f:link.action action="generateIndexingTasks" arguments="{table: tableName}">
+								<f:translate key="actions.generate.indexingTasks" arguments="{0: tableName}" /> ({tableRecords})
+							</f:link.action>
+						</li>
+					</f:for>
+				</ul>
+			</div>
+
+		</div>
+
+	</div>
+
+</f:section>

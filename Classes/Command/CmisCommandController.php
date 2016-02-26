@@ -1,24 +1,15 @@
 <?php
 namespace Dkd\CmisService\Command;
 
-use Dkd\CmisService\Analysis\RecordAnalyzer;
 use Dkd\CmisService\Analysis\TableConfigurationAnalyzer;
 use Dkd\CmisService\Execution\Result;
-use Dkd\CmisService\Factory\CmisObjectFactory;
-use Dkd\CmisService\Factory\ObjectFactory;
-use Dkd\CmisService\Factory\QueueFactory;
-use Dkd\CmisService\Factory\TaskFactory;
-use Dkd\CmisService\Factory\WorkerFactory;
-use Dkd\CmisService\Initialization;
-use Dkd\CmisService\Queue\QueueInterface;
-use Dkd\CmisService\Task\TaskInterface;
+use Dkd\CmisService\Service\InteractionService;
 use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
 use Dkd\PhpCmis\Data\DocumentInterface;
 use Dkd\PhpCmis\Data\FolderInterface;
 use Symfony\Component\Yaml\Yaml;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
-use TYPO3\CMS\Frontend\Page\PageRepository;
 
 /**
  * CMIS Command Controller
@@ -44,11 +35,146 @@ class CmisCommandController extends CommandController {
 	protected $logContexts = array('cmis_service', 'CLI');
 
 	/**
+	 * @var InteractionService
+	 */
+	protected $interactionService;
+
+	/**
+	 * @param InteractionService $interactionService
 	 * @return void
 	 */
-	public function initializeObject() {
-		$initializer = new Initialization();
-		$initializer->start();
+	public function injectInteractionService(InteractionService $interactionService) {
+		$this->interactionService = $interactionService;
+	}
+
+	/**
+	 * Truncate Queue
+	 *
+	 * Used when the queue should be completely flushed
+	 * of all pending Tasks, regardless of status.
+	 *
+	 * @return void
+	 */
+	public function truncateQueueCommand() {
+		$result = $this->interactionService->truncateQueue();
+		$this->echoResultToConsole($result);
+	}
+
+	/**
+	 * Truncate Identity Storage
+	 *
+	 * Used when the local index associating records'
+	 * table and UID to a CMIS UUID needs to be flushed,
+	 * which it does when changing or recreating the
+	 * CMIS storage. In other words this command should be
+	 * executed whenever CMIS UUIDs have changed.
+	 *
+	 * Executes "TRUNCATE TABLE tx_cmisservice_identity".
+	 *
+	 * @return void
+	 */
+	public function truncateIdentityStorageCommand() {
+		$result = $this->interactionService->truncateIdentities();
+		$this->echoResultToConsole($result);
+	}
+
+	/**
+	 * Generate Indexing Tasks
+	 *
+	 * Generates indexing Tasks for all monitored content.
+	 * Indexing tasks are then processed by pickTask() or
+	 * pickTasks($num). No actual interaction with CMIS
+	 * is done by this command - the execution of indexing
+	 * Tasks performs this check and if no updates are
+	 * required, skips further processing and marks the
+	 * Task as successfully completed.
+	 *
+	 * @param string $table Table to index, or empty for all tables.
+	 * @return void
+	 */
+	public function generateIndexingTasksCommand($table = NULL) {
+		if (TRUE === empty($table)) {
+			$tables = $this->interactionService->getMonitoredTableNames();
+		} elseif (FALSE !== strpos($table, ',')) {
+			$tables = explode(',', $table);
+			$tables = array_map('trim', $tables);
+		} else {
+			$tables = array($table);
+		}
+		foreach ($tables as $tableName) {
+			$result = $this->interactionService->createAndAddIndexingTasks($tableName);
+			$this->echoResultToConsole($result);
+		}
+	}
+
+	/**
+	 * Initialize the CMIS repository
+	 *
+	 * It is safe to re-run this command multiple times!
+	 *
+	 * Analyse the CMIS repository's data storage to
+	 * detect any TYPO3-specific data types that may be
+	 * missing, then creates those data types. If a
+	 * required object type already exists is is left
+	 * untouched.
+	 *
+	 * Also takes into consideration any custom setup
+	 * which adds types.
+	 *
+	 * This CLI command circumvents the Queue and directly
+	 * executes the InitializationTask.
+	 *
+	 * @param boolean $verbose If TRUE (1) will output additional information about payloads
+	 * @return void
+	 */
+	public function initializeCommand($verbose = FALSE) {
+		$result = $this->interactionService->initializeRepository();
+		$this->echoResultToConsole($result, $verbose);
+	}
+
+	/**
+	 * Pick and execute one (1) Task
+	 *
+	 * Picks the next-in-line Task from the Queue and runs
+	 * it, then exits.
+	 *
+	 * For multiple Tasks in one run, use pickTasks()
+	 *
+	 * @param boolean $verbose If TRUE (1) will output additional information about payloads
+	 * @return void
+	 */
+	public function pickTaskCommand($verbose = FALSE) {
+		$this->pickTasksCommand(1, $verbose);
+	}
+
+	/**
+	 * Pick and execute one or more Tasks
+	 *
+	 * Pick the number of Tasks indicated in $tasks and run
+	 * all of them in a single run.
+	 *
+	 * @param integer $tasks Number of tasks to pick and execute.
+	 * @param boolean $verbose If TRUE (1) will output additional information about payloads
+	 * @return void
+	 */
+	public function pickTasksCommand($tasks = 1, $verbose = FALSE) {
+		$results = $this->interactionService->pickTasks($tasks);
+		if ($verbose) {
+			array_map(array($this, 'echoResultToConsole'), $results);
+		} else {
+			$this->response->setContent(sprintf('Executed %d tasks(s)', count($results)) . PHP_EOL);
+			$this->response->send();
+		}
+	}
+
+	/**
+	 * Reads the current queue status
+	 *
+	 * @return void
+	 */
+	public function statusCommand() {
+		$result = $this->interactionService->readQueueStatus();
+		$this->echoResultToConsole($result);
 	}
 
 	/**
@@ -164,203 +290,6 @@ class CmisCommandController extends CommandController {
 	}
 
 	/**
-	 * Truncate Queue
-	 *
-	 * Used when the queue should be completely flushed
-	 * of all pending Tasks, regardless of status.
-	 *
-	 * @return void
-	 */
-	public function truncateQueueCommand() {
-		$this->getQueue()->flush();
-		$this->getObjectFactory()->getLogger()->debug('Queue dump command executed', $this->logContexts);
-	}
-
-	/**
-	 * Truncate Identity Storage
-	 *
-	 * Used when the local index associating records'
-	 * table and UID to a CMIS UUID needs to be flushed,
-	 * which it does when changing or recreating the
-	 * CMIS storage. In other words this command should be
-	 * executed whenever CMIS UUIDs have changed.
-	 *
-	 * Executes "TRUNCATE TABLE tx_cmisservice_identity".
-	 *
-	 * @return void
-	 */
-	public function truncateIdentityStorageCommand() {
-		$this->getDatabaseConnection()->exec_TRUNCATEquery('tx_cmisservice_identity');
-	}
-
-	/**
-	 * Generate Indexing Tasks
-	 *
-	 * Generates indexing Tasks for all monitored content.
-	 * Indexing tasks are then processed by pickTask() or
-	 * pickTasks($num). No actual interaction with CMIS
-	 * is done by this command - the execution of indexing
-	 * Tasks performs this check and if no updates are
-	 * required, skips further processing and marks the
-	 * Task as successfully completed.
-	 *
-	 * @param string $table Table to index, or empty for all tables.
-	 * @return void
-	 */
-	public function generateIndexingTasksCommand($table = NULL) {
-		if (TRUE === empty($table)) {
-			$tableAnalyzer = $this->getTableConfigurationAnalyzer();
-			$tables = $tableAnalyzer->getIndexableTableNames();
-		} elseif (FALSE !== strpos($table, ',')) {
-			$tables = explode(',', $table);
-			$tables = array_map('trim', $tables);
-		} else {
-			$tables = array($table);
-		}
-		$this->createAndAddIndexingTasks($tables);
-	}
-
-	/**
-	 * Generate all required indexing tasks for all tables
-	 * in array $tables
-	 *
-	 * @param array $tables
-	 * @return void
-	 */
-	protected function createAndAddIndexingTasks($tables) {
-		$indexingTasks = array();
-		$relationIndexingTasks = array();
-		$objectFactory = $this->getObjectFactory();
-		foreach ($tables as $table) {
-			if ($objectFactory->getConfiguration()->getTableConfiguration()->isTableEnabled($table)) {
-				$records = $this->getAllEnabledRecordsFromTable($table);
-				foreach ($records as $record) {
-					$indexingTasks[] = $this->createRecordIndexingTask($table, $record);
-					$relationIndexingTasks[] = $this->createRecordIndexingTask($table, $record, TRUE);
-				}
-			}
-		}
-		$tasks = array_merge($indexingTasks, $relationIndexingTasks);
-		$tableNames = implode(', ', $tables);
-		$queue = $this->getQueue();
-		$queue->addAll($tasks);
-		$tablesSuffix = 1 !== count($tables) ? 's' : '';
-		$countTasks = count($indexingTasks);
-		$tasksSuffix = 1 !== $countTasks ? 's' : '';
-		$countRelations = count($relationIndexingTasks);
-		$relationsSuffix = 1 !== $countRelations ? 's' : '';
-		$messageText = 'Added %d %s task%s for table%s %s.';
-		$message = sprintf($messageText, $countTasks, 'indexing', $tasksSuffix, $tablesSuffix, $tableNames) . PHP_EOL;
-		$message .= sprintf($messageText, $countRelations, 'relation indexing', $relationsSuffix, $tablesSuffix, $tableNames);
-		$this->response->setContent($message . PHP_EOL);
-		$objectFactory->getLogger()->info(sprintf('%s indexing task(s) created', $queue->count()), $this->logContexts);
-	}
-
-	/**
-	 * @param string $table
-	 * @param array $record
-	 * @param boolean $includeRelations
-	 * @return TaskInterface
-	 */
-	protected function createRecordIndexingTask($table, $record, $includeRelations = FALSE) {
-		$taskFactory = $this->getTaskFactory();
-		$recordAnalyzer = $this->getRecordAnalyzer($table, $record);
-		$fields = $recordAnalyzer->getIndexableColumnNames();
-		return $taskFactory->createRecordIndexingTask($table, $record['uid'], $fields, $includeRelations);
-	}
-
-	/**
-	 * Initialize the CMIS repository
-	 *
-	 * It is safe to re-run this command multiple times!
-	 *
-	 * Analyse the CMIS repository's data storage to
-	 * detect any TYPO3-specific data types that may be
-	 * missing, then creates those data types. If a
-	 * required object type already exists is is left
-	 * untouched.
-	 *
-	 * Also takes into consideration any custom setup
-	 * which adds types.
-	 *
-	 * This CLI command circumvents the Queue and directly
-	 * executes the InitializationTask.
-	 *
-	 * @param boolean $verbose If TRUE (1) will output additional information about payloads
-	 * @return void
-	 */
-	public function initializeCommand($verbose = FALSE) {
-		$taskFactory = $this->getTaskFactory();
-		$initializationTask = $taskFactory->createInitializationTask();
-		$worker = $this->getWorkerFactory()->createWorker();
-		$result = $worker->execute($initializationTask);
-		$this->echoResultToConsole($result, $verbose);
-		$this->getObjectFactory()->getLogger()->info('Initialization performed', $this->logContexts);
-	}
-
-	/**
-	 * Pick and execute one (1) Task
-	 *
-	 * Picks the next-in-line Task from the Queue and runs
-	 * it, then exits.
-	 *
-	 * For multiple Tasks in one run, use pickTasks()
-	 *
-	 * @param boolean $verbose If TRUE (1) will output additional information about payloads
-	 * @return void
-	 */
-	public function pickTaskCommand($verbose = FALSE) {
-		$this->pickTasksCommand(1, $verbose);
-	}
-
-	/**
-	 * Pick and execute one or more Tasks
-	 *
-	 * Pick the number of Tasks indicated in $tasks and run
-	 * all of them in a single run.
-	 *
-	 * @param integer $tasks Number of tasks to pick and execute.
-	 * @param boolean $verbose If TRUE (1) will output additional information about payloads
-	 * @return void
-	 */
-	public function pickTasksCommand($tasks = 1, $verbose = FALSE) {
-		$queue = $this->getQueue();
-		while (0 <= --$tasks && ($task = $queue->pick())) {
-			$result = $task->getWorker()->execute($task);
-			$this->echoResultToConsole($result, $verbose);
-		}
-		$this->response->send();
-		$this->getObjectFactory()->getLogger()->info(sprintf('Picked %d Worker task(s)', $queue->count()), $this->logContexts);
-	}
-
-	/**
-	 * Reads the current queue status
-	 *
-	 * @return void
-	 */
-	public function statusCommand() {
-		$queue = $this->getQueue();
-		$count = $queue->count();
-		$message = sprintf('%d job%s currently queued', $count, (1 !== $count ? 's' : ''));
-		$this->response->setContent($message . PHP_EOL);
-		$this->getObjectFactory()->getLogger()->debug(sprintf('Status: %s', $message), $this->logContexts);
-	}
-
-	/**
-	 * Get every record that is not deleted or disabled by
-	 * TCA configuration, from $table.
-	 *
-	 * @param string $table
-	 * @return array
-	 */
-	protected function getAllEnabledRecordsFromTable($table) {
-		$pageRepository = $this->getPageRepository();
-		// get an "enableFields" SQL condition, string starting with " AND ".
-		$condition = $pageRepository->enableFields($table, 0, array(), TRUE);
-		return $GLOBALS['TYPO3_DB']->exec_SELECTgetRows('*', $table, '1=1' . $condition);
-	}
-
-	/**
 	 * @param Result $result
 	 * @param boolean $verbose
 	 * @return void
@@ -371,99 +300,6 @@ class CmisCommandController extends CommandController {
 		if (0 < count($payload) && TRUE === $verbose) {
 			$this->response->appendContent(var_export($payload, TRUE) . PHP_EOL);
 		}
-	}
-
-	/**
-	 * Creates an instance of TaskFactory to create Tasks.
-	 *
-	 * @codeCoverageIgnore
-	 * @return TaskFactory
-	 */
-	protected function getTaskFactory() {
-		return new TaskFactory();
-	}
-
-	/**
-	 * Creates an instance of QueueFactory to create Queue instance.
-	 *
-	 * @codeCoverageIgnore
-	 * @return QueueFactory
-	 */
-	protected function getQueueFactory() {
-		return new QueueFactory();
-	}
-
-	/**
-	 * Creates an instance of ObjectFactory to create new objects.
-	 *
-	 * @codeCoverageIgnore
-	 * @return ObjectFactory
-	 */
-	protected function getObjectFactory() {
-		return new ObjectFactory();
-	}
-
-	/**
-	 * Creates an instance of WorkerFactory to create new workers.
-	 *
-	 * @codeCoverageIgnore
-	 * @return WorkerFactory
-	 */
-	protected function getWorkerFactory() {
-		return new WorkerFactory();
-	}
-
-	/**
-	 * Creates an instance of CmisObjectFactory to create new CMIS objects.
-	 *
-	 * @codeCoverageIgnore
-	 * @return CmisObjectFactory
-	 */
-	protected function getCmisObjectFactory() {
-		return new CmisObjectFactory();
-	}
-
-	/**
-	 * Gets an instance of the PageRepository which is used as
-	 * support class to generate enableFields conditions.
-	 *
-	 * @codeCoverageIgnore
-	 * @return PageRepository
-	 */
-	protected function getPageRepository() {
-		return new PageRepository();
-	}
-
-	/**
-	 * Prepare an instance of the table configuration analyzer
-	 * which reads and checks tables and fields for indexability.
-	 *
-	 * @codeCoverageIgnore
-	 * @return TableConfigurationAnalyzer
-	 */
-	protected function getTableConfigurationAnalyzer() {
-		return new TableConfigurationAnalyzer();
-	}
-
-	/**
-	 * Prepare an instance of the record analyzer.
-	 *
-	 * @param string $table
-	 * @param array $record
-	 * @return RecordAnalyzer
-	 */
-	protected function getRecordAnalyzer($table, $record) {
-		return new RecordAnalyzer($table, $record);
-	}
-
-	/**
-	 * Gets the Queue containing Tasks.
-	 *
-	 * @codeCoverageIgnore
-	 * @return QueueInterface
-	 */
-	protected function getQueue() {
-		return $this->getQueueFactory()->fetchQueue();
 	}
 
 	/**

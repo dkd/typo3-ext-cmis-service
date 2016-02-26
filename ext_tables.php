@@ -14,7 +14,7 @@ if (TYPO3_MODE === 'BE') {
 		'tx_cmisservice_manager',
 		'after:lang',
 		array(
-			'Manager' => 'index,truncateQueue,truncateIdentities,generateIndexingTasks',
+			'Manager' => 'index,tables,repositories,refreshStatus,truncateQueue,truncateIdentities,generateIndexingTasks,pickTask,pickTasks',
 		),
 		array(
 			'access' => 'admin',

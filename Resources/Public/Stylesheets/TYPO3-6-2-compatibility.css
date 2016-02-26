@@ -1,0 +1,9 @@
+/**
+ * These styles are required for TYPO3 Installations < 7.2
+ * to fix compatibility with bootstrap css
+ */
+
+/* reset box sizing for backend module doc-header */
+#typo3-docheader * {
+    box-sizing: content-box;
+}
