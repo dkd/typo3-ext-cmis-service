@@ -1,5 +1,6 @@
 <?php
 namespace Dkd\CmisService\Analysis\Detection;
+use Dkd\CmisService\Factory\ObjectFactory;
 
 /**
  * Class RelationData
@@ -126,4 +127,21 @@ class RelationData {
 		$this->targetUids = $targetUids;
 	}
 
+	/**
+	 * @param string $fieldName
+	 */
+	public function getRelationObjectType($fieldName) {
+		$relation = $this->getObjectFactory()
+			->getConfiguration()
+			->getTableConfiguration()
+			->getRelationType($this->sourceTable, $fieldName);
+		return $relation ?: 'R:cm:references';
+	}
+
+	/**
+	 * @return ObjectFactory
+	 */
+	protected function getObjectFactory() {
+		return new ObjectFactory();
+	}
 }

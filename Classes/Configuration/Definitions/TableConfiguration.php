@@ -71,4 +71,11 @@ class TableConfiguration extends AbstractConfigurationDefinition implements Conf
 		return (array) $this->get($table . '.mapping');
 	}
 
+	/**
+	 * @param string $sourceTable
+	 * @param string $fieldName
+	 */
+	public function getRelationType($sourceTable, $fieldName) {
+		return $this->get($sourceTable . '.relationships.' . $fieldName);
+	}
 }

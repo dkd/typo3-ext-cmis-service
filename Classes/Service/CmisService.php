@@ -237,19 +237,36 @@ class CmisService implements SingletonInterface {
 			if ('sys_domain' === $table) {
 				// Domains are *always* created in the same place. Always. One level only.
 				$parentFolder = $this->resolveCmisSitesParentFolder();
+				$resolvedUsingMethod = 'Sites parent folder';
 			} elseif (NULL !== $domainRecord) {
 				// Domain record detected; has priority. Store CMIS object in Site folder.
 				$parentFolder = $this->resolveCmisSiteFolderByPageUid($domainRecord['pid']);
+				$resolvedUsingMethod = 'Sites folder by page UID';
 			} elseif (0 < $parentPageUid) {
 				// Standard record without domain and with parent; store under parent page.
 				$parentFolder = $this->resolveObjectByTableAndUid('pages', $parentPageUid);
+				$resolvedUsingMethod = 'Page by page UID';
 			} elseif (FALSE === empty($configuredRootUuid)) {
 				// Page UID is zero; page has no domain; a top point is configured. Use it.
 				$parentFolder = $session->getObject($session->createObjectId($configuredRootUuid));
+				$resolvedUsingMethod = 'Configured root folder UUID';
 			} else {
 				// Page UID is zero; page has no domain; no top point is configured. Resolve
 				// hostname or IP and use as site folder.
 				$parentFolder = $this->getAndAutoCreateDefaultSiteFolder();
+				$resolvedUsingMethod = 'Auto-created sites folder';
+			}
+			if (!$parentFolder instanceof FolderInterface) {
+				throw new \RuntimeException(
+					sprintf(
+						'Object resolved (via %s) as parent for new object for %s:%s is not a folder - actual type: %s. ID: %s.',
+						$resolvedUsingMethod,
+						$table,
+						$uid,
+						$parentFolder->getType()->getId(),
+						$parentFolder->getId()
+					)
+				);
 			}
 			$document = $this->createCmisObject($parentFolder, $table, $uid);
 		}

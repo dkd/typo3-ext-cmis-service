@@ -82,6 +82,11 @@ plugin.tx_cmisservice.settings {
             mapping {
                 title = cm:title
             }
+            relationships {
+                shortcut = R:dkd:typo3:pages:shortcut_to
+                content_from_pid = R:dkd:typo3:pages:content_from
+                mount_pid = R:dkd:typo3:pages:mountpoint
+            }
         }
     }
 

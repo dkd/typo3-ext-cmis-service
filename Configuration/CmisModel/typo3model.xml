@@ -62,6 +62,30 @@
                       <many>false</many>
                   </target>
               </association>
+              <association name="dkd:typo3:pages:content_from">
+                  <title>Use content from</title>
+                  <source>
+                      <mandatory>false</mandatory>
+                      <many>true</many>
+                  </source>
+                  <target>
+                      <class>dkd:typo3:pages</class>
+                      <mandatory>false</mandatory>
+                      <many>false</many>
+                  </target>
+              </association>
+              <association name="dkd:typo3:pages:mountpoint">
+                  <title>Mounted on page</title>
+                  <source>
+                      <mandatory>false</mandatory>
+                      <many>true</many>
+                  </source>
+                  <target>
+                      <class>dkd:typo3:pages</class>
+                      <mandatory>false</mandatory>
+                      <many>false</many>
+                  </target>
+              </association>
           </associations>
           <mandatory-aspects>
               <aspect>dkd:typo3:aspect:general</aspect>

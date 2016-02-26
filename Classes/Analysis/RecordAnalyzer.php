@@ -139,16 +139,27 @@ class RecordAnalyzer {
 				);
 			}
 			if (!empty($configuration['config']['foreign_table_field'])) {
-				$targetField = $configuration['config']['foreign_table_field'];
+				$targetField = (string) $configuration['config']['foreign_table_field'];
+				$relatedRecords = $this->getDatabaseConnection()->exec_SELECTgetRows(
+					'*',
+					$targetTable,
+					$targetField . ' = ' . $sourceUid
+				);
+				$targetFields = array($targetField => $sourceUid);
 			} else {
-				$targetField = 'uid';
+				if (FALSE === strpos($targetTable, ',')) {
+					$relatedRecords = $this->getDatabaseConnection()->exec_SELECTgetRows(
+						'*',
+						$targetTable,
+						'uid IN (' . $this->record[$fieldName] . ')'
+					);
+				} else {
+					$relatedRecords = array();
+					foreach (explode(',', $this->record[$fieldName]) as $identity) {
+						$relatedRecords[] = array('uid' => $identity);
+					}
+				}
 			}
-			$relatedRecords = $this->getDatabaseConnection()->exec_SELECTgetRows(
-				'*',
-				$targetTable,
-				$targetField . ' = ' . (string) $sourceUid
-			);
-			$targetFields = array($configuration['config']['foreign_table_field'] => $sourceUid);
 		} elseif ($columnAnalyzer->isFieldSingleDatabaseRelation()) {
 			$relatedRecords = array(
 				$this->loadRecordFromTable($targetTable, $this->record[$fieldName])

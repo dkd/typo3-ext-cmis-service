@@ -194,7 +194,7 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 							PropertyIds::NAME => 'Relation',
 							PropertyIds::SOURCE_ID => $document->getId(),
 							PropertyIds::TARGET_ID => $foreignObject->getId(),
-							PropertyIds::OBJECT_TYPE_ID => 'R:cm:references'
+							PropertyIds::OBJECT_TYPE_ID => $relationData->getRelationObjectType($fieldName)
 						));
 						$logger->info(
 							sprintf(
@@ -207,9 +207,10 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 					} catch (CmisObjectNotFoundException $error) {
 						$logger->info(
 							sprintf(
-								'Record %d from table %s is not yet indexed by CMIS',
+								'Record %d from table %s is not yet indexed by CMIS. Original error message: %s',
 								$targetUid,
-								$targetTable
+								$targetTable,
+								$error->getMessage()
 							)
 						);
 					}
