@@ -240,7 +240,7 @@ class RecordAnalyzer {
 	 * @return ColumnAnalyzer
 	 */
 	protected function getColumnAnalyzer($fieldName) {
-		return new ColumnAnalyzer($GLOBALS['TCA'][$this->table]['columns'][$fieldName]);
+		return new ColumnAnalyzer($GLOBALS['TCA'][$this->table]['columns'][$fieldName], $this->table, $fieldName);
 	}
 
 	/**

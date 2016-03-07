@@ -25,6 +25,11 @@ abstract class AbstractExecution implements ExecutionInterface {
 	protected $logContexts = array('cmis_service', 'execution');
 
 	/**
+	 * @var array
+	 */
+	protected static $eventListeners = array();
+
+	/**
 	 * Returns the Result stored in this Execution
 	 * after it has been executed.
 	 *
@@ -102,6 +107,48 @@ abstract class AbstractExecution implements ExecutionInterface {
 	 */
 	public function validate(TaskInterface $task) {
 		return TRUE;
+	}
+
+	/**
+	 * Adds a class implementing EventListenerInterface
+	 * to be executed when event() is called.
+	 *
+	 * @param string $event
+	 * @param string $listenerClassName
+	 * @return void
+	 */
+	public static function addEventListener($event, $listenerClassName) {
+		if (!is_a($listenerClassName, EventListenerInterface::class, TRUE)) {
+			throw new \RuntimeException(
+				sprintf(
+					'Invalid CMIS Service EventListener: %s must implement %s',
+					$listenerClassName,
+					EventListenerInterface::class
+				)
+			);
+		}
+		static::$eventListeners[get_called_class()][$event][] = $listenerClassName;
+	}
+
+	/**
+	 * Called to trigger event listeners associated with
+	 * the execution class or a parent class hereof.
+	 *
+	 * @param string $event
+	 * @param TaskInterface|NULL $task
+	 * @param array $data
+	 * @return void
+	 */
+	public function event($event, TaskInterface $task = NULL, array $data = array()) {
+		foreach (static::$eventListeners as $subscribedOrigin => $listenersAndEvents) {
+			foreach ($listenersAndEvents as $subscribedEvent => $listenerClassNames) {
+				foreach ($listenerClassNames as $listenerClassName) {
+					/** @var EventListenerInterface $listener */
+					$listener = new $listenerClassName();
+					$listener->event($event, $this, $task, $data);
+				}
+			}
+		}
 	}
 
 	/**

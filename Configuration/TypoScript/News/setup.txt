@@ -16,6 +16,7 @@ plugin.tx_cmisservice.settings {
                 4 = P:cm:syndication
                 5 = P:cm:referencing
                 6 = P:cm:taggable
+                7 = P:dkd:typo3:aspect:forgettable
             }
             mapping {
                 description = cmis:description

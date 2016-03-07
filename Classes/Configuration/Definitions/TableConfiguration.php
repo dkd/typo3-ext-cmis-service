@@ -49,6 +49,24 @@ class TableConfiguration extends AbstractConfigurationDefinition implements Conf
 
 	/**
 	 * @param string $table
+	 * @param string $field
+	 * @return string|NULL
+	 */
+	public function getConfiguredExtractionMethod($table, $field) {
+		return $this->get($table . '.extraction.' . $field . '.method');
+	}
+
+	/**
+	 * @param string $table
+	 * @param string $field
+	 * @return string|NULL
+	 */
+	public function getConfiguredExtractionSetup($table, $field) {
+		return $this->get($table . '.extraction.' . $field);
+	}
+
+	/**
+	 * @param string $table
 	 * @return string
 	 */
 	public function getSinglePrimaryType($table) {

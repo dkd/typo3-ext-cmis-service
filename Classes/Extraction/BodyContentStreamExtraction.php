@@ -7,7 +7,7 @@ use GuzzleHttp\Stream\StreamInterface;
 /**
  * Extraction: ContentStream from input string
  */
-class BodyContentStreamExtraction implements ExtractionInterface {
+class BodyContentStreamExtraction extends AbstractExtraction {
 
 	/**
 	 * Extract a string, creating a resource wrapper with

@@ -4,7 +4,7 @@ namespace Dkd\CmisService\Extraction;
 /**
  * Extraction: Boolean casting of value
  */
-class BooleanExtraction implements ExtractionInterface {
+class BooleanExtraction extends AbstractExtraction {
 
 	/**
 	 * Extract any boolean-castable to boolean

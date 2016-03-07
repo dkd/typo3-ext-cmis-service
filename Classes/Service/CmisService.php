@@ -18,7 +18,9 @@ use Dkd\PhpCmis\Data\FolderInterface;
 use Dkd\PhpCmis\DataObjects\DocumentTypeDefinition;
 use Dkd\PhpCmis\DataObjects\FolderTypeDefinition;
 use Dkd\PhpCmis\Definitions\TypeDefinitionInterface;
+use Dkd\PhpCmis\Exception\CmisContentAlreadyExistsException;
 use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
+use Dkd\PhpCmis\Exception\CmisRuntimeException;
 use Dkd\PhpCmis\PropertyIds;
 use Dkd\PhpCmis\SessionInterface;
 use GuzzleHttp\Stream\Stream;
@@ -175,7 +177,7 @@ class CmisService implements SingletonInterface {
 		$properties = $this->readDefaultPropertyValuesForTableFromConfiguration($table);
 		$properties[PropertyIds::OBJECT_TYPE_ID] = $this->resolvePrimaryObjectTypeForTableAndUid($table, $uid)->getId();
 		$properties[Constants::CMIS_PROPERTY_FULLTITLE] = $title;
-		$properties[PropertyIds::NAME] = $this->sanitizeTitle($title, $table . '-' . $uid);
+		$properties[PropertyIds::NAME] = $this->sanitizeTitle($title, $table . $uid);
 		$properties[Constants::CMIS_PROPERTY_TYPO3TABLE] = $table;
 		$properties[Constants::CMIS_PROPERTY_TYPO3UID] = (integer) $uid;
 		$properties[PropertyIds::SECONDARY_OBJECT_TYPE_IDS] = $this->resolveSecondaryObjectTypesForTableAndUid($table, $uid);
@@ -268,6 +270,13 @@ class CmisService implements SingletonInterface {
 					)
 				);
 			}
+
+			$existingObject = $this->resolveChildByTableAndUid($parentFolder, $table, $uid);
+			if ($existingObject) {
+				$this->storeUuidLocallyForRecord($table, $uid, $existingObject->getId());
+				return $existingObject;
+			}
+
 			$document = $this->createCmisObject($parentFolder, $table, $uid);
 		}
 		return $document;
@@ -436,33 +445,22 @@ class CmisService implements SingletonInterface {
 		if (NULL === $properties) {
 			$properties = $this->resolvePropertiesForTableAndUid($table, $uid);
 		}
-
-		foreach ($folder->getChildren() as $child) {
-			if ($child->getName() === $properties[PropertyIds::NAME]) {
-				$objectId = $child->getId();
-				$this->storeUuidLocallyForRecord($table, $uid, $objectId);
-				$this->getObjectFactory()->getLogger()->info(
-					sprintf(
-						'Existing CMIS Object (%s) used instead of creating new, ID: %s',
-						$type,
-						$objectId
-					),
-					$this->logContexts
-				);
-				return $child;
-			}
+		$existingChild = $this->resolveChildByTableAndUid($folder, $table, $uid);
+		if ($existingChild) {
+			$this->storeUuidLocallyForRecord($table, $uid, $existingChild->getId());
+			return $existingChild;
 		}
 
-		$session = $this->getCmisObjectFactory()->getSession();
 		$primaryType = $this->resolvePrimaryObjectTypeForTableAndUid($table, $uid);
 
+		$properties[PropertyIds::NAME] = $this->sanitizeTitle($properties[PropertyIds::NAME], $table . '-' . $uid);
 		$properties[PropertyIds::OBJECT_TYPE_ID] = $primaryType->getId();
-		if (TRUE === $primaryType instanceof FolderTypeDefinition) {
-			$objectId = $session->createFolder($properties, $folder);
-		} elseif (TRUE === $primaryType instanceof DocumentTypeDefinition) {
-			$objectId = $session->createDocument($properties, $folder);
-		} else {
-			$objectId = $session->createItem($properties, $folder);
+
+		try {
+			$objectId = $this->createByTypeInFolder($folder, $primaryType, $properties);
+		} catch (CmisContentAlreadyExistsException $error) {
+			$properties[PropertyIds::NAME] = $table . '-' . $uid;
+			$objectId = $this->createByTypeInFolder($folder, $primaryType, $properties);
 		}
 
 		$this->getObjectFactory()->getLogger()->info(
@@ -470,7 +468,58 @@ class CmisService implements SingletonInterface {
 			$this->logContexts
 		);
 		$this->storeUuidLocallyForRecord($table, $uid, $objectId);
-		return $session->getObject($objectId);
+		return $this->getCmisSession()->getObject($objectId);
+	}
+
+	/**
+	 * @param FolderInterface $folder
+	 * @param TypeDefinitionInterface $primaryType
+	 * @param array $properties
+	 */
+	protected function createByTypeInFolder(FolderInterface $folder, TypeDefinitionInterface $primaryType, array $properties) {
+		$session = $this->getCmisObjectFactory()->getSession();
+		if (TRUE === $primaryType instanceof FolderTypeDefinition) {
+			$objectId = $session->createFolder($properties, $folder);
+		} elseif (TRUE === $primaryType instanceof DocumentTypeDefinition) {
+			$objectId = $session->createDocument($properties, $folder);
+		} else {
+			$objectId = $session->createItem($properties, $folder);
+		}
+		return $objectId;
+	}
+
+	/**
+	 * @param FolderInterface $folder
+	 * @param string $name
+	 * @param string $documentType
+	 * @return CmisObjectInterface|NULL
+	 */
+	public function resolveChildByName(FolderInterface $folder, $name) {
+		foreach ($folder->getChildren() as $child) {
+			if ($child->getName() === $name) {
+				// Object using the exact same name was detected.
+				return $child;
+			}
+		}
+		return NULL;
+	}
+
+	/**
+	 * @param FolderInterface $folder
+	 * @param string $table
+	 * @param integer $uid
+	 * @return CmisObjectInterface|NULL
+	 */
+	public function resolveChildByTableAndUid(FolderInterface $folder, $table, $uid) {
+		foreach ($folder->getChildren() as $child) {
+			if (
+				$child->getPropertyValue(Constants::CMIS_PROPERTY_TYPO3TABLE) === $table
+				&& $child->getPropertyValue(Constants::CMIS_PROPERTY_TYPO3UID) === $uid
+			) {
+				return $child;
+			}
+		}
+		return NULL;
 	}
 
 	/**

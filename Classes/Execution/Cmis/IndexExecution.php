@@ -15,6 +15,8 @@ use Dkd\CmisService\Task\TaskInterface;
 use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
 use Dkd\PhpCmis\Data\DocumentInterface;
 use Dkd\PhpCmis\Data\FolderInterface;
+use Dkd\PhpCmis\Data\RelationshipInterface;
+use Dkd\PhpCmis\Exception\CmisContentAlreadyExistsException;
 use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
 use Dkd\PhpCmis\PropertyIds;
 
@@ -22,6 +24,13 @@ use Dkd\PhpCmis\PropertyIds;
  * Class IndexExecution
  */
 class IndexExecution extends AbstractCmisExecution implements ExecutionInterface {
+
+	const EVENT_MAP = 'map';
+	const EVENT_MAPPED = 'mapped';
+	const EVENT_SAVE = 'save';
+	const EVENT_SAVED = 'saved';
+	const EVENT_STREAM_SAVE = 'streamsave';
+	const EVENT_STREAM_SAVED = 'streamsaved';
 
 	/**
 	 * @var RenderingService
@@ -83,23 +92,37 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 			);
 		}
 		$data = array();
-		foreach ($fields as $fieldName) {
-			$data[$fieldName] = $this->performTextExtraction($table, $uid, $fieldName, $record);
-		}
 		$recordAnalyzer = new RecordAnalyzer($table, $record);
-		$cmisPropertyValues = $this->remapFieldsToDocumentProperties($data, $recordAnalyzer);
 		$document = $this->getCmisService()->resolveObjectByTableAndUid($table, $uid);
-		$document->updateProperties($cmisPropertyValues);
 		if (TRUE === (boolean) $task->getParameter(RecordIndexTask::OPTION_RELATIONS)) {
 			// The Task was configured to also index the relations from
 			// this document to other CMIS documents (which have already
 			// been indexed by a previous Task). We therefore now turn
 			// all TYPO3 relations into CMIS relationships in a sync-type
 			// manner; both creating and removing relationships as needed.
-			$this->synchronizeRelationships($document, $recordAnalyzer, $data);
+			$this->synchronizeRelationships($document, $recordAnalyzer);
+		} else {
+			$this->event(self::EVENT_MAP, $task, array('object' => $document, 'source' => $fields));
+			foreach ($fields as $fieldName) {
+				$data[$fieldName] = $this->performTextExtraction($table, $fieldName, $record);
+			}
+			$cmisPropertyValues = $this->remapFieldsToDocumentProperties($data, $recordAnalyzer);
+			$existingChild = $this->getCmisService()->resolveChildByName(
+				$document->getParents()[0],
+				$cmisPropertyValues[PropertyIds::NAME]
+			);
+			$this->event(self::EVENT_MAPPED, $task, array('object' => $document, 'source' => $fields, 'properties' => $data));
+			$this->event(self::EVENT_SAVE, $task, array('object' => $document));
+			try {
+				$document->updateProperties($cmisPropertyValues);
+			} catch (CmisContentAlreadyExistsException $error) {
+				$cmisPropertyValues[PropertyIds::NAME] = $table . '-' . $uid;
+				$document->updateProperties($cmisPropertyValues);
+			}
+			$this->affixAuthor($document, $recordAnalyzer);
+			$this->affixContentStream($document, $recordAnalyzer, $task);
+			$this->event(self::EVENT_SAVED, $task, array('object' => $document));
 		}
-		$this->affixAuthor($document, $recordAnalyzer);
-		$this->affixContentStream($document, $recordAnalyzer);
 		$this->result->setCode(Result::OK);
 		$this->result->setMessage('Indexed record ' . $uid . ' from ' . $table);
 		$this->result->setPayload($data);
@@ -109,16 +132,19 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 	/**
 	 * @param CmisObjectInterface $document
 	 * @param RecordAnalyzer $recordAnalyzer
+	 * @param TaskInterface $task
 	 * @return void
 	 */
-	protected function affixContentStream(CmisObjectInterface $document, RecordAnalyzer $recordAnalyzer) {
+	protected function affixContentStream(CmisObjectInterface $document, RecordAnalyzer $recordAnalyzer, TaskInterface $task) {
 		if ($document instanceof DocumentInterface) {
 			$renderedBody = $this->renderingService->renderRecord(
 				$recordAnalyzer->getTable(),
 				$recordAnalyzer->getRecord()
 			);
 			$stream = $this->getExtractionMethodDetector()->resolveBodyContentStreamExtractor()->extract($renderedBody);
+			$this->event(self::EVENT_STREAM_SAVE, $task, array('object' => $document, 'stream' => $stream));
 			$document->setContentStream($stream, TRUE);
+			$this->event(self::EVENT_STREAM_SAVED, $task, array('object' => $document, 'stream' => $stream));
 		}
 	}
 
@@ -155,14 +181,14 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 	 *
 	 * @param CmisObjectInterface $document CMIS object to use in relationships
 	 * @param RecordAnalyzer $recordAnalyzer An instance of RecordAnalyzer for record
-	 * @param array $data The extracted data not yet mapped to CMIS properties.
 	 * @return void
 	 */
-	protected function synchronizeRelationships(CmisObjectInterface $document, RecordAnalyzer $recordAnalyzer, array $data) {
+	protected function synchronizeRelationships(CmisObjectInterface $document, RecordAnalyzer $recordAnalyzer) {
 		$tableConfigurationAnalyzer = new TableConfigurationAnalyzer();
 		$objectFactory = $this->getObjectFactory();
 		$table = $recordAnalyzer->getTable();
 		$logger = $objectFactory->getLogger();
+		$record = $recordAnalyzer->getRecord();
 		foreach ($recordAnalyzer->getIndexableColumnNames() as $fieldName) {
 			$columnAnalyzer = $tableConfigurationAnalyzer->getColumnAnalyzerForField($table, $fieldName);
 			if ($columnAnalyzer->isFieldDatabaseRelation()) {
@@ -190,16 +216,17 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 						}
 						$cmisObjectId = $objectFactory->getCmisService()->getUuidForLocalRecord($table, $targetUid);
 						$foreignObject = $session->getObject($session->createObjectId($cmisObjectId));
-						$relation = $session->createRelationship(array(
+						$relationType = $relationData->getRelationObjectType($fieldName);
+						$session->createRelationship(array(
 							PropertyIds::NAME => 'Relation',
 							PropertyIds::SOURCE_ID => $document->getId(),
 							PropertyIds::TARGET_ID => $foreignObject->getId(),
-							PropertyIds::OBJECT_TYPE_ID => $relationData->getRelationObjectType($fieldName)
+							PropertyIds::OBJECT_TYPE_ID => $relationType
 						));
 						$logger->info(
 							sprintf(
 								'Relationship (%s) created between %s and %s',
-								'cm:reference',
+								$relationType,
 								$document->getId(),
 								$foreignObject->getId()
 							)
@@ -220,6 +247,24 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 				// Extracted by LegacyFileReferenceExtractor which executed during the
 				// first indexing step (without relations). We now need these as UUIDs
 				// that can be used in relationships with the CMIS document.
+			}
+
+			// Relationships extracted by Extractors
+			foreach ($this->performAssociationExtraction($table, $fieldName, $record) as $association) {
+				$relationTitle = sprintf(
+					'Relationship (%s) between %s and %s',
+					$association[PropertyIds::OBJECT_TYPE_ID],
+					$document->getId(),
+					$association[PropertyIds::TARGET_ID]
+				);
+				if (!isset($association[PropertyIds::SOURCE_ID])) {
+					$association[PropertyIds::SOURCE_ID] = $document->getId();
+				}
+				if (!isset($association[PropertyIds::NAME])) {
+					$association[PropertyIds::NAME] = $relationTitle;
+				}
+				$session->createRelationship($association);
+				$logger->info('Created ' . $relationTitle);
 			}
 		}
 	}
@@ -250,7 +295,7 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 		*/
 		$propertyMap = $this->getObjectFactory()->getConfiguration()->getTableConfiguration()->getSingleTableMapping($table);
 		foreach ($propertyMap as $recordProperty => $cmisPropertyId) {
-			$values[$cmisPropertyId] = $this->performTextExtraction($table, $uid, $recordProperty, $record);
+			$values[$cmisPropertyId] = $this->performTextExtraction($table, $recordProperty, $record);
 		}
 		$values[Constants::CMIS_PROPERTY_FULLTITLE] = $values[PropertyIds::NAME];
 		$values[PropertyIds::NAME] = $this->getCmisService()->sanitizeTitle($values[PropertyIds::NAME], $table . '-' . $uid);
@@ -261,13 +306,22 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 
 	/**
 	 * @param string $table
-	 * @param integer $uid
 	 * @param string $field
 	 * @oaram array $record
 	 * @return string
 	 */
-	protected function performTextExtraction($table, $uid, $field, $record) {
+	protected function performTextExtraction($table, $field, $record) {
 		return $this->getExtractionMethodDetector()->resolveExtractionForColumn($table, $field)->extract($record[$field]);
+	}
+
+	/**
+	 * @param string $table
+	 * @param string $field
+	 * @oaram array $record
+	 * @return array[]
+	 */
+	protected function performAssociationExtraction($table, $field, $record) {
+		return $this->getExtractionMethodDetector()->resolveExtractionForColumn($table, $field)->extractAssociations($record[$field], $table, $field);
 	}
 
 	/**

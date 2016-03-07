@@ -24,10 +24,24 @@ class ColumnAnalyzer {
 	protected $configurationArray;
 
 	/**
-	 * @param array $configurationArray
+	 * @var string
 	 */
-	public function __construct(array $configurationArray) {
+	protected $table;
+
+	/**
+	 * @var string
+	 */
+	protected $field;
+
+	/**
+	 * @param array $configurationArray
+	 * @param string $table
+	 * @param string $field
+	 */
+	public function __construct(array $configurationArray, $table, $field) {
 		$this->setConfigurationArray($configurationArray);
+		$this->table = $table;
+		$this->field = $field;
 	}
 
 	/**
@@ -44,6 +58,14 @@ class ColumnAnalyzer {
 	 */
 	public function getConfigurationArray() {
 		return $this->configurationArray;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isTitleField() {
+		$tableConfiguration = new TableConfigurationAnalyzer();
+		return in_array($this->field, $tableConfiguration->getLabelFieldListFromTable($this->table));
 	}
 
 	/**

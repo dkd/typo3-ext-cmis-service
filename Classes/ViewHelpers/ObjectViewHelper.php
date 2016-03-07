@@ -19,6 +19,9 @@ class ObjectViewHelper extends AbstractViewHelper {
 		if (NULL === $cmisObjectId) {
 			$cmisObjectId = $this->renderChildren();
 		}
+		if (empty($cmisObjectId)) {
+			return NULL;
+		}
 		$session = $this->getCmisSession();
 		return $session->getObject($session->createObjectId($cmisObjectId));
 	}

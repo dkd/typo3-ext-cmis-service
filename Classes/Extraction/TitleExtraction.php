@@ -2,9 +2,9 @@
 namespace Dkd\CmisService\Extraction;
 
 /**
- * Extraction: Simple treatment of single values
+ * Extraction: Title field defined in TCA
  */
-class SingleValueExtraction extends AbstractExtraction {
+class TitleExtraction extends AbstractExtraction {
 
 	/**
 	 * Return the trimmed $content as a single value.

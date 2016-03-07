@@ -4,7 +4,7 @@ namespace Dkd\CmisService\Extraction;
 /**
  * Extraction: Simple treatment of multi-values (CSV)
  */
-class MultiValueExtraction implements ExtractionInterface {
+class MultiValueExtraction extends AbstractExtraction {
 
 	/**
 	 * Return the exploded and trimmed array from CSV $content.

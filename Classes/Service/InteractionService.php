@@ -212,14 +212,6 @@ class InteractionService implements SingletonInterface {
 	}
 
 	/**
-	 * @param integer $limit
-	 * @return array
-	 */
-	public function getLogItems($limit = 100) {
-
-	}
-
-	/**
 	 * @param string $table
 	 * @param array $record
 	 * @param boolean $includeRelations

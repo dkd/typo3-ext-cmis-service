@@ -1,14 +1,12 @@
 <?php
 namespace Dkd\CmisService\Extraction;
 
+use Dkd\CmisService\Factory\ObjectFactory;
+
 /**
- * Extraction Interface
- *
- * Implemented by classes which are capable of extracting
- * plain text representations of richly formatted or
- * marked-up text content or proprietary file types.
+ * Base class for extractions
  */
-interface ExtractionInterface {
+abstract class AbstractExtraction implements ExtractionInterface {
 
 	/**
 	 * Perform extraction, returning a simple string.
@@ -16,7 +14,9 @@ interface ExtractionInterface {
 	 * @param mixed $content
 	 * @return mixed
 	 */
-	public function extract($content);
+	public function extract($content) {
+		return $content;
+	}
 
 	/**
 	 * Extracts CMIS Relationships from value if value
@@ -30,6 +30,15 @@ interface ExtractionInterface {
 	 * @param string $field
 	 * @return array[]
 	 */
-	public function extractAssociations($content, $table, $field);
+	public function extractAssociations($content, $table, $field) {
+		return array();
+	}
+
+	/**
+	 * @return ObjectFactory
+	 */
+	protected function getObjectFactory() {
+		return new ObjectFactory();
+	}
 
 }

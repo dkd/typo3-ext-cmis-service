@@ -5,12 +5,14 @@ use Dkd\CmisService\Analysis\ColumnAnalyzer;
 use Dkd\CmisService\Analysis\TableConfigurationAnalyzer;
 use Dkd\CmisService\Extraction\BodyContentStreamExtraction;
 use Dkd\CmisService\Extraction\ExtractionInterface;
+use Dkd\CmisService\Factory\ObjectFactory;
 
 /**
  * Class ExtractionMethodDetector
  */
 class ExtractionMethodDetector extends AbstractDetector implements DetectorInterface {
 
+	const METHOD_TITLE = 'Title';
 	const METHOD_PASSTHROUGH = 'Passthrough';
 	const METHOD_RICHTEXT = 'RichTextEditor';
 	const METHOD_MULTIVALUE = 'MultiValue';
@@ -44,6 +46,10 @@ class ExtractionMethodDetector extends AbstractDetector implements DetectorInter
 	public function resolveExtractionForColumn($table, $field) {
 		$tableConfigurationAnalyzer = new TableConfigurationAnalyzer();
 		$columnConfigurationAnalyzer = $tableConfigurationAnalyzer->getColumnAnalyzerForField($table, $field);
+		$configuredExtractionType = ObjectFactory::getInstance()->getConfiguration()->getTableConfiguration()->getConfiguredExtractionMethod($table, $field);
+		if ($configuredExtractionType) {
+			return $this->resolveExtractionByTypeNameOrClassName($configuredExtractionType);
+		}
 		$type = $this->determineExtractionMethod($columnConfigurationAnalyzer);
 		return $this->resolveExtractionByTypeNameOrClassName($type);
 	}
@@ -88,7 +94,9 @@ class ExtractionMethodDetector extends AbstractDetector implements DetectorInter
 		if (NULL === $columnAnalyzer->getFieldType()) {
 			return self::DEFAULT_METHOD;
 		}
-		if (TRUE === $columnAnalyzer->isFieldLegacyFileReference()) {
+		if (TRUE === $columnAnalyzer->isTitleField()) {
+			return self::METHOD_TITLE;
+		} elseif (TRUE === $columnAnalyzer->isFieldLegacyFileReference()) {
 			// legacy file reference; we need an extractor that works
 			// differently from the database relation extractor that
 			// handles non-legacy FAL file references.

@@ -12,6 +12,12 @@ use Dkd\CmisService\Task\TaskInterface;
  */
 interface ExecutionInterface {
 
+	const EVENT_START = 'start';
+	const EVENT_FINISH = 'finish';
+	const EVENT_ERROR = 'error';
+	const EVENT_VALIDATE = 'validate';
+	const EVENT_VALID = 'valid';
+
 	/**
 	 * Returns the Result instance stored in this Execution
 	 * after it has been executed.
@@ -38,5 +44,26 @@ interface ExecutionInterface {
 	 * @throws \InvalidArgumentException
 	 */
 	public function validate(TaskInterface $task);
+
+	/**
+	 * Called to trigger event listeners associated with
+	 * the execution class or a parent class hereof.
+	 *
+	 * @param string $event
+	 * @param TaskInterface|NULL $task
+	 * @param array $data
+	 * @return void
+	 */
+	public function event($event, TaskInterface $task = NULL, array $data = array());
+
+	/**
+	 * Adds a class implementing EventListenerInterface
+	 * to be executed when event() is called.
+	 *
+	 * @param string $event
+	 * @param string $listenerClassName
+	 * @return void
+	 */
+	public static function addEventListener($event, $listenerClassName);
 
 }

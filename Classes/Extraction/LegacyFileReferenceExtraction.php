@@ -8,7 +8,7 @@ namespace Dkd\CmisService\Extraction;
  * needed or resolves existing files, then returns
  * the UUIDs of all related files in an array.
  */
-class LegacyFileReferenceExtraction implements ExtractionInterface {
+class LegacyFileReferenceExtraction extends AbstractExtraction {
 
 	/**
 	 * Extracts CSV referneces to files, turning each
@@ -27,4 +27,5 @@ class LegacyFileReferenceExtraction implements ExtractionInterface {
 		// FAL reference extraction class as array of identifiers.
 		return array();
 	}
+
 }

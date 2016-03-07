@@ -8,6 +8,7 @@
       <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
       <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
       <import uri="http://www.alfresco.org/model/user/1.0" prefix="usr"/>
+	  <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
   </imports>
   <namespaces>
       <namespace uri="http://www.dkd.de/model/content/cmis/1.0" prefix="dkd"/>
@@ -36,6 +37,16 @@
               <property name="dkd:typo3:pages:doktype">
                   <type>d:int</type>
                   <mandatory>true</mandatory>
+                  <multiple>false</multiple>
+              </property>
+              <property name="dkd:typo3:pages:sorting">
+                  <type>d:int</type>
+                  <mandatory>true</mandatory>
+                  <multiple>false</multiple>
+              </property>
+              <property name="dkd:typo3:pages:endtime">
+                  <type>d:datetime</type>
+                  <mandatory>false</mandatory>
                   <multiple>false</multiple>
               </property>
           </properties>
@@ -79,6 +90,7 @@
           </associations>
           <mandatory-aspects>
               <aspect>dkd:typo3:aspect:general</aspect>
+              <aspect>dkd:typo3:aspect:forgettable</aspect>
           </mandatory-aspects>
       </type>
       <type name="dkd:typo3:sys_file">
@@ -86,6 +98,8 @@
           <parent>cm:content</parent>
           <mandatory-aspects>
               <aspect>dkd:typo3:aspect:general</aspect>
+              <aspect>dkd:typo3:aspect:forgettable</aspect>
+              <aspect>dkd:typo3:aspect:assessable</aspect>
           </mandatory-aspects>
       </type>
       <type name="dkd:typo3:tt_content">
@@ -137,6 +151,7 @@
           </properties>
           <mandatory-aspects>
               <aspect>dkd:typo3:aspect:general</aspect>
+              <aspect>dkd:typo3:aspect:forgettable</aspect>
           </mandatory-aspects>
       </type>
       <type name="dkd:typo3:arbitrary">
@@ -144,8 +159,25 @@
           <parent>cm:content</parent>
           <mandatory-aspects>
               <aspect>dkd:typo3:aspect:general</aspect>
+			  <aspect>dkd:typo3:aspect:forgettable</aspect>
           </mandatory-aspects>
       </type>
+	  <type name="dkd:typo3:item:concept_similarity">
+		  <title>Concept similarity assesment</title>
+		  <parent>sys:base</parent>
+		  <properties>
+			  <property name="dkd:typo3:item:concept_similarity:concept_name">
+				  <title>Concept name</title>
+				  <type>d:text</type>
+				  <mandatory>true</mandatory>
+			  </property>
+			  <property name="dkd:typo3:item:concept_similarity:similarity">
+				  <title>Similarity</title>
+				  <type>d:float</type>
+				  <mandatory>true</mandatory>
+			  </property>
+		  </properties>
+	  </type>
   </types>
   <aspects>
       <aspect name="dkd:typo3:aspect:general">
@@ -167,8 +199,36 @@
                   <type>d:text</type>
                   <multiple>false</multiple>
               </property>
+              <property name="dkd:typo3:general:originalContent">
+                  <type>d:text</type>
+                  <multiple>false</multiple>
+              </property>
           </properties>
           <associations>
+			  <association name="dkd:typo3:relation:bodytext_linksto">
+				  <title>Links to page from body text</title>
+				  <source>
+					  <mandatory>false</mandatory>
+					  <many>true</many>
+				  </source>
+				  <target>
+					  <class>dkd:typo3:pages</class>
+					  <mandatory>false</mandatory>
+					  <many>true</many>
+				  </target>
+			  </association>
+			  <association name="dkd:typo3:relation:header_linksto">
+				  <title>Links to page from header</title>
+				  <source>
+					  <mandatory>false</mandatory>
+					  <many>true</many>
+				  </source>
+				  <target>
+					  <class>dkd:typo3:pages</class>
+					  <mandatory>false</mandatory>
+					  <many>true</many>
+				  </target>
+			  </association>
               <association name="dkd:typo3:relation:references_file">
                   <title>References file</title>
                   <source>
@@ -183,5 +243,57 @@
               </association>
           </associations>
       </aspect>
+	  <aspect name="dkd:typo3:aspect:forgettable">
+		  <title>TYPO3 forgetting/preserving attributes</title>
+		  <properties>
+			  <property name="dkd:typo3:forgettable:preservation_value">
+				  <title>Preservation value</title>
+				  <type>d:int</type>
+			  </property>
+			  <property name="dkd:typo3:forgettable:memory_buoyancy">
+				  <title>Memory buoyancy</title>
+				  <type>d:int</type>
+			  </property>
+		  </properties>
+	  </aspect>
+	  <aspect name="dkd:typo3:aspect:assessable">
+		  <title>TYPO3 quality assessable image</title>
+		  <properties>
+			  <property name="dkd:typo3:assessable:quality">
+				  <title>Assessed quality/score</title>
+				  <type>d:float</type>
+			  </property>
+			  <property name="dkd:typo3:assessable:blur">
+				  <title>Image blur</title>
+				  <type>d:float</type>
+			  </property>
+			  <property name="dkd:typo3:assessable:contrast">
+				  <title>Image contrast</title>
+				  <type>d:float</type>
+			  </property>
+			  <property name="dkd:typo3:assessable:darkness">
+				  <title>Image darkness</title>
+				  <type>d:float</type>
+			  </property>
+			  <property name="dkd:typo3:assessable:noise">
+				  <title>Image noise</title>
+				  <type>d:float</type>
+			  </property>
+		  </properties>
+		  <associations>
+			  <association name="dkd:typo3:relation:concept_similarity">
+				  <title>Concept similarities</title>
+				  <source>
+					  <mandatory>false</mandatory>
+					  <many>false</many>
+				  </source>
+				  <target>
+					  <class>dkd:typo3:item:concept_similarity</class>
+					  <mandatory>false</mandatory>
+					  <many>true</many>
+				  </target>
+			  </association>
+		  </associations>
+	  </aspect>
   </aspects>
 </model>

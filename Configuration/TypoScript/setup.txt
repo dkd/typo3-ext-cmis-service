@@ -50,6 +50,7 @@ plugin.tx_cmisservice.settings {
             primaryType = I:cm:category
             secondaryTypes {
                 0 = P:cm:titled
+                1 = P:dkd:typo3:aspect:forgettable
             }
             mapping {
                 title = cm:title
@@ -60,6 +61,8 @@ plugin.tx_cmisservice.settings {
             primaryType = D:dkd:typo3:sys_file
             secondaryTypes {
                 0 = P:cm:titled
+                1 = P:dkd:typo3:aspect:forgettable
+                2 = P:dkd:typo3:aspect:assessable
             }
         }
         tt_content {
@@ -69,6 +72,20 @@ plugin.tx_cmisservice.settings {
                 0 = P:cm:titled
                 1 = P:cm:localizable
                 2 = P:cm:ownable
+                3 = P:dkd:typo3:aspect:forgettable
+            }
+            mapping {
+                bodytext = dkd:typo3:general:originalContent
+            }
+            extraction {
+                header_link {
+                    method = Link
+                    type = R:dkd:typo3:relation:header_linksto
+                }
+                bodytext {
+                    method = RichTextEditor
+                    type = R:dkd:typo3:relation:bodytext_linksto
+                }
             }
         }
         pages {
@@ -78,6 +95,7 @@ plugin.tx_cmisservice.settings {
                 0 = P:cm:titled
                 1 = P:cm:localizable
                 2 = P:cm:ownable
+                3 = P:dkd:typo3:aspect:forgettable
             }
             mapping {
                 title = cm:title

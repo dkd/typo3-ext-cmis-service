@@ -4,7 +4,7 @@ namespace Dkd\CmisService\Extraction;
 /**
  * Extraction: Command-line execution to extract text content
  */
-class CommandBasedExtraction implements ExtractionInterface {
+class CommandBasedExtraction extends AbstractExtraction {
 
 	/**
 	 * Attempts to execute the command specified in $content.

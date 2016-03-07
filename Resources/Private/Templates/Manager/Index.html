@@ -18,16 +18,19 @@
 			</h3>
 			<div class="progress" style="height: 3.5em;">
 				<div class="progress-bar progress-bar-striped progress-bar-success" role="progressbar" aria-valuenow="{status.percent.indexed}"
-				     aria-valuemin="0" aria-valuemax="100" style="height: 3.5em; padding-top: 1em; width: {status.percent.indexed}%;">
-					{status.percent.indexed}%
+				     aria-valuemin="0" aria-valuemax="100" style="height: 3.7em; padding-top: 0.25em; width: {status.percent.indexed}%;">
+					{status.percent.indexed}%<br />
+					{status.identities}
 				</div>
 				<div class="progress-bar progress-bar-striped progress-bar-warning" role="progressbar" aria-valuenow="{status.percent.queued}"
-				     aria-valuemin="0" aria-valuemax="100" style="height: 3.5em; padding-top: 1em; width: {status.percent.queued}%;">
-					{status.percent.queued}%
+				     aria-valuemin="0" aria-valuemax="100" style="height: 3.7em; padding-top: 0.25em; width: {status.percent.queued}%;">
+					{status.percent.queued}%<br />
+					{status.queued}
 				</div>
 				<div class="progress-bar progress-bar-striped progress-bar-danger" role="progressbar" aria-valuenow="{status.percent.remaining}"
-				     aria-valuemin="0" aria-valuemax="100" style="height: 3.5em; padding-top: 1em; width: {status.percent.remaining}%;">
-					{status.percent.remaining}%
+				     aria-valuemin="0" aria-valuemax="100" style="height: 3.7em; padding-top: 0.25em; width: {status.percent.remaining}%;">
+					{status.percent.remaining}%<br />
+					{status.remaining}
 				</div>
 			</div>
 			<div class="pull-right clearfix">

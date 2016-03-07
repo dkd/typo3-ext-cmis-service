@@ -40,13 +40,11 @@ class ManagerController extends ActionController {
 		$numberOfQueuedTasks = $this->interactionService->countQueue();
 		$totalTargetedRecords = array_sum($targetedRecords);
 		$percentIndexed = round(($numberOfIdentities / $totalTargetedRecords) * 100);
-		$percentQueued = round(($numberOfQueuedTasks / $totalTargetedRecords) * 100);
-		if (($percentIndexed + $percentQueued) > 100) {
-			$percentQueued = 100 - $percentIndexed;
-		}
+		$percentQueued = min(round(($numberOfQueuedTasks / $totalTargetedRecords) * 100), 100 - $percentIndexed);
 		$this->view->assign('status', array(
 			'queued' => $numberOfQueuedTasks,
 			'identities' => $numberOfIdentities,
+			'remaining' => ($totalTargetedRecords - $numberOfIdentities),
 			'total' => $totalTargetedRecords,
 			'percent' => array(
 				'indexed' => $percentIndexed,

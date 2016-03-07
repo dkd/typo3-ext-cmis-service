@@ -151,7 +151,7 @@ class TableConfigurationAnalyzer {
 	 */
 	public function getColumnAnalyzerForField($table, $field) {
 		$configuration = (array) $this->getConfigurationForField($table, $field);
-		return new ColumnAnalyzer($configuration);
+		return new ColumnAnalyzer($configuration, $table, $field);
 	}
 
 	/**

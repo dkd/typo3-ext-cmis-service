@@ -18,7 +18,7 @@ if (TYPO3_MODE === 'BE') {
 		),
 		array(
 			'access' => 'admin',
-			'icon' => 'EXT:' . $_EXTKEY . '/Resources/Public/Icons/ManagerModuleIcon.png',
+			'icon' => 'EXT:' . $_EXTKEY . '/Resources/Public/Icons/ManagerModuleIcon.svg',
 			'labels' => 'LLL:EXT:' . $_EXTKEY . '/Resources/Private/Language/locallang.xlf',
 			'inheritNavigationComponentFromMainModule' => FALSE
 		)

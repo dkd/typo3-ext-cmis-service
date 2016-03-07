@@ -4,7 +4,7 @@ namespace Dkd\CmisService\Extraction;
 /**
  * Extraction: HTML to plain text
  */
-class HtmlExtraction implements ExtractionInterface {
+class HtmlExtraction extends AbstractExtraction {
 
 	/**
 	 * Extract HTML to plain text

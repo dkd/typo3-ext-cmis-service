@@ -4,7 +4,7 @@ namespace Dkd\CmisService\Extraction;
 /**
  * Extraction: Completely raw content of a file resource.
  */
-class RawFileContentExtraction implements ExtractionInterface {
+class RawFileContentExtraction extends AbstractExtraction {
 
 	/**
 	 * Reads file from path in $content, returning the

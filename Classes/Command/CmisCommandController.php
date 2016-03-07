@@ -294,7 +294,7 @@ class CmisCommandController extends CommandController {
 	 * @param boolean $verbose
 	 * @return void
 	 */
-	protected function echoResultToConsole(Result $result, $verbose) {
+	protected function echoResultToConsole(Result $result, $verbose = FALSE) {
 		$payload = $result->getPayload();
 		$this->response->appendContent($result->getMessage() . PHP_EOL);
 		if (0 < count($payload) && TRUE === $verbose) {

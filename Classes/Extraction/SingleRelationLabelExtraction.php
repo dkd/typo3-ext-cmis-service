@@ -4,7 +4,7 @@ namespace Dkd\CmisService\Extraction;
 /**
  * Extraction: Single (1:1) relation entity label extraction
  */
-class SingleRelationLabelExtraction implements ExtractionInterface {
+class SingleRelationLabelExtraction extends AbstractExtraction {
 
 	/**
 	 * Reads the value of the column identified as "label"
