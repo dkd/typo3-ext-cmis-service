@@ -49,6 +49,11 @@
                   <mandatory>false</mandatory>
                   <multiple>false</multiple>
               </property>
+			  <property name="dkd:typo3:pages.subtitle">
+				  <type>d:text</type>
+				  <mandatory>false</mandatory>
+				  <multiple>false</multiple>
+			  </property>
           </properties>
           <associations>
               <association name="dkd:typo3:pages:shortcut_to">

@@ -99,6 +99,7 @@ plugin.tx_cmisservice.settings {
             }
             mapping {
                 title = cm:title
+                subtitle = dkd:typo3:pages.subtitle
             }
             relationships {
                 shortcut = R:dkd:typo3:pages:shortcut_to
