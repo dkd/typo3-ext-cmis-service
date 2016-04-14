@@ -257,7 +257,7 @@
 			  </property>
 			  <property name="dkd:typo3:forgettable:memory_buoyancy">
 				  <title>Memory buoyancy</title>
-				  <type>d:int</type>
+          <type>d:float</type>
 			  </property>
 		  </properties>
 	  </aspect>
