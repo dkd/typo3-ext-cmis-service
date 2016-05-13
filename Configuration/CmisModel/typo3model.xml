@@ -103,8 +103,8 @@
           <parent>cm:content</parent>
           <mandatory-aspects>
               <aspect>dkd:typo3:aspect:general</aspect>
-              <aspect>dkd:typo3:aspect:forgettable</aspect>
-              <aspect>dkd:typo3:aspect:assessable</aspect>
+              <!-- <aspect>dkd:typo3:aspect:forgettable</aspect> -->
+              <!-- <aspect>dkd:typo3:aspect:assessable</aspect> -->
           </mandatory-aspects>
       </type>
       <type name="dkd:typo3:tt_content">
