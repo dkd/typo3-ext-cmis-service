@@ -35,11 +35,16 @@
             "name": "Sascha Egerer",
             "homepage": "http://www.dkd.de",
             "role": "Developer"
+        },
+        {
+            "name": "Johannes Goslar",
+            "homepage": "http://www.dkd.de",
+            "role": "Developer"
         }
     ],
     "require": {
         "typo3/cms": "^7.6",
-        "dkd/php-cmis": "dev-master"
+        "dkd/php-cmis": "~1.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "1.*",
