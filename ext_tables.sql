@@ -8,6 +8,7 @@ CREATE TABLE `tx_cmisservice_queue` (
 
 CREATE TABLE `tx_cmisservice_identity` (
   `cmis_uuid` tinytext NOT NULL,
+  `cmis_version` varchar(8) NOT NULL DEFAULT '',
   `uid` int(11) NOT NULL auto_increment,
   `foreign_tablename` varchar(255) NOT NULL DEFAULT '',
   `foreign_uid` int(11) DEFAULT '0' NOT NULL,

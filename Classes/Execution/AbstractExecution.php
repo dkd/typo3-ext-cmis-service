@@ -5,6 +5,7 @@ use Dkd\CmisService\Error\DatabaseCallException;
 use Dkd\CmisService\Error\RecordNotFoundException;
 use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Task\TaskInterface;
+use TYPO3\CMS\Core\Database\DatabaseConnection;
 
 /**
  * Base class for Executions

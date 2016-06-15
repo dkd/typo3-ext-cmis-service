@@ -4,6 +4,7 @@ namespace Dkd\CmisService\Command;
 use Dkd\CmisService\Analysis\TableConfigurationAnalyzer;
 use Dkd\CmisService\Execution\Result;
 use Dkd\CmisService\Service\InteractionService;
+use Dkd\CmisService\Task\RecordImportTask;
 use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
 use Dkd\PhpCmis\Data\DocumentInterface;
 use Dkd\PhpCmis\Data\FolderInterface;
@@ -76,6 +77,103 @@ class CmisCommandController extends CommandController {
 	public function truncateIdentityStorageCommand() {
 		$result = $this->interactionService->truncateIdentities();
 		$this->echoResultToConsole($result);
+	}
+
+	/**
+	 * Generate Importing Tasks
+	 *
+	 * WARNING WARNING WARNING
+	 *
+	 * DO NOT RUN THIS BEFORE YOU HAVE RUN THE INDEXING TASKS!
+	 * RUNNING THIS TASK ON AN EMPTY IDENTITY CACHE CAUSES
+	 * DUPLICATES TO BE IMPORTED AND ASSOCIATED WITH THE CMIS
+	 * OBJECT. MAKE ABSOLUTELY SURE YOU HAVE INDEXED EVERY
+	 * MONITORED RECORD ON THE TYPO3 SITE BEFORE EXECUTING!
+	 * DRY MODE IS ON BY DEFAULT TO PREVENT ERRORS
+	 *
+	 * Generates importing tasks by walking the remote
+	 * CMIS server to detect new/un-indexed objects which
+	 * can be imported to the TYPO3 site as records. Scans
+	 * the CMIS site folder defined as site root, traverses
+	 * all sub-folders and scans all objects therein.
+	 *
+	 * Uses the reverse of the indexing configuration to
+	 * determine if an object type can be imported. If an
+	 * object can be imported, an import task is added to
+	 * the queue to be executed by the "picktask(s)" command.
+	 *
+	 * Importing updates the local UUID storage and attempts
+	 * to fill the TYPO3-specific model properties back in
+	 * the CMIS storage, turning the CMIS object into a fully
+	 * associated and indexed object.
+	 *
+	 * Dry running (no actual tasks created) can be enabled
+	 * but is disabled by default.
+	 *
+	 * @param string $table Table to import new CMIS objects into, or empty for all tables
+	 * @param boolean $dry If TRUE tasks will not be added to the queue for execution
+	 * @param boolean $verbose If TRUE outputs a list of all UUIDs detected for import
+	 * @return void
+	 */
+	public function generateImportingTasksCommand($table = NULL, $dry = TRUE, $verbose = FALSE) {
+		$this->response->setContent('Scanning CMIS site folder for new/un-indexed objects...' . PHP_EOL);
+		if ($table === NULL) {
+			$this->response->appendContent('Scanning for imports for all monitored tables' . PHP_EOL);
+		} else {
+			$this->response->appendContent(sprintf('Scanning for imports for table "%s"', $table) . PHP_EOL);
+		}
+		$this->response->send();
+		// collect tasks for tables so we can report and/or queue them
+		$tasks = $this->interactionService->createImportingTasks($table);
+		$numberOfTasks = count($tasks);
+		$numberOfTasksSuffix = $numberOfTasks != 1 ? 's' : '';
+		$this->response->setContent(
+			sprintf(
+				'Detected %d new or un-indexed CMIS object%s',
+				$numberOfTasks,
+				$numberOfTasksSuffix
+			) . PHP_EOL
+		);
+		if ($verbose) {
+			foreach ($tasks as $task) {
+				$this->response->appendContent(
+					sprintf('* %s -> %s',
+						$task->getParameter(RecordImportTask::OPTION_SOURCE),
+						$task->getParameter(RecordImportTask::OPTION_TABLE)
+					)
+				);
+			}
+		}
+		if (!$numberOfTasks) {
+			$this->response->appendContent('No import tasks need to be created' . PHP_EOL);
+			$this->response->send();
+			return;
+		}
+		$this->response->send();
+		if ($dry) {
+			$this->response->appendContent(
+				'WARNING! THIS ACTION CAUSES DUPLICATES TO BE IMPORTED AND FOREVER ASSOCIATED WITH THE CMIS ' . PHP_EOL .
+				'OBJECT. DO NOT RUN THIS COMMAND UNLESS YOU ARE ABSOLUTELY, 100% SURE YOU HAVE INDEXED' . PHP_EOL .
+				'EVERY SINGLE MONITORED RECORD ON THE TYPO3 SITE FIRST!' . PHP_EOL
+			);
+			$this->response->appendContent(
+				sprintf(
+					'Dry mode is ON - %d import task%s would have been created',
+					$numberOfTasks,
+					$numberOfTasksSuffix
+				) . PHP_EOL
+			);
+		} else {
+			$this->interactionService->addTasksToQueue($tasks);
+			$this->response->setContent(
+				sprintf(
+					'Added import task%s for %d record%s to queue',
+					$numberOfTasksSuffix,
+					$numberOfTasks,
+					$numberOfTasksSuffix
+				) . PHP_EOL
+			);
+		}
 	}
 
 	/**

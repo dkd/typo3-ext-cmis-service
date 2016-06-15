@@ -12,6 +12,7 @@ use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\SingletonInterface;
 use Dkd\CmisService\Error\RecordNotFoundException;
 use Dkd\CmisService\Error\DatabaseCallException;
+use Dkd\CmisService\Task\RecordImportTask;
 use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
 use Dkd\PhpCmis\Data\DocumentInterface;
 use Dkd\PhpCmis\Data\FolderInterface;
@@ -73,6 +74,46 @@ class CmisService implements SingletonInterface {
 	}
 
 	/**
+	 * Returns the record associated with the CMIS object
+	 * or NULL if no record can be found. If second argument
+	 * is TRUE the specific version of the CMIS object must
+	 * be matched or NULL is returned (indicating the CMIS
+	 * object needs to be imported - importing then is capable
+	 * of merging the existing record with new CMIS data).
+	 *
+	 * @param string $objectId
+	 * @param boolean $matchVersion
+	 * @return array|NULL
+	 */
+	public function getRecordForCmisUuid($objectId, $matchVersion = FALSE) {
+		if (strpos($objectId, ';')) {
+			list ($uuid, $version) = explode(';', $objectId);
+		} else {
+			$uuid = $objectId;
+			$version = '';
+		}
+		if ($matchVersion) {
+			$clause = sprintf("cmis_uuid = '%s' AND cmis_version = '%s'", $uuid, $version);
+		} else {
+			$clause = sprintf("cmis_uuid = '%s'", $uuid);
+		}
+		$identityRecord = $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+			'foreign_tablename,foreign_uid',
+			'tx_cmisservice_identity',
+			$clause
+		);
+		if (!$identityRecord) {
+			// Object is not yet mapped - early return NULL since we can't look for any original record next
+			return NULL;
+		}
+		return $this->getDatabaseConnection()->exec_SELECTgetSingleRow(
+			'*',
+			$identityRecord['foreign_tablename'],
+			sprintf('uid = %d', $identityRecord['foreign_uid'])
+		);
+	}
+
+	/**
 	 * Save a CMIS-generated UUID to the local storage.
 	 * The UUID can then be retrieved using getUuidForLocalRecord().
 	 *
@@ -82,11 +123,11 @@ class CmisService implements SingletonInterface {
 	 * @return void
 	 */
 	public function storeUuidLocallyForRecord($table, $uid, $objectId) {
-		$versionNeedle = strpos($objectId, ';');
-		if (FALSE !== $versionNeedle) {
-			$uuid = substr($objectId, 0, $versionNeedle);
+		if (strpos($objectId, ';')) {
+			list ($uuid, $version) = explode(';', $objectId);
 		} else {
 			$uuid = $objectId;
+			$version = '';
 		}
 		$record = $this->getIdentityStorageRecord($table, $uid);
 		if ($record) {
@@ -94,7 +135,8 @@ class CmisService implements SingletonInterface {
 				'tx_cmisservice_identity',
 				sprintf("foreign_uid = %d AND foreign_tablename = '%s'", $uid, $table),
 				array(
-					'cmis_uuid' => $uuid
+					'cmis_uuid' => $uuid,
+					'cmis_version' => $version
 				)
 			);
 		} else {
@@ -102,6 +144,7 @@ class CmisService implements SingletonInterface {
 				'tx_cmisservice_identity',
 				array(
 					'cmis_uuid' => $uuid,
+					'cmis_version' => $version,
 					'foreign_uid' => $uid,
 					'foreign_tablename' => $table
 				)
@@ -429,6 +472,24 @@ class CmisService implements SingletonInterface {
 			$this->logContexts
 		);
 		return $object;
+	}
+
+	/**
+	 * Queues an importing task to get create a TYPO3 record
+	 * based on a CMIS object. Resolves parent folder also
+	 * based on parent CMIS ID - which means that any object
+	 * you attempt to import *must* exist within the site root
+	 * associated with this TYPO3 site.
+	 *
+	 * Importing an object causes the record and object to
+	 * become associated and indexed by TYPO3 - so editing the
+	 * record in TYPO3 afterwards also updates the CMIS object.
+	 *
+	 * @param CmisObjectInterface $cmisObject
+	 * @return void
+	 */
+	public function queueObjectImport(CmisObjectInterface $cmisObject) {
+		
 	}
 
 	/**
