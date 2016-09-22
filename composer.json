@@ -1,5 +1,6 @@
 {
     "name": "dkd/cmis-service",
+    "version": "1.0.0",
     "type": "typo3-cms-extension",
     "description": "TYPO3 Extension CMIS Service",
     "keywords": ["cmis", "typo3"],
@@ -44,7 +45,7 @@
     ],
     "require": {
         "typo3/cms": "^7.6",
-        "dkd/php-cmis": "~1.0"
+        "dkd/php-cmis": "^1.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "1.*",
