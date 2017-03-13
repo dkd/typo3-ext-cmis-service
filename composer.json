@@ -43,9 +43,11 @@
             "role": "Developer"
         }
     ],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "require": {
         "typo3/cms": "^7.6",
-        "dkd/php-cmis": "^1.0"
+        "dkd/php-cmis": "~2.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "1.*",
@@ -55,5 +57,10 @@
         "typo3-ci/typo3cms": "*",
         "symfony/yaml": "~2.5.3",
         "psr/log": "1.0.*@dev"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.x-dev"
+        }
     }
 }

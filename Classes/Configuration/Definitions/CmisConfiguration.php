@@ -32,11 +32,9 @@ class CmisConfiguration extends AbstractConfigurationDefinition implements Confi
 	protected function createHttpInvoker($username, $password) {
 		return new Client(
 			array(
-				'defaults' => array(
-					'auth' => array(
-						$username,
-						$password
-					)
+				'auth' => array(
+					$username,
+					$password
 				)
 			)
 		);
