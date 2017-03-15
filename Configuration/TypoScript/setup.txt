@@ -123,11 +123,6 @@ plugin.tx_cmisservice.settings {
         }
         server = {$plugin.tx_cmisservice.settings.cmis.server}
     }
-    stanbol {
-        hostname = {$plugin.tx_cmisservice.settings.stanbol.hostname}
-        port = {$plugin.tx_cmisservice.settings.stanbol.port}
-    }
-
 }
 
 module.tx_cmisservice.settings < plugin.tx_cmisservice.settings

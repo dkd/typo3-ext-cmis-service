@@ -45,10 +45,4 @@ plugin.tx_cmisservice.settings {
         }
         server = default
     }
-    stanbol {
-        # Hostname of Stanbol semantic engine
-        hostname = localhost
-        # Port number of Stanbol semantic engine
-        port = 9090
-    }
 }

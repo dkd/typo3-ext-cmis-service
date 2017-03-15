@@ -17,7 +17,6 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 	const SCOPE_IMPLEMENTATION = 'implementation';
 	const SCOPE_TABLES = 'tables';
 	const SCOPE_CMIS = 'cmis';
-	const SCOPE_STANBOL = 'stanbol';
 
 	/**
 	 * @var ImplementationConfiguration
@@ -35,11 +34,6 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 	protected $cmisConfigurations = array();
 
 	/**
-	 * @var StanbolConfiguration
-	 */
-	protected $stanbolConfiguration;
-
-	/**
 	 * @var string
 	 */
 	protected $activeCmisServerConfigurationName = self::CMIS_DEFAULT_SERVER;
@@ -52,8 +46,7 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 		$this->initialize(
 			new ImplementationConfiguration(),
 			new TableConfiguration(),
-			new CmisConfiguration(),
-			new StanbolConfiguration()
+			new CmisConfiguration()
 		);
 	}
 
@@ -63,22 +56,19 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 	 *
 	 * @param ImplementationConfiguration $implementationConfiguration
 	 * @param TableConfiguration $tableConfiguration
-	 * @param NetworkConfiguration $networkConfiguration
 	 * @param CmisConfiguration $cmisConfiguration
-	 * @param StanbolConfiguration $stanbolConfiguration
 	 * @return void
 	 */
 	public function initialize(
 		ImplementationConfiguration $implementationConfiguration,
 		TableConfiguration $tableConfiguration,
-		CmisConfiguration $cmisConfiguration,
-		StanbolConfiguration $stanbolConfiguration) {
+		CmisConfiguration $cmisConfiguration
+    ) {
 		$this->implementationConfiguration = $implementationConfiguration;
 		$this->tableConfiguration = $tableConfiguration;
 		$this->cmisConfigurations = array(
 			self::CMIS_DEFAULT_SERVER => $cmisConfiguration
 		);
-		$this->stanbolConfiguration = $stanbolConfiguration;
 	}
 
 	/**
@@ -116,12 +106,8 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 			$configurationObject->setDefinitions((array) $definitions[self::SCOPE_CMIS]);
 			$this->cmisConfigurations[self::CMIS_DEFAULT_SERVER] = $configurationObject;
 		}
-		if (TRUE === isset($definitions[self::SCOPE_STANBOL])) {
-			$stanbol = (array) $definitions[self::SCOPE_STANBOL];
-		}
 		$this->implementationConfiguration->setDefinitions($implementation);
 		$this->tableConfiguration->setDefinitions($tables);
-		$this->stanbolConfiguration->setDefinitions($stanbol);
 	}
 
 	/**
@@ -171,15 +157,6 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 	}
 
 	/**
-	 * Get the ConfigurationDefinition describing Stanbol integration
-	 *
-	 * @return StanbolConfiguration
-	 */
-	public function getStanbolConfiguration() {
-		return $this->stanbolConfiguration;
-	}
-
-	/**
 	 * Get the ConfigurationDefinition describing table configurations
 	 *
 	 * @return TableConfiguration
@@ -200,7 +177,6 @@ class MasterConfiguration extends AbstractConfigurationDefinition implements Con
 		return array(
 			self::SCOPE_TABLES => $this->getTableConfiguration()->getDefinitions(),
 			self::SCOPE_IMPLEMENTATION => $this->getImplementationConfiguration()->getDefinitions(),
-			self::SCOPE_STANBOL => $this->getStanbolConfiguration()->getDefinitions(),
 			self::SCOPE_CMIS => array(
 				self::CMIS_OPTION_SERVER => $this->activeCmisServerConfigurationName,
 				self::CMIS_OPTION_SERVERS => $this->extractAllDefinitions($this->cmisConfigurations)
