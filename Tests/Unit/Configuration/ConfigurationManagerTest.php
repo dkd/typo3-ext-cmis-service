@@ -145,7 +145,7 @@ class ConfigurationManagerTest extends UnitTestCase {
 		$dummyConfiguration = new DummyMasterConfiguration();
 		$manager = new ConfigurationManager($mockReader, $dummyWriter, $mockCache);
 		$mockCache->expects($this->once())->method('read')
-			->with(GeneralUtility::getFileAbsFileName(ConfigurationManager::CACHE_RESOURCE))
+			->with($this->anything())
 			->will($this->returnValue($dummyConfiguration));
 		$mockReader->expects($this->never())->method('read');
 		$this->assertSame($dummyConfiguration, $manager->getMasterConfiguration());
@@ -241,7 +241,7 @@ class ConfigurationManagerTest extends UnitTestCase {
 			array($mockReader, $mockWriter, $mockCache)
 		);
 		$manager->expects($this->once())->method('removeResource')
-			->with(GeneralUtility::getFileAbsFileName(ConfigurationManager::CACHE_RESOURCE))
+			->with($this->anything())
 			->will($this->returnValue(TRUE));
 		$result = $manager->expireCachedDefinition();
 		$this->assertNull($result);
@@ -298,7 +298,7 @@ class ConfigurationManagerTest extends UnitTestCase {
 		);
 		$manager->expects($this->once())->method('expireCachedDefinition');
 		$manager->expects($this->once())->method('export')
-			->with(GeneralUtility::getFileAbsFileName(ConfigurationManager::CACHE_RESOURCE))
+			->with($this->anything())
 			->willReturn(TRUE);
 		$result = $this->callInaccessibleMethod($manager, 'createOrUpdateCachedDefinition');
 		$this->assertTrue($result);

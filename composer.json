@@ -46,7 +46,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "typo3/cms": "^7.6",
+        "typo3/cms": "^7.6|^8",
         "dkd/php-cmis": "~2.0"
     },
     "require-dev": {

@@ -1,7 +1,6 @@
 <?php
 namespace Dkd\CmisService\Hook;
 
-use Dkd\CmisService\Configuration\ConfigurationManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
@@ -16,7 +15,9 @@ class ClearCacheListener extends AbstractListener {
 	 * @return void
 	 */
 	public function clearCacheCommand($command) {
-		$cachedConfigurationFile = GeneralUtility::getFileAbsFileName(ConfigurationManager::CACHE_RESOURCE);
+		$cachedConfigurationFile = GeneralUtility::getFileAbsFileName(
+		    $this->getObjectFactory()->getConfigurationManager()->getCachedResourceIdentifier()
+        );
 		if (TRUE === file_exists($cachedConfigurationFile)) {
 			unlink($cachedConfigurationFile);
 		}

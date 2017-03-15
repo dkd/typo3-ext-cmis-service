@@ -4,8 +4,10 @@ namespace Dkd\CmisService\Configuration;
 use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
 use Dkd\CmisService\Configuration\Reader\ConfigurationReaderInterface;
 use Dkd\CmisService\Configuration\Writer\ConfigurationWriterInterface;
+use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
+use function version_compare;
 
 /**
  * Configuration Manager
@@ -59,7 +61,7 @@ use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
  */
 class ConfigurationManager {
 
-	const CACHE_RESOURCE = 'typo3temp/Cache/Code/cmis-service-cache.yaml';
+	const CACHE_RESOURCE = '%s/Cache/Code/cmis-service-cache.yaml';
 	const MASTER_RESOURCE = 'plugin.tx_cmisservice.settings';
 
 	/**
@@ -145,7 +147,7 @@ class ConfigurationManager {
 	public function getMasterConfiguration() {
 		if (FALSE === $this->masterConfiguration instanceof MasterConfiguration) {
 			$definitionClassName = 'Dkd\\CmisService\\Configuration\\Definitions\\MasterConfiguration';
-			$cachedResource = GeneralUtility::getFileAbsFileName(self::CACHE_RESOURCE);
+			$cachedResource = GeneralUtility::getFileAbsFileName($this->getCachedResourceIdentifier());
 			if (TRUE === $this->cache instanceof ConfigurationReaderInterface && TRUE === $this->cache->exists($cachedResource)) {
 				$this->masterConfiguration = $this->cache->read($cachedResource, $definitionClassName);
 			} else {
@@ -188,7 +190,7 @@ class ConfigurationManager {
 		if (FALSE === $this->cache instanceof ConfigurationReaderInterface) {
 			return NULL;
 		}
-		$this->removeResource(GeneralUtility::getFileAbsFileName(self::CACHE_RESOURCE));
+		$this->removeResource(GeneralUtility::getFileAbsFileName($this->getCachedResourceIdentifier()));
 		return NULL;
 	}
 
@@ -209,7 +211,7 @@ class ConfigurationManager {
 		) {
 			return NULL;
 		}
-		$cachedResourceIdentifier = GeneralUtility::getFileAbsFileName(self::CACHE_RESOURCE);
+		$cachedResourceIdentifier = GeneralUtility::getFileAbsFileName($this->getCachedResourceIdentifier());
 		$currentChecksum = $this->reader->checksum(self::MASTER_RESOURCE);
 		$cachedChecksum = $this->cache->checksum($cachedResourceIdentifier);
 		if ($cachedChecksum !== $currentChecksum) {
@@ -223,11 +225,26 @@ class ConfigurationManager {
 	 * Removes a resource if it exists. Returns TRUE if the file
 	 * was removed or if it did not already exist.
 	 *
-	 * @param string $file
+	 * @param string $resourceIdentifier
 	 * @return boolean
 	 */
 	protected function removeResource($resourceIdentifier) {
 		return file_exists($resourceIdentifier) ? unlink($resourceIdentifier) : TRUE;
 	}
+
+    /**
+     * @return string
+     */
+	public function getCachedResourceIdentifier()
+    {
+        return sprintf(
+            self::CACHE_RESOURCE,
+            version_compare(
+                ExtensionManagementUtility::getExtensionVersion('core'),
+                8,
+                '>='
+            ) ? 'typo3temp/var' : 'typo3temp'
+        );
+    }
 
 }

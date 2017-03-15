@@ -50,7 +50,7 @@ class SimpleQueue implements QueueInterface, QueueCachableInterface {
 	// Constants from Locker::FOOBAR possible, empty string for sys default
 	const LOCK_METHOD = '';
 	const LOCK_ID = 'dkd.cmisservice.queueLock';
-	const MAX_LOCK_WAIT = 120;
+	const MAX_LOCK_WAIT = 20;
 	const CACHE_IDENTITY = 'SimpleQueue';
 
 	/**
