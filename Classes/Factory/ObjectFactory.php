@@ -6,7 +6,6 @@ use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
 use Dkd\CmisService\Resolving\UUIDResolver;
 use Dkd\CmisService\Service\CmisService;
 use Psr\Log\LoggerInterface;
-use TYPO3\CMS\Core\Log\LogManager;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
 use TYPO3\CMS\Extbase\ObjectManagerInterface;

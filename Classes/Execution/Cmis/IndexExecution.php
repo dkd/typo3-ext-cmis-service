@@ -8,14 +8,11 @@ use Dkd\CmisService\Constants;
 use Dkd\CmisService\Execution\Exception;
 use Dkd\CmisService\Execution\ExecutionInterface;
 use Dkd\CmisService\Execution\Result;
-use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Service\RenderingService;
 use Dkd\CmisService\Task\RecordIndexTask;
 use Dkd\CmisService\Task\TaskInterface;
 use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
 use Dkd\PhpCmis\Data\DocumentInterface;
-use Dkd\PhpCmis\Data\FolderInterface;
-use Dkd\PhpCmis\Data\RelationshipInterface;
 use Dkd\PhpCmis\Exception\CmisContentAlreadyExistsException;
 use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
 use Dkd\PhpCmis\PropertyIds;
@@ -74,7 +71,6 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 	 * @throws Exception
 	 */
 	public function execute(TaskInterface $task) {
-		$objectFactory = new ObjectFactory();
 		/** @var RecordIndexTask $task */
 		$this->result = $this->createResultObject();
 		$fields = (array) $task->getParameter(RecordIndexTask::OPTION_FIELDS);
@@ -107,10 +103,6 @@ class IndexExecution extends AbstractCmisExecution implements ExecutionInterface
 				$data[$fieldName] = $this->performTextExtraction($table, $fieldName, $record);
 			}
 			$cmisPropertyValues = $this->remapFieldsToDocumentProperties($data, $recordAnalyzer);
-			$existingChild = $this->getCmisService()->resolveChildByName(
-				$document->getParents()[0],
-				$cmisPropertyValues[PropertyIds::NAME]
-			);
 			$this->event(self::EVENT_MAPPED, $task, array('object' => $document, 'source' => $fields, 'properties' => $data));
 			$this->event(self::EVENT_SAVE, $task, array('object' => $document));
 			try {

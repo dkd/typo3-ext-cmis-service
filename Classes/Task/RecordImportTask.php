@@ -2,7 +2,6 @@
 namespace Dkd\CmisService\Task;
 
 use Dkd\CmisService\Factory\ExecutionFactory;
-use Dkd\CmisService\Execution\ExecutionInterface;
 
 /**
  * Class RecordImportTask

@@ -5,8 +5,6 @@ use Dkd\CmisService\Execution\AbstractExecution;
 use Dkd\CmisService\Factory\CmisObjectFactory;
 use Dkd\CmisService\Resolving\UUIDResolver;
 use Dkd\CmisService\Service\CmisService;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
-use TYPO3\CMS\Core\Utility\ClassNamingUtility;
 
 /**
  * Class AbstractCmisExecution

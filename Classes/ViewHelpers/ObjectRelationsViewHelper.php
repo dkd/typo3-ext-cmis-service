@@ -4,7 +4,6 @@ namespace Dkd\CmisService\ViewHelpers;
 use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\PhpCmis\Data\DocumentInterface;
 use Dkd\PhpCmis\Data\FolderInterface;
-use Dkd\PhpCmis\Data\RelationshipInterface;
 use Dkd\PhpCmis\Enum\RelationshipDirection;
 use Dkd\PhpCmis\SessionInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;

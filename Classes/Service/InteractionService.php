@@ -15,12 +15,8 @@ use Dkd\CmisService\SingletonInterface;
 use Dkd\CmisService\Task\RecordImportTask;
 use Dkd\CmisService\Task\TaskInterface;
 use Dkd\PhpCmis\Data\FolderInterface;
-use Dkd\PhpCmis\Definitions\TypeDefinitionInterface;
 use Dkd\PhpCmis\Exception\CmisRuntimeException;
-use Dkd\PhpCmis\SessionInterface;
 use TYPO3\CMS\Core\Database\DatabaseConnection;
-use TYPO3\CMS\Core\Log\LogManager;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Frontend\Page\PageRepository;
 
 /**

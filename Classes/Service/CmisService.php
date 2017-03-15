@@ -6,22 +6,21 @@ use Dkd\CmisService\Analysis\RecordAnalyzer;
 use Dkd\CmisService\Configuration\Definitions\CmisConfiguration;
 use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
 use Dkd\CmisService\Constants;
+use Dkd\CmisService\Error\DatabaseCallException;
+use Dkd\CmisService\Error\RecordNotFoundException;
 use Dkd\CmisService\Execution\Exception;
 use Dkd\CmisService\Factory\CmisObjectFactory;
 use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\SingletonInterface;
-use Dkd\CmisService\Error\RecordNotFoundException;
-use Dkd\CmisService\Error\DatabaseCallException;
-use Dkd\CmisService\Task\RecordImportTask;
 use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
 use Dkd\PhpCmis\Data\DocumentInterface;
 use Dkd\PhpCmis\Data\FolderInterface;
+use Dkd\PhpCmis\Data\ObjectIdInterface;
 use Dkd\PhpCmis\DataObjects\DocumentTypeDefinition;
 use Dkd\PhpCmis\DataObjects\FolderTypeDefinition;
 use Dkd\PhpCmis\Definitions\TypeDefinitionInterface;
 use Dkd\PhpCmis\Exception\CmisContentAlreadyExistsException;
 use Dkd\PhpCmis\Exception\CmisObjectNotFoundException;
-use Dkd\PhpCmis\Exception\CmisRuntimeException;
 use Dkd\PhpCmis\PropertyIds;
 use Dkd\PhpCmis\SessionInterface;
 use GuzzleHttp\Stream\Stream;
@@ -192,7 +191,6 @@ class CmisService implements SingletonInterface {
 	 * @return array
 	 */
 	public function resolveSecondaryObjectTypesForTableAndUid($table, $uid) {
-		$session = $this->getCmisObjectFactory()->getSession();
 		$types = $this->getObjectFactory()->getConfiguration()->getTableConfiguration()->getSingleSecondaryTypes($table);
 		array_unshift($types, Constants::CMIS_DOCUMENT_TYPE_MAIN_ASPECT);
 		return $types;
@@ -206,7 +204,6 @@ class CmisService implements SingletonInterface {
 	 * the properties required for saving in CMIS without
 	 * causing errors about missing values.
 	 *
-	 * @param CmisObjectInterface $document
 	 * @param string $table
 	 * @param integer $uid
 	 * @return array
@@ -261,7 +258,7 @@ class CmisService implements SingletonInterface {
 	 *
 	 * @param string $table
 	 * @param integer $uid
-	 * @return DocumentInterface
+	 * @return CmisObjectInterface
 	 */
 	public function resolveObjectByTableAndUid($table, $uid) {
 		$session = $this->getCmisObjectFactory()->getSession();
@@ -329,7 +326,7 @@ class CmisService implements SingletonInterface {
 	 * Gets, and creates if missing, a default Site
 	 * folder based on the hostname of the current host.
 	 *
-	 * @return CmisObjectInterface|NULL
+	 * @return FolderInterface|NULL
 	 */
 	public function getAndAutoCreateDefaultSiteFolder() {
 		$session = $this->getCmisObjectFactory()->getSession();
@@ -349,6 +346,7 @@ class CmisService implements SingletonInterface {
 				PropertyIds::OBJECT_TYPE_ID => Constants::CMIS_DOCUMENT_TYPE_SITE,
 				PropertyIds::SECONDARY_OBJECT_TYPE_IDS => $this->resolveSecondaryObjectTypesForTableAndUid('sys_domain', 0)
 			), $sitesParentFolder);
+			/** @var FolderInterface $parentFolder */
 			$parentFolder = $session->getObject($createdFolder);
 		}
 		return $parentFolder;
@@ -489,7 +487,7 @@ class CmisService implements SingletonInterface {
 	 * @return void
 	 */
 	public function queueObjectImport(CmisObjectInterface $cmisObject) {
-		
+
 	}
 
 	/**
@@ -500,7 +498,7 @@ class CmisService implements SingletonInterface {
 	 * @param string $table The name of the table in TCA
 	 * @param integer $uid The UID of the record on the TYPO3 side
 	 * @param array $properties Properties to set; if NULL resolved from table/uid
-	 * @return ObjectIdInterface
+	 * @return CmisObjectInterface
 	 */
 	public function createCmisObject(FolderInterface $folder, $table, $uid, array $properties = NULL) {
 		if (NULL === $properties) {
@@ -513,9 +511,7 @@ class CmisService implements SingletonInterface {
 		}
 
 		$primaryType = $this->resolvePrimaryObjectTypeForTableAndUid($table, $uid);
-
 		$properties[PropertyIds::NAME] = $this->sanitizeTitle($properties[PropertyIds::NAME], $table . '-' . $uid);
-		$properties[PropertyIds::OBJECT_TYPE_ID] = $primaryType->getId();
 
 		try {
 			$objectId = $this->createByTypeInFolder($folder, $primaryType, $properties);
@@ -536,6 +532,7 @@ class CmisService implements SingletonInterface {
 	 * @param FolderInterface $folder
 	 * @param TypeDefinitionInterface $primaryType
 	 * @param array $properties
+     * @return ObjectIdInterface
 	 */
 	protected function createByTypeInFolder(FolderInterface $folder, TypeDefinitionInterface $primaryType, array $properties) {
 		$session = $this->getCmisObjectFactory()->getSession();
@@ -552,7 +549,6 @@ class CmisService implements SingletonInterface {
 	/**
 	 * @param FolderInterface $folder
 	 * @param string $name
-	 * @param string $documentType
 	 * @return CmisObjectInterface|NULL
 	 */
 	public function resolveChildByName(FolderInterface $folder, $name) {

@@ -2,7 +2,6 @@
 namespace Dkd\CmisService\ViewHelpers;
 
 use Dkd\CmisService\Factory\ObjectFactory;
-use Dkd\PhpCmis\Enum\RelationshipDirection;
 use Dkd\PhpCmis\SessionInterface;
 use TYPO3\CMS\Fluid\Core\ViewHelper\AbstractViewHelper;
 

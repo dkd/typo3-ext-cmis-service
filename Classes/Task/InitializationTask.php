@@ -1,8 +1,8 @@
 <?php
 namespace Dkd\CmisService\Task;
 
-use Dkd\CmisService\Factory\ExecutionFactory;
 use Dkd\CmisService\Execution\ExecutionInterface;
+use Dkd\CmisService\Factory\ExecutionFactory;
 
 /**
  * Class InitializationTask

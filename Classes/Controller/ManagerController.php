@@ -2,9 +2,7 @@
 namespace Dkd\CmisService\Controller;
 
 use Dkd\CmisService\Execution\Result;
-use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\Service\InteractionService;
-use TYPO3\CMS\Core\Database\DatabaseConnection;
 use TYPO3\CMS\Core\Messaging\FlashMessage;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 

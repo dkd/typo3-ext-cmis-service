@@ -9,7 +9,6 @@ use Dkd\CmisService\Task\RecordImportTask;
 use Dkd\CmisService\Task\TaskInterface;
 use Dkd\PhpCmis\CmisObject\CmisObjectInterface;
 use Dkd\PhpCmis\Data\FileableCmisObjectInterface;
-use Dkd\PhpCmis\Data\ItemInterface;
 
 /**
  * Class ImportExecution

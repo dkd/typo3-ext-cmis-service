@@ -1,7 +1,6 @@
 <?php
 namespace Dkd\CmisService\Service;
 
-use Dkd\CmisService\Constants;
 use Dkd\CmisService\Factory\ObjectFactory;
 use Dkd\CmisService\SingletonInterface;
 use TYPO3\CMS\Core\Database\DatabaseConnection;

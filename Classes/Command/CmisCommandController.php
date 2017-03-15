@@ -1,7 +1,6 @@
 <?php
 namespace Dkd\CmisService\Command;
 
-use Dkd\CmisService\Analysis\TableConfigurationAnalyzer;
 use Dkd\CmisService\Execution\Result;
 use Dkd\CmisService\Service\InteractionService;
 use Dkd\CmisService\Task\RecordImportTask;
