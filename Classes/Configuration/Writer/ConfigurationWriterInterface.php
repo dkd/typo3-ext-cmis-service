@@ -20,4 +20,5 @@ interface ConfigurationWriterInterface extends ConfigurationResourceConsumerInte
 	 */
 	public function write(ConfigurationDefinitionInterface $configuration, $resourceIdentifier);
 
+	public function remove($resourceIdentifier);
 }

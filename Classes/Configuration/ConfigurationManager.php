@@ -4,10 +4,8 @@ namespace Dkd\CmisService\Configuration;
 use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
 use Dkd\CmisService\Configuration\Reader\ConfigurationReaderInterface;
 use Dkd\CmisService\Configuration\Writer\ConfigurationWriterInterface;
-use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Reflection\ObjectAccess;
-use function version_compare;
 
 /**
  * Configuration Manager
@@ -50,18 +48,13 @@ use function version_compare;
  *      has a checksum different than current definition,
  *      $writer is told to write target on lifecycle end.
  *
- * Note: since this behavior is governed by system settings
- * it is possible to let the Production environment not
- * use any caching or writing but simply read from a small
- * static YAML file with L1 caching only, for optimal speed.
- *
  * Note: since this class is a Singleton, constructor
  * parameters are only respected when the first instance is
  * created and ignored for all others.
  */
 class ConfigurationManager {
 
-	const CACHE_RESOURCE = '%s/Cache/Code/cmis-service-cache.yaml';
+	const CACHE_RESOURCE = 'cmis-server-cache';
 	const MASTER_RESOURCE = 'plugin.tx_cmisservice.settings';
 
 	/**
@@ -147,7 +140,7 @@ class ConfigurationManager {
 	public function getMasterConfiguration() {
 		if (FALSE === $this->masterConfiguration instanceof MasterConfiguration) {
 			$definitionClassName = 'Dkd\\CmisService\\Configuration\\Definitions\\MasterConfiguration';
-			$cachedResource = GeneralUtility::getFileAbsFileName($this->getCachedResourceIdentifier());
+			$cachedResource = $this->getCachedResourceIdentifier();
 			if (TRUE === $this->cache instanceof ConfigurationReaderInterface && TRUE === $this->cache->exists($cachedResource)) {
 				$this->masterConfiguration = $this->cache->read($cachedResource, $definitionClassName);
 			} else {
@@ -174,7 +167,6 @@ class ConfigurationManager {
 			throw new \RuntimeException('Cannot export configuration - no ConfigurationWriter configured', 1409181458);
 		}
 		$definition = $this->getMasterConfiguration();
-		$targetResourceIdentifier = GeneralUtility::getFileAbsFileName($targetResourceIdentifier);
 		return $this->writer->write($definition, $targetResourceIdentifier);
 	}
 
@@ -187,20 +179,15 @@ class ConfigurationManager {
 	 * @return NULL
 	 */
 	public function expireCachedDefinition() {
-		if (FALSE === $this->cache instanceof ConfigurationReaderInterface) {
+		if (FALSE === $this->cache instanceof ConfigurationWriterInterface) {
 			return NULL;
 		}
-		$this->removeResource(GeneralUtility::getFileAbsFileName($this->getCachedResourceIdentifier()));
+        $this->cache->remove($this->getCachedResourceIdentifier());
 		return NULL;
 	}
 
 	/**
 	 * Creates or updates (if required) the cached representation.
-	 * Returns NULL if no operation was performed. Returns TRUE if
-	 * cached definition was updated successfully. Returns FALSE if
-	 * some (silent) error occurred during writing, or if writing
-	 * was skipped by the Writer but not due to checksum mismatch.
-	 * On FALSE, further errors will have been logged.
 	 *
 	 * @return boolean|NULL
 	 */
@@ -211,25 +198,9 @@ class ConfigurationManager {
 		) {
 			return NULL;
 		}
-		$cachedResourceIdentifier = GeneralUtility::getFileAbsFileName($this->getCachedResourceIdentifier());
-		$currentChecksum = $this->reader->checksum(self::MASTER_RESOURCE);
-		$cachedChecksum = $this->cache->checksum($cachedResourceIdentifier);
-		if ($cachedChecksum !== $currentChecksum) {
-			$this->expireCachedDefinition();
-			return $this->export($cachedResourceIdentifier);
-		}
-		return NULL;
-	}
-
-	/**
-	 * Removes a resource if it exists. Returns TRUE if the file
-	 * was removed or if it did not already exist.
-	 *
-	 * @param string $resourceIdentifier
-	 * @return boolean
-	 */
-	protected function removeResource($resourceIdentifier) {
-		return file_exists($resourceIdentifier) ? unlink($resourceIdentifier) : TRUE;
+		$cachedResourceIdentifier = $this->getCachedResourceIdentifier();
+        $this->expireCachedDefinition();
+        return $this->export($cachedResourceIdentifier);
 	}
 
     /**
@@ -237,14 +208,6 @@ class ConfigurationManager {
      */
 	public function getCachedResourceIdentifier()
     {
-        return sprintf(
-            self::CACHE_RESOURCE,
-            version_compare(
-                ExtensionManagementUtility::getExtensionVersion('core'),
-                8,
-                '>='
-            ) ? 'typo3temp/var' : 'typo3temp'
-        );
+        return self::CACHE_RESOURCE;
     }
-
 }

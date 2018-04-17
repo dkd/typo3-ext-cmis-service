@@ -18,7 +18,7 @@
     "repositories": [
         {
             "type": "composer",
-            "url": "http://composer.typo3.org/"
+            "url": "https://composer.typo3.org/"
         },
         {
             "url": "https://github.com/dkd/php-cmis-client.git",

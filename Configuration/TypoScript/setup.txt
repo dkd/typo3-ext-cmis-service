@@ -108,21 +108,6 @@ plugin.tx_cmisservice.settings {
             }
         }
     }
-
-    # Configuration for services: CMIS and Stanbol
-    cmis {
-        servers {
-            default {
-                bindingType = {$plugin.tx_cmisservice.settings.cmis.servers.default.bindingType}
-                url = {$plugin.tx_cmisservice.settings.cmis.servers.default.url}
-                username = {$plugin.tx_cmisservice.settings.cmis.servers.default.username}
-                password = {$plugin.tx_cmisservice.settings.cmis.servers.default.password}
-                contentRepositoryId = {$plugin.tx_cmisservice.settings.cmis.servers.default.contentRepositoryId}
-                root = {$plugin.tx_cmisservice.settings.cmis.servers.default.root}
-            }
-        }
-        server = {$plugin.tx_cmisservice.settings.cmis.server}
-    }
 }
 
 module.tx_cmisservice.settings < plugin.tx_cmisservice.settings

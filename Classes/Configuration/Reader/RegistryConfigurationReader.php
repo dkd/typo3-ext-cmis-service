@@ -2,31 +2,20 @@
 namespace Dkd\CmisService\Configuration\Reader;
 
 use Dkd\CmisService\Configuration\Definitions\ConfigurationDefinitionInterface;
-use Symfony\Component\Yaml\Yaml;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 /**
- * YAML Configuration Reader
+ * Registry Configuration Reader
  *
  * Reads Configuration Definitions from data stored
- * in a YAML file.
+ * in the TYPO3 registry.
  */
-class YamlConfigurationReader implements ConfigurationReaderInterface {
+class RegistryConfigurationReader implements ConfigurationReaderInterface {
+
+    const REGISTRY_NAMESPACE = 'cmis_service';
+    const CHANGE_DATE_KEY = 'changeDate';
 
 	/**
-	 * Load the specified resource into the reader.
-	 * Note that all Reader implementations may not
-	 * support every possible stream/record identification
-	 * format - consult the documentation for each Reader
-	 * implementation for a list of supported streams.
-	 *
-	 * Developer note: this method must be kept in perfect
-	 * sync with ConfigurationResourceConsumerInterface::read
-	 * and normal practice is for a Reader to also implement
-	 * the Consumer interface to let it serve a dual purpose
-	 * of reading as well as stat'ing configurations by their
-	 * identifier name.
-	 *
 	 * @param string $resourceIdentifier
 	 * @param string $definitionClassName
 	 * @return ConfigurationDefinitionInterface
@@ -36,10 +25,11 @@ class YamlConfigurationReader implements ConfigurationReaderInterface {
 			throw new \RuntimeException('Configuration definition class "' . $definitionClassName . '" must implement interface ' .
 				'"Dkd\\CmisService\\Configuration\\Definitions\\ConfigurationDefinitionInterface"', 1409923995);
 		}
-		$yamlArray = (array) Yaml::parse(file_get_contents(GeneralUtility::getFileAbsFileName($resourceIdentifier)));
+
+		$data = $this->getRegistry()->get(self::REGISTRY_NAMESPACE, $resourceIdentifier);
 		/** @var ConfigurationDefinitionInterface $definition */
 		$definition = new $definitionClassName();
-		$definition->setDefinitions($yamlArray);
+		$definition->setDefinitions($data);
 		return $definition;
 	}
 
@@ -51,7 +41,7 @@ class YamlConfigurationReader implements ConfigurationReaderInterface {
 	 * @return boolean
 	 */
 	public function exists($resourceIdentifier) {
-		return TRUE === file_exists(GeneralUtility::getFileAbsFileName($resourceIdentifier));
+		return [] !== $this->getRegistry()->get(self::REGISTRY_NAMESPACE, $resourceIdentifier, []);
 	}
 
 	/**
@@ -63,7 +53,7 @@ class YamlConfigurationReader implements ConfigurationReaderInterface {
 	 * @return string
 	 */
 	public function checksum($resourceIdentifier) {
-		return sha1(GeneralUtility::getFileAbsFileName($resourceIdentifier));
+		return sha1($resourceIdentifier);
 	}
 
 	/**
@@ -75,6 +65,20 @@ class YamlConfigurationReader implements ConfigurationReaderInterface {
 	 * @return \DateTime
 	 */
 	public function lastModified($resourceIdentifier) {
-		return \DateTime::createFromFormat('U', filemtime(GeneralUtility::getFileAbsFileName($resourceIdentifier)));
+        $data = $this->getRegistry()->get(self::REGISTRY_NAMESPACE, $resourceIdentifier);
+        if (!empty($data[self::CHANGE_DATE_KEY])) {
+            $date = $data[self::CHANGE_DATE_KEY];
+        } else {
+            $date = time() - 31557600;
+        }
+        return \DateTime::createFromFormat('U', $date);
 	}
+
+	/**
+	 * @return \TYPO3\CMS\Core\Registry
+	 */
+	protected function getRegistry() {
+		return GeneralUtility::makeInstance('TYPO3\\CMS\\Core\\Registry');
+	}
+
 }
