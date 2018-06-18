@@ -23,10 +23,29 @@ class YamlConfigurationWriter extends YamlConfigurationReader implements Configu
 	 * @param string $resourceIdentifier
 	 * @return boolean
 	 */
-	public function write(ConfigurationDefinitionInterface $configuration, $resourceIdentifier) {
+	public function write(ConfigurationDefinitionInterface $configuration, $identifier) {
 		$array = $configuration->getDefinitions();
 		$yamlFileContents = Yaml::dump($array);
-		return GeneralUtility::writeFile($resourceIdentifier, $yamlFileContents);
+		return GeneralUtility::writeFile(GeneralUtility::getFileAbsFileName($identifier), $yamlFileContents);
 	}
+
+    /**
+     * @param string $identifier
+     */
+	public function remove($identifier) {
+        $this->removeResource(GeneralUtility::getFileAbsFileName($identifier));
+    }
+
+    /**
+     * Removes a resource if it exists. Returns TRUE if the file
+     * was removed or if it did not already exist.
+     *
+     * @param string $resourceIdentifier
+     * @return boolean
+     */
+    protected function removeResource($resourceIdentifier) {
+        $resourceIdentifier = GeneralUtility::getFileAbsFileName($resourceIdentifier);
+        return file_exists($resourceIdentifier) ? unlink($resourceIdentifier) : TRUE;
+    }
 
 }

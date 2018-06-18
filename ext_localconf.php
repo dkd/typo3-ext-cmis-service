@@ -9,7 +9,5 @@ $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['proc
 	= 'Dkd\\CmisService\\Hook\\DataHandlerListener';
 $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['moveRecordClass'][]
 	= 'Dkd\\CmisService\\Hook\\DataHandlerListener';
-$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['t3lib/class.t3lib_tcemain.php']['clearCachePostProc'][]
-	= 'Dkd\\CmisService\\Hook\\ClearCacheListener->clearCacheCommand';
 
 \TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin('Dkd.CmisService', 'Renderer', array('Render' => 'render'));

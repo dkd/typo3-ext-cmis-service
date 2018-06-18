@@ -23,4 +23,7 @@ if (TYPO3_MODE === 'BE') {
 			'inheritNavigationComponentFromMainModule' => FALSE
 		)
 	);
+
+    // register Clear Cache Menu hook
+    $GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['additionalBackendItems']['cacheActions']['clearCmisServiceConnectionCache'] = \Dkd\CmisService\ConnectionManager::class;
 }

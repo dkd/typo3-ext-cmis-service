@@ -3,12 +3,11 @@ namespace Dkd\CmisService\Factory;
 
 use Dkd\CmisService\Configuration\ConfigurationManager;
 use Dkd\CmisService\Configuration\Definitions\MasterConfiguration;
-use Dkd\CmisService\Resolving\UUIDResolver;
 use Dkd\CmisService\Service\CmisService;
 use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface;
-use TYPO3\CMS\Extbase\ObjectManagerInterface;
+use TYPO3\CMS\Extbase\Object\ObjectManagerInterface;
 
 /**
  * Object Factory
@@ -89,10 +88,9 @@ class ObjectFactory {
 	 */
 	public function getConfigurationManager() {
 		if (NULL === self::$configurationManager) {
-			$managerClassName = $this->getConfigurationManagerClassName();
 			$readerClassName = $this->getConfigurationReaderClassName();
 			$writerClassName = $this->getConfigurationWriterClassName();
-			$cacheClassName = $this->getConfigurationReaderCacheClassName();
+			$cacheClassName = $this->getConfigurationWriterCacheClassName();
 			$writer = $cache = NULL;
 			$reader = $this->makeInstance($readerClassName);
 			if (NULL !== $writerClassName) {
@@ -227,7 +225,7 @@ class ObjectFactory {
 	 * @return string|NULL
 	 */
 	protected function getConfigurationWriterClassName() {
-		return 'Dkd\\CmisService\\Configuration\\Writer\\YamlConfigurationWriter';
+		return 'Dkd\\CmisService\\Configuration\\Writer\\RegistryConfigurationWriter';
 	}
 
 	/**
@@ -236,8 +234,8 @@ class ObjectFactory {
 	 *
 	 * @return string|NULL
 	 */
-	protected function getConfigurationReaderCacheClassName() {
-		return 'Dkd\\CmisService\\Configuration\\Reader\\YamlConfigurationReader';
+	protected function getConfigurationWriterCacheClassName() {
+		return 'Dkd\\CmisService\\Configuration\\Writer\\RegistryConfigurationWriter';
 	}
 
 }
